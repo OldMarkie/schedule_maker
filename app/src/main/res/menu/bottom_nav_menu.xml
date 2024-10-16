@@ -1,0 +1,14 @@
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+    <item
+        android:id="@+id/nav_add_event"
+        android:icon="@drawable/ic_add_event"
+        android:title="Add Event" />
+    <item
+        android:id="@+id/nav_view_events"
+        android:icon="@drawable/ic_view_events"
+        android:title="View Events" />
+    <item
+        android:id="@+id/nav_settings"
+        android:icon="@drawable/ic_settings"
+        android:title="Settings" />
+</menu>
