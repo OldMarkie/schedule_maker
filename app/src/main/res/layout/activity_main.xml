@@ -6,6 +6,29 @@
     android:gravity="center"
     android:padding="16dp">
 
+
+    <!-- Title of the page -->
+    <TextView
+        android:id="@+id/pageTitle"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Home"
+        android:textSize="24sp"
+        android:textStyle="bold"
+        android:layout_gravity="center" />
+
+    <!-- Content of the activity -->
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Welcome to the Home Page"
+        android:layout_gravity="center" />
+
+    <Space
+        android:layout_width="match_parent"
+        android:layout_height="20dp"
+        android:layout_weight="0" />
+
     <!-- Digital Clock at the top-center of the screen -->
     <TextView
         android:id="@+id/digitalClock"
@@ -14,6 +37,25 @@
         android:textSize="40sp"
         android:textStyle="bold"
         android:text="00:00:00" />
+
+    <!-- Current day below the clock -->
+    <TextView
+        android:id="@+id/currentDay"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textSize="30sp"
+        android:textStyle="bold"
+        android:text="Friday"
+        android:layout_marginTop="8dp" />
+
+    <!-- Current date (month, day, year) below the day -->
+    <TextView
+        android:id="@+id/currentDate"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textSize="20sp"
+        android:text="Jan 1, 2025"
+        android:layout_marginTop="4dp" />
 
     <!-- Latest schedule displayed below the clock -->
     <TextView

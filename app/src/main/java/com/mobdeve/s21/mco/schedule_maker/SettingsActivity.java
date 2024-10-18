@@ -1,77 +1,53 @@
 package com.mobdeve.s21.mco.schedule_maker;
-import android.content.SharedPreferences;
+
+import android.content.Intent;
 import android.os.Bundle;
 import androidx.appcompat.app.AppCompatActivity;
-import android.widget.CompoundButton;
-import android.widget.Switch;
-import android.widget.Toast;
+import com.google.android.material.bottomnavigation.BottomNavigationView;
+import android.view.MenuItem;
+import android.widget.TextView;
 
 public class SettingsActivity extends AppCompatActivity {
 
-    private Switch switchNotifications;
-    private Switch switchDarkMode;
-
-    private SharedPreferences preferences;
-    private SharedPreferences.Editor editor;
+    private TextView pageTitle;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_settings);
 
-        // Initialize SharedPreferences
-        preferences = getSharedPreferences("AppSettings", MODE_PRIVATE);
-        editor = preferences.edit();
+        // Initialize the TextView
+        pageTitle = findViewById(R.id.pageTitle);
+        pageTitle.setText("Settings");
 
-        // Find switches in the layout
-        switchNotifications = findViewById(R.id.switchNotifications);
-        switchDarkMode = findViewById(R.id.switchDarkMode);
+        // Set up the BottomNavigationView
+        BottomNavigationView bottomNavigationView = findViewById(R.id.bottomNavigationView);
+        bottomNavigationView.setSelectedItemId(R.id.nav_settings);
 
-        // Load and apply saved preferences
-        loadSettings();
-
-        // Handle notification switch toggling
-        switchNotifications.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+        bottomNavigationView.setOnNavigationItemSelectedListener(new BottomNavigationView.OnNavigationItemSelectedListener() {
             @Override
-            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-                editor.putBoolean("notifications", isChecked);
-                editor.apply();
-                Toast.makeText(SettingsActivity.this, "Notifications " + (isChecked ? "Enabled" : "Disabled"), Toast.LENGTH_SHORT).show();
-            }
-        });
+            public boolean onNavigationItemSelected(MenuItem item) {
+                int id = item.getItemId();
 
-        // Handle dark mode switch toggling
-        switchDarkMode.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
-            @Override
-            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-                editor.putBoolean("darkMode", isChecked);
-                editor.apply();
-                Toast.makeText(SettingsActivity.this, "Dark Mode " + (isChecked ? "Enabled" : "Disabled"), Toast.LENGTH_SHORT).show();
-
-                // Apply dark mode immediately
-                if (isChecked) {
-                    setTheme(R.style.DarkTheme);
-                } else {
-                    setTheme(R.style.LightTheme);
+                if (id == R.id.nav_home) {
+                    startActivity(new Intent(SettingsActivity.this, MainActivity.class));
+                    overridePendingTransition(0, 0);
+                    return true;
+                } else if (id == R.id.nav_add_event) {
+                    startActivity(new Intent(SettingsActivity.this, EventActivity.class));
+                    overridePendingTransition(0, 0);
+                    return true;
+                } else if (id == R.id.nav_view_events) {
+                    startActivity(new Intent(SettingsActivity.this, EventListActivity.class));
+                    overridePendingTransition(0, 0);
+                    return true;
+                } else if (id == R.id.nav_settings) {
+                    return true;  // Stay on settings page
                 }
-                recreate();  // Recreate the activity to apply theme changes
+
+                return false;
             }
         });
-    }
-
-    // Load saved settings
-    private void loadSettings() {
-        boolean notificationsEnabled = preferences.getBoolean("notifications", false);
-        boolean darkModeEnabled = preferences.getBoolean("darkMode", false);
-
-        switchNotifications.setChecked(notificationsEnabled);
-        switchDarkMode.setChecked(darkModeEnabled);
-
-        // Apply the theme based on saved preference
-        if (darkModeEnabled) {
-            setTheme(R.style.DarkTheme);
-        } else {
-            setTheme(R.style.LightTheme);
-        }
     }
 }
+
