@@ -7,11 +7,27 @@
     android:padding="16dp">
 
     <!-- Event name input -->
+    <TextView
+        android:id="@+id/pageTitle"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:layout_weight="0.05"
+        android:text="Home"
+        android:textSize="24sp"
+        android:textStyle="bold" />
+
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_weight="1"
         android:orientation="vertical">
+
+        <EditText
+            android:id="@+id/eventNameInput"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="Enter event name" />
 
         <TextView
             android:id="@+id/eventDateInput"
@@ -22,12 +38,6 @@
             android:hint="Select event date"
             android:padding="10dp"
             android:textSize="16sp" />
-
-        <EditText
-            android:id="@+id/eventNameInput"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:hint="Enter event name" />
 
         <Button
             android:id="@+id/saveButton"

@@ -24,17 +24,24 @@ public class EventActivity extends AppCompatActivity {
     private TextView eventDateInput;
     private Button saveButton;
     private Calendar eventCalendar;
+    private TextView pageTitle;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_event);
 
+        // Initialize the TextView
+        pageTitle = findViewById(R.id.pageTitle);
+        pageTitle.setText("Add Schedule");
+
         eventNameInput = findViewById(R.id.eventNameInput);
         eventDateInput = findViewById(R.id.eventDateInput);
         saveButton = findViewById(R.id.saveButton);
 
         eventCalendar = Calendar.getInstance();
+
+
 
         // Set up the date picker
         eventDateInput.setOnClickListener(new View.OnClickListener() {

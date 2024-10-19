@@ -7,6 +7,8 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import android.view.MenuItem;
+import android.widget.TextView;
+
 import java.util.List;
 
 public class EventListActivity extends AppCompatActivity {
@@ -14,11 +16,16 @@ public class EventListActivity extends AppCompatActivity {
     private RecyclerView recyclerView;
     private EventAdapter eventAdapter;
     private List<Event> eventList;
+    private TextView pageTitle;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_event_list);
+
+        // Initialize the TextView
+        pageTitle = findViewById(R.id.pageTitle);
+        pageTitle.setText("Schedules");
 
         // Initialize RecyclerView
         recyclerView = findViewById(R.id.recyclerView);
