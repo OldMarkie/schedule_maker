@@ -5,18 +5,15 @@ import android.os.Bundle;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
-
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import android.view.MenuItem;
-import android.widget.TextView;
-
 import java.util.List;
 
 public class EventListActivity extends AppCompatActivity {
 
-    private TextView pageTitle;
     private RecyclerView recyclerView;
     private EventAdapter eventAdapter;
+    private List<Event> eventList;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -25,17 +22,7 @@ public class EventListActivity extends AppCompatActivity {
 
         // Initialize RecyclerView
         recyclerView = findViewById(R.id.recyclerView);
-        recyclerView.setLayoutManager(new LinearLayoutManager(this)); // Use a linear layout manager
-
-        // Fetch events and set the adapter
-        List<Event> eventList = DummyData.getEvents(); // Fetch the events from the data source
-        eventAdapter = new EventAdapter(eventList);
-        recyclerView.setAdapter(eventAdapter);
-
-
-        // Initialize the TextView
-        pageTitle = findViewById(R.id.pageTitle);
-        pageTitle.setText("View Events");
+        recyclerView.setLayoutManager(new LinearLayoutManager(this));
 
         // Set up the BottomNavigationView
         BottomNavigationView bottomNavigationView = findViewById(R.id.bottomNavigationView);
@@ -65,5 +52,20 @@ public class EventListActivity extends AppCompatActivity {
                 return false;
             }
         });
+    }
+
+    // Use onResume to reload the list whenever this activity is returned to
+    @Override
+    protected void onResume() {
+        super.onResume();
+        loadEvents();  // Reload the data and update the RecyclerView
+    }
+
+    // Load the events from the data source and update the adapter
+    private void loadEvents() {
+        eventList = DummyData.getEvents();  // Fetch the updated events from the data source
+        eventAdapter = new EventAdapter(eventList);
+        recyclerView.setAdapter(eventAdapter);
+        eventAdapter.notifyDataSetChanged();  // Notify the adapter that the data has changed
     }
 }

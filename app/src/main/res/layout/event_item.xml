@@ -1,28 +1,31 @@
+<?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:orientation="vertical"
-    android:padding="10dp">
+    android:padding="10dp"
+    android:background="?android:attr/selectableItemBackground"
+    android:clickable="true"
+    android:focusable="true">
 
+    <!-- Event Name -->
     <TextView
         android:id="@+id/eventName"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Event Name"
         android:textSize="18sp"
-        android:textStyle="bold" />
+        android:textStyle="bold"
+        android:text="Event Name"
+        android:textColor="@android:color/black" />
 
+    <!-- Event Date and Time -->
     <TextView
-        android:id="@+id/eventDay"
+        android:id="@+id/eventDate"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Event Day"
-        android:textSize="16sp" />
+        android:textSize="16sp"
+        android:text="Event Date and Time"
+        android:textColor="@android:color/darker_gray"
+        android:layout_marginTop="4dp" />
 
-    <TextView
-        android:id="@+id/eventTime"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Event Time"
-        android:textSize="16sp" />
 </LinearLayout>

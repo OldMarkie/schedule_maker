@@ -29,15 +29,16 @@
         android:id="@+id/recyclerView"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:scrollbars="vertical"/>
+        android:layout_weight="1"
+        android:scrollbars="vertical" />
 
     <!-- Bottom Navigation Bar -->
     <com.google.android.material.bottomnavigation.BottomNavigationView
         android:id="@+id/bottomNavigationView"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        app:menu="@menu/bottom_nav_menu"
+        android:layout_gravity="bottom"
         app:itemIconTint="@color/black"
         app:itemTextColor="@color/black"
-        android:layout_gravity="bottom" />
+        app:menu="@menu/bottom_nav_menu" />
 </LinearLayout>

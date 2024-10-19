@@ -4,10 +4,11 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
+import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 import java.util.List;
 
-public class EventAdapter extends RecyclerView.Adapter<EventAdapter.ViewHolder> {
+public class EventAdapter extends RecyclerView.Adapter<EventAdapter.EventViewHolder> {
 
     private List<Event> eventList;
 
@@ -15,36 +16,34 @@ public class EventAdapter extends RecyclerView.Adapter<EventAdapter.ViewHolder> 
         this.eventList = eventList;
     }
 
-    public static class ViewHolder extends RecyclerView.ViewHolder {
-        public TextView eventName;
-        public TextView eventDay;
-        public TextView eventTime;
-
-        public ViewHolder(View view) {
-            super(view);
-            eventName = view.findViewById(R.id.eventName);
-            eventDay = view.findViewById(R.id.eventDay);
-            eventTime = view.findViewById(R.id.eventTime);
-        }
-    }
-
+    @NonNull
     @Override
-    public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+    public EventViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         View view = LayoutInflater.from(parent.getContext())
                 .inflate(R.layout.event_item, parent, false);
-        return new ViewHolder(view);
+        return new EventViewHolder(view);
     }
 
     @Override
-    public void onBindViewHolder(ViewHolder holder, int position) {
+    public void onBindViewHolder(@NonNull EventViewHolder holder, int position) {
         Event event = eventList.get(position);
         holder.eventName.setText(event.getName());
-        holder.eventDay.setText(event.getDay());
-        holder.eventTime.setText(event.getTime());
+        holder.eventDate.setText(event.getFormattedDate());  // Display formatted date
     }
 
     @Override
     public int getItemCount() {
         return eventList.size();
+    }
+
+    public static class EventViewHolder extends RecyclerView.ViewHolder {
+        public TextView eventName;
+        public TextView eventDate;
+
+        public EventViewHolder(View itemView) {
+            super(itemView);
+            eventName = itemView.findViewById(R.id.eventName);
+            eventDate = itemView.findViewById(R.id.eventDate);
+        }
     }
 }

@@ -1,37 +1,28 @@
 package com.mobdeve.s21.mco.schedule_maker;
 
+import java.text.SimpleDateFormat;
+import java.util.Date;
+
 public class Event {
     private String name;
-    private String day;
-    private String time;
+    private Date dateTime; // Use a legitimate Date object
 
-    public Event(String name, String day, String time) {
+    public Event(String name, Date dateTime) {
         this.name = name;
-        this.day = day;
-        this.time = time;
+        this.dateTime = dateTime;
     }
 
     public String getName() {
         return name;
     }
 
-    public void setName(String name) {
-        this.name = name;
+    public Date getDateTime() {
+        return dateTime;
     }
 
-    public String getDay() {
-        return day;
-    }
-
-    public void setDay(String day) {
-        this.day = day;
-    }
-
-    public String getTime() {
-        return time;
-    }
-
-    public void setTime(String time) {
-        this.time = time;
+    // Helper method to format the Date object into a readable string
+    public String getFormattedDate() {
+        SimpleDateFormat dateFormat = new SimpleDateFormat("MMM d, yyyy 'at' h:mm a");
+        return dateFormat.format(dateTime);
     }
 }

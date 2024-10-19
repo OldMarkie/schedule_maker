@@ -105,7 +105,7 @@ public class MainActivity extends AppCompatActivity {
         List<Event> events = DummyData.getEvents();  // Fetch the events from a data source
         if (!events.isEmpty()) {
             Event nextEvent = events.get(0);  // Assuming this is sorted by date
-            latestSchedule.setText("Next: " + nextEvent.getName() + " at " + nextEvent.getTime());
+            latestSchedule.setText("Next: " + nextEvent.getName() + " at " + nextEvent.getFormattedDate());  // Use formatted date
         } else {
             latestSchedule.setText("No upcoming schedule");
         }
