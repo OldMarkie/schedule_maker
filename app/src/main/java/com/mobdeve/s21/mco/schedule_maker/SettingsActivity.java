@@ -1,8 +1,12 @@
 package com.mobdeve.s21.mco.schedule_maker;
 
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.widget.CompoundButton;
+import android.widget.Switch;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.app.AppCompatDelegate;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import android.view.MenuItem;
 import android.widget.TextView;
@@ -10,6 +14,9 @@ import android.widget.TextView;
 public class SettingsActivity extends AppCompatActivity {
 
     private TextView pageTitle;
+    private Switch themeSwitch;
+    private SharedPreferences sharedPreferences;
+    private SharedPreferences.Editor editor;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -19,6 +26,38 @@ public class SettingsActivity extends AppCompatActivity {
         // Initialize the TextView
         pageTitle = findViewById(R.id.pageTitle);
         pageTitle.setText("Settings");
+
+        // Initialize theme switch
+        themeSwitch = findViewById(R.id.switchDarkMode);
+
+        // Initialize SharedPreferences to save theme preference
+        sharedPreferences = getSharedPreferences("ThemePref", MODE_PRIVATE);
+        editor = sharedPreferences.edit();
+
+        // Check current theme preference and set switch accordingly
+        boolean isDarkMode = sharedPreferences.getBoolean("isDarkMode", false);
+        themeSwitch.setChecked(isDarkMode);
+
+        if (isDarkMode) {
+            AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES);
+        } else {
+            AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO);
+        }
+
+        // Toggle theme when the switch is toggled
+        themeSwitch.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                if (isChecked) {
+                    AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES);
+                    editor.putBoolean("isDarkMode", true);
+                } else {
+                    AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO);
+                    editor.putBoolean("isDarkMode", false);
+                }
+                editor.apply();  // Save the preference
+            }
+        });
 
         // Set up the BottomNavigationView
         BottomNavigationView bottomNavigationView = findViewById(R.id.bottomNavigationView);
@@ -50,4 +89,3 @@ public class SettingsActivity extends AppCompatActivity {
         });
     }
 }
-
