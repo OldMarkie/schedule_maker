@@ -61,14 +61,17 @@ public class MainActivity extends AppCompatActivity {
                 } else if (id == R.id.nav_add_event) {
                     startActivity(new Intent(MainActivity.this, EventActivity.class));
                     overridePendingTransition(0, 0);  // No animation
+                    finish();
                     return true;
                 } else if (id == R.id.nav_view_events) {
                     startActivity(new Intent(MainActivity.this, EventListActivity.class));
                     overridePendingTransition(0, 0);
+                    finish();
                     return true;
                 } else if (id == R.id.nav_settings) {
                     startActivity(new Intent(MainActivity.this, SettingsActivity.class));
                     overridePendingTransition(0, 0);
+                    finish();
                     return true;
                 }
 
