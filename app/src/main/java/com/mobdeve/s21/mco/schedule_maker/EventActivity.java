@@ -48,8 +48,6 @@ public class EventActivity extends AppCompatActivity {
 
         eventCalendar = Calendar.getInstance();
 
-
-
         // Set up the date picker
         eventDateInput.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -72,7 +70,6 @@ public class EventActivity extends AppCompatActivity {
                 Intent intent = new Intent(EventActivity.this, EventListActivity.class);
                 intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
                 startActivity(intent);
-                finish();  // Finish EventActivity to return to the event list
             }
         });
 
@@ -85,22 +82,21 @@ public class EventActivity extends AppCompatActivity {
             public boolean onNavigationItemSelected(MenuItem item) {
                 int id = item.getItemId();
 
+                // Navigation based on the selected item
                 if (id == R.id.nav_home) {
                     startActivity(new Intent(EventActivity.this, MainActivity.class));
                     overridePendingTransition(0, 0);
-                    finish();
                     return true;
                 } else if (id == R.id.nav_add_event) {
+                    // Stay on Add Event page
                     return true;
                 } else if (id == R.id.nav_view_events) {
                     startActivity(new Intent(EventActivity.this, EventListActivity.class));
                     overridePendingTransition(0, 0);
-                    finish();
                     return true;
                 } else if (id == R.id.nav_settings) {
                     startActivity(new Intent(EventActivity.this, SettingsActivity.class));
                     overridePendingTransition(0, 0);
-                    finish();
                     return true;
                 }
 
