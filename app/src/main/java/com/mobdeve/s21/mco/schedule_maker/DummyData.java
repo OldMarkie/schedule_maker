@@ -2,18 +2,23 @@ package com.mobdeve.s21.mco.schedule_maker;
 
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.Date;
 import java.util.List;
 
 public class DummyData {
 
     private static List<Event> eventList = new ArrayList<>();
 
-    // Return the list of events
+    // Return the list of events, filtered and sorted
     public static List<Event> getEvents() {
         // Initialize with some example schedules if the list is empty
         if (eventList.isEmpty()) {
             loadExampleSchedules();
         }
+        // Remove past events and sort upcoming events
+        filterAndSortEvents();
         return eventList;
     }
 
@@ -48,5 +53,27 @@ public class DummyData {
         // Example 7: Project Deadline
         calendar.set(2024, Calendar.OCTOBER, 26, 23, 59);  // Date: October 26, 2024, 11:59 PM
         eventList.add(new Event("Project Deadline", calendar.getTime()));
+    }
+
+    // Filter out past events and sort the remaining events by date
+    private static void filterAndSortEvents() {
+        Date currentDate = new Date();  // Get the current date and time
+
+        // Remove past events (events whose date is before the current date and time)
+        List<Event> upcomingEvents = new ArrayList<>();
+        for (Event event : eventList) {
+            if (event.getDateTime().after(currentDate)) {  // Only keep future events
+                upcomingEvents.add(event);
+            }
+        }
+        eventList = upcomingEvents;
+
+        // Sort events by date (ascending order)
+        Collections.sort(eventList, new Comparator<Event>() {
+            @Override
+            public int compare(Event event1, Event event2) {
+                return event1.getDateTime().compareTo(event2.getDateTime());  // Ascending order
+            }
+        });
     }
 }
