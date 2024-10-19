@@ -1,8 +1,10 @@
 package com.mobdeve.s21.mco.schedule_maker;
 
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.app.AppCompatDelegate;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
@@ -20,6 +22,10 @@ public class EventListActivity extends AppCompatActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        SharedPreferences sharedPreferences = getSharedPreferences("ThemePref", MODE_PRIVATE);
+        boolean isDarkMode = sharedPreferences.getBoolean("isDarkMode", false);
+        AppCompatDelegate.setDefaultNightMode(isDarkMode ? AppCompatDelegate.MODE_NIGHT_YES : AppCompatDelegate.MODE_NIGHT_NO);
+
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_event_list);
 
@@ -43,16 +49,19 @@ public class EventListActivity extends AppCompatActivity {
                 if (id == R.id.nav_home) {
                     startActivity(new Intent(EventListActivity.this, MainActivity.class));
                     overridePendingTransition(0, 0);
+                    finish();
                     return true;
                 } else if (id == R.id.nav_add_event) {
                     startActivity(new Intent(EventListActivity.this, EventActivity.class));
                     overridePendingTransition(0, 0);
+                    finish();
                     return true;
                 } else if (id == R.id.nav_view_events) {
                     return true;  // Stay on view events page
                 } else if (id == R.id.nav_settings) {
                     startActivity(new Intent(EventListActivity.this, SettingsActivity.class));
                     overridePendingTransition(0, 0);
+                    finish();
                     return true;
                 }
 
