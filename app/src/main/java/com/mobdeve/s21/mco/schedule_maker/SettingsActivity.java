@@ -20,16 +20,19 @@ public class SettingsActivity extends AppCompatActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_settings);
+
+        // Initialize SharedPreferences and editor
         sharedPreferences = getSharedPreferences("ThemePref", MODE_PRIVATE);
         editor = sharedPreferences.edit();
 
+        // Retrieve preferences for dark mode and time format
         boolean isDarkMode = sharedPreferences.getBoolean("isDarkMode", false);
-        boolean is24HourFormat = sharedPreferences.getBoolean("is24HourFormat", false); // Retrieve time format preference
+        boolean is24HourFormat = sharedPreferences.getBoolean("is24HourFormat", false);
 
+        // Set dark mode based on the saved preference
         AppCompatDelegate.setDefaultNightMode(isDarkMode ? AppCompatDelegate.MODE_NIGHT_YES : AppCompatDelegate.MODE_NIGHT_NO);
-
-        super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_settings);
 
         // Initialize pageTitle
         pageTitle = findViewById(R.id.pageTitle);
@@ -39,11 +42,11 @@ public class SettingsActivity extends AppCompatActivity {
         themeSwitch = findViewById(R.id.themeSwitch);
         timeFormatSwitch = findViewById(R.id.timeFormatSwitch);
 
-        // Set switch states based on stored preferences
+        // Set switch states based on saved preferences
         themeSwitch.setChecked(isDarkMode);
         timeFormatSwitch.setChecked(is24HourFormat);
 
-        // Set listeners for switches
+        // Set listener for theme switch
         themeSwitch.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
@@ -53,6 +56,7 @@ public class SettingsActivity extends AppCompatActivity {
             }
         });
 
+        // Set listener for time format switch
         timeFormatSwitch.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
