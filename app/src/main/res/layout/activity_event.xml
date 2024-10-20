@@ -14,6 +14,7 @@
         android:layout_gravity="center"
         android:layout_weight="0.05"
         android:text="Home"
+        android:textAllCaps="true"
         android:textSize="24sp"
         android:textStyle="bold" />
 
@@ -23,21 +24,31 @@
         android:layout_weight="1"
         android:orientation="vertical">
 
-        <EditText
-            android:id="@+id/eventNameInput"
+        <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:hint="Enter event name" />
+            android:orientation="vertical">
 
-        <TextView
-            android:id="@+id/eventDateInput"
+            <EditText
+                android:id="@+id/eventNameInput"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="Enter event name" />
+
+            <TextView
+                android:id="@+id/eventDateInput"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:clickable="true"
+                android:focusable="false"
+                android:hint="Select event date"
+                android:padding="10dp"
+                android:textSize="16sp" />
+        </LinearLayout>
+
+        <Space
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:clickable="true"
-            android:focusable="false"
-            android:hint="Select event date"
-            android:padding="10dp"
-            android:textSize="16sp" />
+            android:layout_height="20dp" />
 
         <Button
             android:id="@+id/saveButton"

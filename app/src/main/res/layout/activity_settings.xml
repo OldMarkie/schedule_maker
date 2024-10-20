@@ -12,6 +12,7 @@
         android:layout_height="wrap_content"
         android:paddingBottom="16dp"
         android:text="Settings"
+        android:textAllCaps="true"
         android:textSize="24sp"
         android:textStyle="bold" />
 

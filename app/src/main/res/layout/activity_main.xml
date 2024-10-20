@@ -12,21 +12,17 @@
         android:id="@+id/pageTitle"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_gravity="center"
         android:text="Home"
-        android:textSize="24sp"
-        android:textStyle="bold"
-        android:layout_gravity="center" />
+        android:textAllCaps="true"
+        android:textSize="55sp"
+        android:textStyle="bold" />
 
     <!-- Content of the activity -->
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Welcome to the Home Page"
-        android:layout_gravity="center" />
 
     <Space
         android:layout_width="match_parent"
-        android:layout_height="20dp"
+        android:layout_height="40dp"
         android:layout_weight="0" />
 
     <!-- Digital Clock at the top-center of the screen -->
@@ -34,37 +30,37 @@
         android:id="@+id/digitalClock"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:textSize="40sp"
-        android:textStyle="bold"
-        android:text="00:00:00" />
+        android:text="00:00:00"
+        android:textSize="45sp"
+        android:textStyle="bold" />
 
     <!-- Current day below the clock -->
     <TextView
         android:id="@+id/currentDay"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:textSize="30sp"
-        android:textStyle="bold"
+        android:layout_marginTop="8dp"
         android:text="Friday"
-        android:layout_marginTop="8dp" />
+        android:textSize="24sp"
+        android:textStyle="bold" />
 
     <!-- Current date (month, day, year) below the day -->
     <TextView
         android:id="@+id/currentDate"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:textSize="20sp"
+        android:layout_marginTop="4dp"
         android:text="Jan 1, 2025"
-        android:layout_marginTop="4dp" />
+        android:textSize="20sp" />
 
     <!-- Latest schedule displayed below the clock -->
     <TextView
         android:id="@+id/latestSchedule"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:textSize="20sp"
+        android:layout_marginTop="20dp"
         android:text="No upcoming schedule"
-        android:layout_marginTop="20dp" />
+        android:textSize="16sp" />
 
     <!-- Space to push the bottom navigation down -->
 
