@@ -54,12 +54,9 @@ public class EventAdapter extends RecyclerView.Adapter<EventAdapter.EventViewHol
         holder.eventDate.setText(dateFormat.format(event.getDateTime()));
 
         // Set click listener to show event details
-        holder.itemView.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                EventDetailsDialogFragment dialog = EventDetailsDialogFragment.newInstance(event, listener);
-                dialog.show(activity.getSupportFragmentManager(), "eventDetails");
-            }
+        holder.itemView.setOnClickListener(v -> {
+            EventDetailsDialogFragment dialog = EventDetailsDialogFragment.newInstance(event, listener);
+            dialog.show(activity.getSupportFragmentManager(), "eventDetails");
         });
     }
 

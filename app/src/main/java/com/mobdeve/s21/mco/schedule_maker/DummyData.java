@@ -11,28 +11,65 @@ public class DummyData {
 
     private static List<Event> eventList = new ArrayList<>();
 
-    // Return the list of events, including recurring weekly ones, filtered and sorted
-    public static List<Event> getEvents() {
-        if (eventList.isEmpty()) {
-            loadExampleSchedules();
+    // Return events for a specific weekday (including recurring weekly events)
+    public static List<Event> getEventsForWeekDay(Date weekDay) {
+        List<Event> filteredEvents = new ArrayList<>();
+        Calendar selectedDate = Calendar.getInstance();
+        selectedDate.setTime(weekDay);
+
+        for (Event event : eventList) {
+            Calendar eventDate = Calendar.getInstance();
+            eventDate.setTime(event.getDateTime());
+
+            if (event.isWeekly()) {
+                // Weekly recurring events: match the day of the week
+                if (eventDate.get(Calendar.DAY_OF_WEEK) == selectedDate.get(Calendar.DAY_OF_WEEK)) {
+                    filteredEvents.add(event);  // If the event recurs on this weekday, add it to the list
+                }
+            } else {
+                // One-time events: match the exact date
+                if (isSameDay(eventDate, selectedDate)) {
+                    filteredEvents.add(event);
+                }
+            }
         }
-        return filterAndSortEvents();
+
+        return filteredEvents;
     }
 
-    // Load some example schedules
-    private static void loadExampleSchedules() {
-        Calendar calendar = Calendar.getInstance();
+    // Return events for a specific date (including recurring weekly events)
+    public static List<Event> getEventsForDate(Date date) {
+        List<Event> filteredEvents = new ArrayList<>();
+        Calendar selectedDate = Calendar.getInstance();
+        selectedDate.setTime(date);
 
-        // Example of adding one-time events
-        calendar.set(2024, Calendar.OCTOBER, 20, 10, 0); // Example date
-        eventList.add(new Event("Sample Event 1", calendar.getTime(), false));
+        for (Event event : eventList) {
+            Calendar eventDate = Calendar.getInstance();
+            eventDate.setTime(event.getDateTime());
 
-        // Example of adding weekly events
-        calendar.set(2024, Calendar.OCTOBER, 22, 10, 0); // Example date for weekly event
-        eventList.add(new Event("Weekly Meeting", calendar.getTime(), true));
+            if (event.isWeekly()) {
+                // For weekly events, check if the day of the week matches
+                if (eventDate.get(Calendar.DAY_OF_WEEK) == selectedDate.get(Calendar.DAY_OF_WEEK)) {
+                    filteredEvents.add(event);
+                }
+            } else {
+                // For one-time events, check if the exact date matches
+                if (isSameDay(eventDate, selectedDate)) {
+                    filteredEvents.add(event);
+                }
+            }
+        }
+
+        return filteredEvents;
     }
 
-    // Add event
+    // Helper method to check if two Calendar objects represent the same day
+    private static boolean isSameDay(Calendar cal1, Calendar cal2) {
+        return cal1.get(Calendar.YEAR) == cal2.get(Calendar.YEAR) &&
+                cal1.get(Calendar.DAY_OF_YEAR) == cal2.get(Calendar.DAY_OF_YEAR);
+    }
+
+    // Method to add an event (one-time or weekly)
     public static void addEvent(Event event) {
         eventList.add(event);
     }
@@ -42,67 +79,15 @@ public class DummyData {
         eventList.remove(event);
     }
 
-    // Filter and include weekly events
-    private static List<Event> filterAndSortEvents() {
-        List<Event> allEvents = new ArrayList<>(eventList);
-        Date currentDate = new Date();
-
-        // Generate weekly events if needed
-        List<Event> weeklyEvents = new ArrayList<>();
-        for (Event event : eventList) {
-            if (event.isWeekly()) {
-                Calendar calendar = Calendar.getInstance();
-                calendar.setTime(event.getDateTime());
-                while (calendar.getTime().before(currentDate)) {
-                    calendar.add(Calendar.WEEK_OF_YEAR, 1);
-                }
-                // Add future weekly events
-                while (calendar.getTime().before(new Date(currentDate.getTime() + (7L * 24 * 60 * 60 * 1000)))) {  // 1 week ahead
-                    weeklyEvents.add(new Event(event.getName(), calendar.getTime(), true));
-                    calendar.add(Calendar.WEEK_OF_YEAR, 1);
-                }
+    // Return all events (one-time and weekly events) sorted by date
+    public static List<Event> getEvents() {
+        // Sort events by date
+        Collections.sort(eventList, new Comparator<Event>() {
+            @Override
+            public int compare(Event e1, Event e2) {
+                return e1.getDateTime().compareTo(e2.getDateTime());  // Sort in ascending order by date
             }
-        }
-        allEvents.addAll(weeklyEvents);
-
-        // Filter out past events
-        List<Event> upcomingEvents = new ArrayList<>();
-        for (Event event : allEvents) {
-            if (event.getDateTime().after(currentDate)) {
-                upcomingEvents.add(event);
-            }
-        }
-
-        // Sort by date
-        Collections.sort(upcomingEvents, Comparator.comparing(Event::getDateTime));
-
-        return upcomingEvents;
-    }
-
-    // Return events for a specific date (including recurring weekly events)
-    public static List<Event> getEventsForDate(Date date) {
-        List<Event> filteredEvents = new ArrayList<>();
-        Calendar calendar1 = Calendar.getInstance();
-        calendar1.setTime(date);
-
-        for (Event event : eventList) {
-            Calendar calendar2 = Calendar.getInstance();
-            calendar2.setTime(event.getDateTime());
-
-            // Check if the event is weekly and falls on the same day of the week
-            if (event.isWeekly()) {
-                while (calendar2.getTime().before(date)) {
-                    calendar2.add(Calendar.WEEK_OF_YEAR, 1);
-                }
-            }
-
-            // Match the day
-            if (calendar1.get(Calendar.YEAR) == calendar2.get(Calendar.YEAR) &&
-                    calendar1.get(Calendar.DAY_OF_YEAR) == calendar2.get(Calendar.DAY_OF_YEAR)) {
-                filteredEvents.add(event);
-            }
-        }
-
-        return filteredEvents;
+        });
+        return eventList;
     }
 }

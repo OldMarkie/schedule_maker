@@ -1,7 +1,5 @@
 package com.mobdeve.s21.mco.schedule_maker;
 
-import static com.mobdeve.s21.mco.schedule_maker.DummyData.deleteEvent;
-
 import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -28,7 +26,7 @@ public class EventListActivity extends AppCompatActivity {
     private List<Event> eventList, weeklyEventList;
     private TextView pageTitle, weeklyScheduleTitle, eventsForDateTitle;
     private CalendarView calendarView;
-    private Date currentSelectedDate;  // Store the current selected date
+    private Date currentSelectedDate;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -38,7 +36,7 @@ public class EventListActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_event_list);
 
-        // Initialize the views
+        // Initialize views
         pageTitle = findViewById(R.id.pageTitle);
         calendarView = findViewById(R.id.calendarView);
         recyclerView = findViewById(R.id.recyclerView);
@@ -47,7 +45,7 @@ public class EventListActivity extends AppCompatActivity {
         eventsForDateTitle = findViewById(R.id.eventsForDateTitle);
 
         // Disable past dates in the CalendarView
-        calendarView.setMinDate(System.currentTimeMillis() - 1000);  // Disable dates before today
+        calendarView.setMinDate(System.currentTimeMillis() - 1000);  // Disable past dates
         pageTitle.setText("Schedules");
 
         // Set up RecyclerView for weekly events
@@ -84,23 +82,24 @@ public class EventListActivity extends AppCompatActivity {
 
         // Load the weekly schedule and events for today
         loadWeeklySchedule();
-        currentSelectedDate = Calendar.getInstance().getTime(); // Set current date as default
+        currentSelectedDate = Calendar.getInstance().getTime();  // Set current date as default
         loadEventsForDate(currentSelectedDate);
 
         // Handle date selection on CalendarView
         calendarView.setOnDateChangeListener((view, year, month, dayOfMonth) -> {
             Calendar selectedDate = Calendar.getInstance();
             selectedDate.set(year, month, dayOfMonth);
-            currentSelectedDate = selectedDate.getTime(); // Update the current selected date
+            currentSelectedDate = selectedDate.getTime();  // Update the current selected date
             loadEventsForDate(currentSelectedDate);
         });
 
-        // Set up the BottomNavigationView
+        // Set up BottomNavigationView
         BottomNavigationView bottomNavigationView = findViewById(R.id.bottomNavigationView);
         bottomNavigationView.setSelectedItemId(R.id.nav_view_events);
         bottomNavigationView.setOnNavigationItemSelectedListener(item -> {
             int id = item.getItemId();
 
+            // Convert switch to if-else statement
             if (id == R.id.nav_home) {
                 startActivity(new Intent(EventListActivity.this, MainActivity.class));
                 overridePendingTransition(0, 0);
@@ -120,7 +119,7 @@ public class EventListActivity extends AppCompatActivity {
                 return true;
             }
 
-            return false;
+            return false;  // Return false if no cases matched
         });
     }
 
@@ -129,13 +128,14 @@ public class EventListActivity extends AppCompatActivity {
         Calendar calendar = Calendar.getInstance();
         int currentWeekDay = calendar.get(Calendar.DAY_OF_WEEK);
 
-        calendar.add(Calendar.DATE, -(currentWeekDay - Calendar.SUNDAY)); // Move to the first day of the week (Sunday)
+        // Move to the first day of the week (Sunday)
+        calendar.add(Calendar.DATE, -(currentWeekDay - Calendar.SUNDAY));
 
         weeklyEventList.clear();  // Clear the list for reloading
 
         for (int i = 0; i < 7; i++) {  // Loop through the 7 days of the week
             Date weekDay = calendar.getTime();
-            List<Event> events = DummyData.getEventsForDate(weekDay);  // Fetch events for the specific day
+            List<Event> events = DummyData.getEventsForWeekDay(weekDay);  // Fetch events for the specific day
             weeklyEventList.addAll(events);
             calendar.add(Calendar.DATE, 1);  // Move to the next day
         }
@@ -157,8 +157,8 @@ public class EventListActivity extends AppCompatActivity {
         eventsForDateTitle.setText("Events for " + selectedDateString);
 
         eventList.clear();  // Clear current event list
-        eventList.addAll(DummyData.getEventsForDate(date)); // Load events for the selected date
-        eventAdapter.notifyDataSetChanged(); // Notify the adapter to refresh the RecyclerView
+        eventList.addAll(DummyData.getEventsForDate(date));  // Load events for the selected date
+        eventAdapter.notifyDataSetChanged();  // Notify the adapter to refresh the RecyclerView
     }
 
     // Method to confirm event deletion
@@ -167,9 +167,9 @@ public class EventListActivity extends AppCompatActivity {
         builder.setTitle("Delete Event")
                 .setMessage("Are you sure you want to delete this event?")
                 .setPositiveButton("Delete", (dialog, which) -> {
-                    deleteEvent(event);
-                    loadWeeklySchedule(); // Refresh weekly schedule
-                    loadEventsForDate(currentSelectedDate); // Refresh events for the current date
+                    DummyData.deleteEvent(event);
+                    loadWeeklySchedule();  // Refresh weekly schedule
+                    loadEventsForDate(currentSelectedDate);  // Refresh events for the current date
                 })
                 .setNegativeButton("Cancel", null)
                 .show();
