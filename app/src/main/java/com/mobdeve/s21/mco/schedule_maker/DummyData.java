@@ -26,11 +26,6 @@ public class DummyData {
                 if (eventDate.get(Calendar.DAY_OF_WEEK) == selectedDate.get(Calendar.DAY_OF_WEEK)) {
                     filteredEvents.add(event);  // If the event recurs on this weekday, add it to the list
                 }
-            } else {
-                // One-time events: match the exact date
-                if (isSameDay(eventDate, selectedDate)) {
-                    filteredEvents.add(event);
-                }
             }
         }
 
