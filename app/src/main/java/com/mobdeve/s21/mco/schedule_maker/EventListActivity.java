@@ -28,6 +28,7 @@ public class EventListActivity extends AppCompatActivity {
     private List<Event> eventList, weeklyEventList;
     private TextView pageTitle, weeklyScheduleTitle, eventsForDateTitle;
     private CalendarView calendarView;
+    private Date currentSelectedDate;  // Store the current selected date
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -36,8 +37,6 @@ public class EventListActivity extends AppCompatActivity {
 
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_event_list);
-
-
 
         // Initialize the views
         pageTitle = findViewById(R.id.pageTitle);
@@ -49,7 +48,6 @@ public class EventListActivity extends AppCompatActivity {
 
         // Disable past dates in the CalendarView
         calendarView.setMinDate(System.currentTimeMillis() - 1000);  // Disable dates before today
-
         pageTitle.setText("Schedules");
 
         // Set up RecyclerView for weekly events
@@ -84,18 +82,17 @@ public class EventListActivity extends AppCompatActivity {
         });
         recyclerView.setAdapter(eventAdapter);
 
-        // Disable past dates in the CalendarView
-        calendarView.setMinDate(System.currentTimeMillis() - 1000);  // Disable dates before today
-
-        // Load the weekly schedule
+        // Load the weekly schedule and events for today
         loadWeeklySchedule();
+        currentSelectedDate = Calendar.getInstance().getTime(); // Set current date as default
+        loadEventsForDate(currentSelectedDate);
 
         // Handle date selection on CalendarView
         calendarView.setOnDateChangeListener((view, year, month, dayOfMonth) -> {
             Calendar selectedDate = Calendar.getInstance();
             selectedDate.set(year, month, dayOfMonth);
-
-            loadEventsForDate(selectedDate.getTime());
+            currentSelectedDate = selectedDate.getTime(); // Update the current selected date
+            loadEventsForDate(currentSelectedDate);
         });
 
         // Set up the BottomNavigationView
@@ -157,10 +154,11 @@ public class EventListActivity extends AppCompatActivity {
     private void loadEventsForDate(Date date) {
         SimpleDateFormat dateFormat = new SimpleDateFormat("MMM d, yyyy", Locale.getDefault());
         String selectedDateString = dateFormat.format(date);
-
         eventsForDateTitle.setText("Events for " + selectedDateString);
 
-        eventList.clear();  // Clear
+        eventList.clear();  // Clear current event list
+        eventList.addAll(DummyData.getEventsForDate(date)); // Load events for the selected date
+        eventAdapter.notifyDataSetChanged(); // Notify the adapter to refresh the RecyclerView
     }
 
     // Method to confirm event deletion
@@ -170,11 +168,10 @@ public class EventListActivity extends AppCompatActivity {
                 .setMessage("Are you sure you want to delete this event?")
                 .setPositiveButton("Delete", (dialog, which) -> {
                     deleteEvent(event);
+                    loadWeeklySchedule(); // Refresh weekly schedule
+                    loadEventsForDate(currentSelectedDate); // Refresh events for the current date
                 })
                 .setNegativeButton("Cancel", null)
                 .show();
     }
-
-    
-
 }

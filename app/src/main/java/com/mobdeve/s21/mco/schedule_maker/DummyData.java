@@ -23,7 +23,13 @@ public class DummyData {
     private static void loadExampleSchedules() {
         Calendar calendar = Calendar.getInstance();
 
-        // Add one-time and weekly events here...
+        // Example of adding one-time events
+        calendar.set(2024, Calendar.OCTOBER, 20, 10, 0); // Example date
+        eventList.add(new Event("Sample Event 1", calendar.getTime(), false));
+
+        // Example of adding weekly events
+        calendar.set(2024, Calendar.OCTOBER, 22, 10, 0); // Example date for weekly event
+        eventList.add(new Event("Weekly Meeting", calendar.getTime(), true));
     }
 
     // Add event
