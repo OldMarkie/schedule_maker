@@ -15,7 +15,7 @@
         android:layout_weight="0.05"
         android:text="Home"
         android:textAllCaps="true"
-        android:textSize="24sp"
+        android:textSize="34sp"
         android:textStyle="bold" />
 
     <LinearLayout
@@ -33,7 +33,9 @@
                 android:id="@+id/eventNameInput"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:hint="Enter event name" />
+                android:layout_marginLeft="8dp"
+                android:hint="Enter event name"
+                android:textSize="20sp" />
 
             <TextView
                 android:id="@+id/eventDateInput"
@@ -43,7 +45,16 @@
                 android:focusable="false"
                 android:hint="Select event date"
                 android:padding="10dp"
-                android:textSize="16sp" />
+                android:textSize="20sp" />
+
+            <Switch
+                android:id="@+id/weeklySwitch"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="1dp"
+                android:paddingLeft="8dp"
+                android:text="Repeat Weekly"
+                android:textSize="20sp" />
         </LinearLayout>
 
         <Space
@@ -56,6 +67,7 @@
             android:layout_height="wrap_content"
             android:text="Save Event" />
     </LinearLayout>
+    <!-- In activity_event.xml, add a switch to mark the event as weekly -->
 
     <!-- Event date input (clickable to open DatePicker) -->
 

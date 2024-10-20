@@ -15,6 +15,7 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.DatePicker;
 import android.widget.EditText;
+import android.widget.Switch;
 import android.widget.TextView;
 import android.widget.TimePicker;
 
@@ -29,6 +30,7 @@ public class EventActivity extends AppCompatActivity {
     private Button saveButton;
     private Calendar eventCalendar;
     private TextView pageTitle;
+    private Switch weeklySwitch;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -46,7 +48,7 @@ public class EventActivity extends AppCompatActivity {
         eventNameInput = findViewById(R.id.eventNameInput);
         eventDateInput = findViewById(R.id.eventDateInput);
         saveButton = findViewById(R.id.saveButton);
-
+        weeklySwitch = findViewById(R.id.weeklySwitch);
         eventCalendar = Calendar.getInstance();
 
         // Set up the date picker
@@ -57,17 +59,18 @@ public class EventActivity extends AppCompatActivity {
             }
         });
 
-        // Set up the save button
+        // Save button action
         saveButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 String eventName = eventNameInput.getText().toString();
-                Date eventDate = eventCalendar.getTime();  // Get the selected date and time
+                Date eventDate = eventCalendar.getTime();
+                boolean isWeekly = weeklySwitch.isChecked();  // Get the weekly recurrence status
 
-                // Add the new event to the data source
-                DummyData.getEvents().add(new Event(eventName, eventDate));
+                // Add the new event with weekly recurrence info
+                DummyData.getEvents().add(new Event(eventName, eventDate, isWeekly));
 
-                // Navigate back to EventListActivity and refresh the list
+                // Return to EventListActivity
                 Intent intent = new Intent(EventActivity.this, EventListActivity.class);
                 intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
                 startActivity(intent);
