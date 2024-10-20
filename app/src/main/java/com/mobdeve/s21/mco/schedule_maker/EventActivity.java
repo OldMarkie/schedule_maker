@@ -6,18 +6,17 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.icu.text.SimpleDateFormat;
 import android.os.Bundle;
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.appcompat.app.AppCompatDelegate;
-
-import com.google.android.material.bottomnavigation.BottomNavigationView;
-import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
+import android.widget.CheckBox;
 import android.widget.DatePicker;
 import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.TimePicker;
-
+import android.widget.Toast;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.app.AppCompatDelegate;
+import com.google.android.material.bottomnavigation.BottomNavigationView;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.Locale;
@@ -26,83 +25,75 @@ public class EventActivity extends AppCompatActivity {
 
     private EditText eventNameInput;
     private TextView eventDateInput;
+    private CheckBox weeklyCheckBox;
     private Button saveButton;
     private Calendar eventCalendar;
-    private TextView pageTitle;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        // Load theme preferences before setting content view
         SharedPreferences sharedPreferences = getSharedPreferences("ThemePref", MODE_PRIVATE);
         boolean isDarkMode = sharedPreferences.getBoolean("isDarkMode", false);
+
         AppCompatDelegate.setDefaultNightMode(isDarkMode ? AppCompatDelegate.MODE_NIGHT_YES : AppCompatDelegate.MODE_NIGHT_NO);
 
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_event);
 
-        // Initialize the TextView
-        pageTitle = findViewById(R.id.pageTitle);
-        pageTitle.setText("Add Schedule");
-
         eventNameInput = findViewById(R.id.eventNameInput);
         eventDateInput = findViewById(R.id.eventDateInput);
+        weeklyCheckBox = findViewById(R.id.weeklyCheckBox);
         saveButton = findViewById(R.id.saveButton);
 
         eventCalendar = Calendar.getInstance();
 
-        // Set up the date picker
-        eventDateInput.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                openDatePicker();
+        // Date picker logic for eventDateInput
+        eventDateInput.setOnClickListener(v -> openDatePicker());
+
+        // Save button logic
+        saveButton.setOnClickListener(v -> {
+            String eventName = eventNameInput.getText().toString();
+            Date eventDate = eventCalendar.getTime();
+            boolean isWeekly = weeklyCheckBox.isChecked();
+
+            if (eventName.isEmpty()) {
+                Toast.makeText(EventActivity.this, "Please enter an event name", Toast.LENGTH_SHORT).show();
+            } else {
+                Event newEvent = new Event(eventName, eventDate, isWeekly);
+                DummyData.addEvent(newEvent);  // Add the event
+                Toast.makeText(EventActivity.this, "Event Saved!", Toast.LENGTH_SHORT).show();
+
+                startActivity(new Intent(EventActivity.this, EventListActivity.class));
+                finish();
             }
         });
 
-        // Set up the save button
-        saveButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                String eventName = eventNameInput.getText().toString();
-                Date eventDate = eventCalendar.getTime();  // Get the selected date and time
-
-                // Add the new event to the data source
-                DummyData.getEvents().add(new Event(eventName, eventDate));
-
-                // Navigate back to EventListActivity and refresh the list
-                Intent intent = new Intent(EventActivity.this, EventListActivity.class);
-                intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
-                startActivity(intent);
-            }
-        });
-
-        // Set up BottomNavigationView (same as in other activities)
+        // Bottom Navigation
         BottomNavigationView bottomNavigationView = findViewById(R.id.bottomNavigationView);
         bottomNavigationView.setSelectedItemId(R.id.nav_add_event);
+        bottomNavigationView.setOnNavigationItemSelectedListener(item -> {
+            int id = item.getItemId();
 
-        bottomNavigationView.setOnNavigationItemSelectedListener(new BottomNavigationView.OnNavigationItemSelectedListener() {
-            @Override
-            public boolean onNavigationItemSelected(MenuItem item) {
-                int id = item.getItemId();
-
-                // Navigation based on the selected item
-                if (id == R.id.nav_home) {
-                    startActivity(new Intent(EventActivity.this, MainActivity.class));
-                    overridePendingTransition(0, 0);
-                    return true;
-                } else if (id == R.id.nav_add_event) {
-                    // Stay on Add Event page
-                    return true;
-                } else if (id == R.id.nav_view_events) {
-                    startActivity(new Intent(EventActivity.this, EventListActivity.class));
-                    overridePendingTransition(0, 0);
-                    return true;
-                } else if (id == R.id.nav_settings) {
-                    startActivity(new Intent(EventActivity.this, SettingsActivity.class));
-                    overridePendingTransition(0, 0);
-                    return true;
-                }
-
-                return false;
+            if (id == R.id.nav_home) {
+                startActivity(new Intent(EventActivity.this, MainActivity.class));
+                overridePendingTransition(0, 0);
+                finish();
+                return true;
+            } else if (id == R.id.nav_add_event) {
+                return true;
+            } else if (id == R.id.nav_view_events) {
+                startActivity(new Intent(EventActivity.this, EventListActivity.class));
+                overridePendingTransition(0, 0);
+                finish();
+                return true;
+            } else if (id == R.id.nav_settings) {
+                startActivity(new Intent(EventActivity.this, SettingsActivity.class));
+                overridePendingTransition(0, 0);
+                finish();
+                return true;
             }
+
+            return false;
         });
     }
 

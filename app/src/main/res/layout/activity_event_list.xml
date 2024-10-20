@@ -1,37 +1,58 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:orientation="vertical"
     android:padding="16dp">
 
-    <!-- Title of the page -->
+    <!-- CalendarView to select dates -->
     <TextView
         android:id="@+id/pageTitle"
-        android:layout_width="wrap_content"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_gravity="center"
         android:text="Home"
-        android:textAllCaps="true"
-        android:textSize="24sp"
+        android:textSize="34sp"
         android:textStyle="bold" />
 
+    <CalendarView
+        android:id="@+id/calendarView"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="16dp" />
+
+    <!-- RecyclerView for weekly schedule -->
     <TextView
-        android:id="@+id/tvNoEvents"
+        android:id="@+id/weeklyScheduleTitle"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="No events to display"
-        android:visibility="gone"
+        android:text="Weekly Schedule"
         android:textSize="18sp"
-        android:layout_gravity="center" />
+        android:textStyle="bold"
+        android:layout_marginBottom="8dp" />
+
+    <!-- List of events for the week -->
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/recyclerViewWeekly"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" />
+
+    <!-- List of events for the selected date -->
+    <TextView
+        android:id="@+id/eventsForDateTitle"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Events for Selected Date"
+        android:textSize="18sp"
+        android:textStyle="bold"
+        android:layout_marginTop="16dp"
+        android:layout_marginBottom="8dp" />
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/recyclerView"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_weight="1"
-        android:scrollbars="vertical" />
+        android:layout_weight="1" />
 
     <!-- Bottom Navigation Bar -->
     <com.google.android.material.bottomnavigation.BottomNavigationView
@@ -42,4 +63,7 @@
         app:itemIconTint="@color/black"
         app:itemTextColor="@color/black"
         app:menu="@menu/bottom_nav_menu" />
+
 </LinearLayout>
+
+
