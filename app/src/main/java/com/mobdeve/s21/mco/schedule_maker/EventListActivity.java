@@ -10,10 +10,9 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import android.view.MenuItem;
 import android.widget.TextView;
-
 import java.util.List;
 
-public class EventListActivity extends AppCompatActivity {
+public class EventListActivity extends AppCompatActivity implements EventDetailsDialogFragment.OnEventActionListener {
 
     private RecyclerView recyclerView;
     private EventAdapter eventAdapter;
@@ -37,7 +36,7 @@ public class EventListActivity extends AppCompatActivity {
         recyclerView = findViewById(R.id.recyclerView);
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
 
-        // Set up the BottomNavigationView
+        // Set up BottomNavigationView
         BottomNavigationView bottomNavigationView = findViewById(R.id.bottomNavigationView);
         bottomNavigationView.setSelectedItemId(R.id.nav_view_events);
 
@@ -70,7 +69,6 @@ public class EventListActivity extends AppCompatActivity {
         });
     }
 
-    // Use onResume to reload the list whenever this activity is returned to
     @Override
     protected void onResume() {
         super.onResume();
@@ -80,8 +78,26 @@ public class EventListActivity extends AppCompatActivity {
     // Load the events from the data source and update the adapter
     private void loadEvents() {
         eventList = DummyData.getEvents();  // Fetch the updated events from the data source
-        eventAdapter = new EventAdapter(eventList);
+        eventAdapter = new EventAdapter(eventList, this, this); // Pass the listener to handle event actions
         recyclerView.setAdapter(eventAdapter);
         eventAdapter.notifyDataSetChanged();  // Notify the adapter that the data has changed
+    }
+
+    // Implement event delete action
+    @Override
+    public void onEventDelete(Event event) {
+        // Remove the event from the list and refresh the RecyclerView
+        eventList.remove(event);
+        eventAdapter.notifyDataSetChanged();
+    }
+
+    // Implement event edit action
+    @Override
+    public void onEventEdit(Event event) {
+        // Handle event editing (for example, navigate to an editing screen)
+        //Intent intent = new Intent(EventListActivity.this, EventEditActivity.class);
+        //intent.putExtra("eventName", event.getName());
+        //intent.putExtra("eventDate", event.getDateTime().getTime()); // Pass the event date as a long
+        //startActivity(intent);
     }
 }

@@ -20,6 +20,7 @@ import android.widget.TimePicker;
 
 import java.util.Calendar;
 import java.util.Date;
+import java.util.Locale;
 
 public class EventActivity extends AppCompatActivity {
 
@@ -48,8 +49,6 @@ public class EventActivity extends AppCompatActivity {
 
         eventCalendar = Calendar.getInstance();
 
-
-
         // Set up the date picker
         eventDateInput.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -72,7 +71,6 @@ public class EventActivity extends AppCompatActivity {
                 Intent intent = new Intent(EventActivity.this, EventListActivity.class);
                 intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
                 startActivity(intent);
-                finish();  // Finish EventActivity to return to the event list
             }
         });
 
@@ -85,22 +83,21 @@ public class EventActivity extends AppCompatActivity {
             public boolean onNavigationItemSelected(MenuItem item) {
                 int id = item.getItemId();
 
+                // Navigation based on the selected item
                 if (id == R.id.nav_home) {
                     startActivity(new Intent(EventActivity.this, MainActivity.class));
                     overridePendingTransition(0, 0);
-                    finish();
                     return true;
                 } else if (id == R.id.nav_add_event) {
+                    // Stay on Add Event page
                     return true;
                 } else if (id == R.id.nav_view_events) {
                     startActivity(new Intent(EventActivity.this, EventListActivity.class));
                     overridePendingTransition(0, 0);
-                    finish();
                     return true;
                 } else if (id == R.id.nav_settings) {
                     startActivity(new Intent(EventActivity.this, SettingsActivity.class));
                     overridePendingTransition(0, 0);
-                    finish();
                     return true;
                 }
 
@@ -130,7 +127,6 @@ public class EventActivity extends AppCompatActivity {
         datePickerDialog.show();
     }
 
-    // Opens the TimePickerDialog
     private void openTimePicker() {
         TimePickerDialog timePickerDialog = new TimePickerDialog(
                 EventActivity.this,
@@ -140,8 +136,18 @@ public class EventActivity extends AppCompatActivity {
                         eventCalendar.set(Calendar.HOUR_OF_DAY, hourOfDay);
                         eventCalendar.set(Calendar.MINUTE, minute);
 
-                        // Update the TextView with the selected date and time
-                        SimpleDateFormat dateFormat = new SimpleDateFormat("MMM d, yyyy h:mm a");
+                        // Get user preference for 24-hour or 12-hour format
+                        SharedPreferences sharedPreferences = getSharedPreferences("ThemePref", MODE_PRIVATE);
+                        boolean is24HourFormat = sharedPreferences.getBoolean("is24HourFormat", false);
+
+                        // Set the correct time format based on preference
+                        SimpleDateFormat dateFormat;
+                        if (is24HourFormat) {
+                            dateFormat = new SimpleDateFormat("MMM d, yyyy HH:mm", Locale.getDefault());  // 24-hour format
+                        } else {
+                            dateFormat = new SimpleDateFormat("MMM d, yyyy h:mm a", Locale.getDefault());  // 12-hour AM/PM format
+                        }
+
                         eventDateInput.setText(dateFormat.format(eventCalendar.getTime()));
                     }
                 },

@@ -24,12 +24,14 @@ public class MainActivity extends AppCompatActivity {
     private TextView latestSchedule;
     private Handler handler;
     private Runnable runnable;
+    private boolean is24HourFormat;  // Store the time format preference
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         // Load theme preferences before setting content view
         SharedPreferences sharedPreferences = getSharedPreferences("ThemePref", MODE_PRIVATE);
         boolean isDarkMode = sharedPreferences.getBoolean("isDarkMode", false);
+        is24HourFormat = sharedPreferences.getBoolean("is24HourFormat", false);  // Load time format preference
 
         if (isDarkMode) {
             AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES);
@@ -85,7 +87,7 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void run() {
                 updateClock();
-                handler.postDelayed(this, 1000); // Update every second
+                handler.postDelayed(this, 60000); // Update every minute (60000 milliseconds)
             }
         };
         handler.post(runnable);
@@ -97,9 +99,14 @@ public class MainActivity extends AppCompatActivity {
         loadLatestSchedule();
     }
 
-    // Update the digital clock
+    // Update the digital clock based on user preference (24-hour or 12-hour format)
     private void updateClock() {
-        SimpleDateFormat sdf = new SimpleDateFormat("HH:mm:ss", Locale.getDefault());
+        SimpleDateFormat sdf;
+        if (is24HourFormat) {
+            sdf = new SimpleDateFormat("HH:mm", Locale.getDefault());  // 24-hour format, no seconds
+        } else {
+            sdf = new SimpleDateFormat("hh:mm a", Locale.getDefault());  // 12-hour format with AM/PM
+        }
         String currentTime = sdf.format(new Date());
         digitalClock.setText(currentTime);
     }
@@ -116,12 +123,26 @@ public class MainActivity extends AppCompatActivity {
         currentDate.setText(date);
     }
 
-    // Load the latest schedule (dummy data for now)
+    // Load the latest schedule and apply the correct time format based on user preference
     private void loadLatestSchedule() {
         List<Event> events = DummyData.getEvents();  // Fetch the events from a data source
         if (!events.isEmpty()) {
             Event nextEvent = events.get(0);  // Assuming this is sorted by date
-            latestSchedule.setText("Next: " + nextEvent.getName() + " at " + nextEvent.getFormattedDate());  // Use formatted date
+
+            // Get user preference for time format
+            SharedPreferences sharedPreferences = getSharedPreferences("ThemePref", MODE_PRIVATE);
+            boolean is24HourFormat = sharedPreferences.getBoolean("is24HourFormat", false);
+
+            // Format time based on user preference
+            SimpleDateFormat timeFormat;
+            if (is24HourFormat) {
+                timeFormat = new SimpleDateFormat("HH:mm", Locale.getDefault());  // 24-hour format
+            } else {
+                timeFormat = new SimpleDateFormat("hh:mm a", Locale.getDefault());  // 12-hour format with AM/PM
+            }
+
+            // Display the next event with formatted time
+            latestSchedule.setText("Next: " + nextEvent.getName() + " at " + timeFormat.format(nextEvent.getDateTime()));
         } else {
             latestSchedule.setText("No upcoming schedule");
         }
