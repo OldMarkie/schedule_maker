@@ -3,7 +3,7 @@
 ## Description
 The **Mobile College Schedule Maker/Tracker** is a mobile application designed to help students manage their daily, weekly, and monthly schedules with ease. It allows users to organize class schedules and appointments, making it simpler to stay on top of important events. The app leverages Android's built-in Calendar API, geolocation, SQLite for data storage, and a notification service to provide seamless schedule management.
 
-## Features
+## Features To Be Implemented
 
 - **Add Weekly Schedule**: Create recurring weekly events with specific times and descriptions.
 - **Remove Weekly Schedule**: Delete recurring weekly events.
@@ -16,7 +16,7 @@ The **Mobile College Schedule Maker/Tracker** is a mobile application designed t
 - **Save Schedule as Image**: Export the event schedule as an image for sharing or easy reference.
 - **Settings**: Access various app settings such as notification preferences, theme, and reminders.
 
-## Services / APIs Used
+## Services / APIs To Be Use
 
 - **Android Calendar API**: Integrates class schedules and appointments with Android's built-in Calendar app.
 - **Geolocation**: Verifies if the current location matches the event location.
