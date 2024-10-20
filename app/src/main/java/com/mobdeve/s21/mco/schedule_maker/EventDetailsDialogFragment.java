@@ -2,6 +2,7 @@ package com.mobdeve.s21.mco.schedule_maker;
 
 import android.app.Dialog;
 import android.content.DialogInterface;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -51,7 +52,19 @@ public class EventDetailsDialogFragment extends DialogFragment {
 
         // Set event details
         eventName.setText(event.getName());
-        SimpleDateFormat dateFormat = new SimpleDateFormat("MMM d, yyyy h:mm a", Locale.getDefault());
+
+        // Get user preference for 24-hour or 12-hour format
+        SharedPreferences sharedPreferences = getContext().getSharedPreferences("ThemePref", getContext().MODE_PRIVATE);
+        boolean is24HourFormat = sharedPreferences.getBoolean("is24HourFormat", false);
+
+        // Set the correct time format based on preference
+        SimpleDateFormat dateFormat;
+        if (is24HourFormat) {
+            dateFormat = new SimpleDateFormat("MMM d, yyyy HH:mm", Locale.getDefault());  // 24-hour format
+        } else {
+            dateFormat = new SimpleDateFormat("MMM d, yyyy h:mm a", Locale.getDefault());  // 12-hour AM/PM format
+        }
+
         eventDate.setText(dateFormat.format(event.getDateTime()));
 
         // Handle the edit button click
@@ -83,4 +96,5 @@ public class EventDetailsDialogFragment extends DialogFragment {
 
         return builder.create();
     }
+
 }
