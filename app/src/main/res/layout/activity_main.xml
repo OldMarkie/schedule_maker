@@ -54,19 +54,20 @@
         android:textSize="20sp" />
 
     <!-- Latest schedule displayed below the clock -->
-    <TextView
-        android:id="@+id/latestSchedule"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="20dp"
-        android:text="No upcoming schedule"
-        android:textSize="16sp" />
 
     <!-- Space to push the bottom navigation down -->
 
     <!-- Bottom Navigation Bar -->
 
+    <androidx.fragment.app.FragmentContainerView
+        android:id="@+id/fragmentContainerView"
+        android:name="com.mobdeve.s21.mco.schedule_maker.LatestScheduleFragment"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_weight="1" />
+
     <Space
+        android:id="@+id/fragment_container"
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_weight="1" />

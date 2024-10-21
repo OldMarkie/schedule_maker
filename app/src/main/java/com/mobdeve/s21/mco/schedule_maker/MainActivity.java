@@ -2,29 +2,27 @@ package com.mobdeve.s21.mco.schedule_maker;
 
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.icu.text.SimpleDateFormat;
 import android.os.Bundle;
+import android.os.Handler;
+import android.widget.TextView;
+
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.app.AppCompatDelegate;
-
-import android.os.Handler;
-import android.view.MenuItem;
-import android.widget.TextView;
+import androidx.fragment.app.FragmentTransaction;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 
-import java.text.SimpleDateFormat;
 import java.util.Date;
-import java.util.List;
 import java.util.Locale;
 
 public class MainActivity extends AppCompatActivity {
 
+    private Handler handler;
+    private Runnable runnable;
+    private boolean is24HourFormat;
     private TextView digitalClock;
     private TextView currentDay;
     private TextView currentDate;
-    private TextView latestSchedule;
-    private Handler handler;
-    private Runnable runnable;
-    private boolean is24HourFormat;  // Store the time format preference
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -46,39 +44,35 @@ public class MainActivity extends AppCompatActivity {
         digitalClock = findViewById(R.id.digitalClock);
         currentDay = findViewById(R.id.currentDay);
         currentDate = findViewById(R.id.currentDate);
-        latestSchedule = findViewById(R.id.latestSchedule);
 
         // Set up the BottomNavigationView
         BottomNavigationView bottomNavigationView = findViewById(R.id.bottomNavigationView);
         bottomNavigationView.setSelectedItemId(R.id.nav_home);  // Highlight Home as the selected tab
 
-        bottomNavigationView.setOnNavigationItemSelectedListener(new BottomNavigationView.OnNavigationItemSelectedListener() {
-            @Override
-            public boolean onNavigationItemSelected(MenuItem item) {
-                int id = item.getItemId();
+        bottomNavigationView.setOnNavigationItemSelectedListener(item -> {
+            int id = item.getItemId();
 
-                // Convert switch to if-else statement
-                if (id == R.id.nav_home) {
-                    return true;  // Stay on the home page
-                } else if (id == R.id.nav_add_event) {
-                    startActivity(new Intent(MainActivity.this, EventActivity.class));
-                    overridePendingTransition(0, 0);  // No animation
-                    finish();
-                    return true;
-                } else if (id == R.id.nav_view_events) {
-                    startActivity(new Intent(MainActivity.this, EventListActivity.class));
-                    overridePendingTransition(0, 0);
-                    finish();
-                    return true;
-                } else if (id == R.id.nav_settings) {
-                    startActivity(new Intent(MainActivity.this, SettingsActivity.class));
-                    overridePendingTransition(0, 0);
-                    finish();
-                    return true;
-                }
-
-                return false;
+            // Convert switch to if-else statement
+            if (id == R.id.nav_home) {
+                return true;  // Stay on the home page
+            } else if (id == R.id.nav_add_event) {
+                startActivity(new Intent(MainActivity.this, EventActivity.class));
+                overridePendingTransition(0, 0);  // No animation
+                finish();
+                return true;
+            } else if (id == R.id.nav_view_events) {
+                startActivity(new Intent(MainActivity.this, EventListActivity.class));
+                overridePendingTransition(0, 0);
+                finish();
+                return true;
+            } else if (id == R.id.nav_settings) {
+                startActivity(new Intent(MainActivity.this, SettingsActivity.class));
+                overridePendingTransition(0, 0);
+                finish();
+                return true;
             }
+
+            return false;
         });
 
         // Start the real-time clock
@@ -95,8 +89,16 @@ public class MainActivity extends AppCompatActivity {
         // Display the current day and date
         displayCurrentDayAndDate();
 
-        // Load the upcoming schedule
-        loadLatestSchedule();
+        // Load the LatestScheduleFragment
+        loadLatestScheduleFragment();
+    }
+
+    // Update the loadLatestScheduleFragment method to use the correct ID
+    private void loadLatestScheduleFragment() {
+        LatestScheduleFragment latestScheduleFragment = new LatestScheduleFragment();
+        FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
+        transaction.replace(R.id.fragmentContainerView, latestScheduleFragment);  // Use the correct container ID
+        transaction.commit();
     }
 
     // Update the digital clock based on user preference (24-hour or 12-hour format)
@@ -121,31 +123,6 @@ public class MainActivity extends AppCompatActivity {
 
         currentDay.setText(day);
         currentDate.setText(date);
-    }
-
-    // Load the latest schedule and apply the correct time format based on user preference
-    private void loadLatestSchedule() {
-        List<Event> events = DummyData.getEvents();  // Fetch the events from a data source
-        if (!events.isEmpty()) {
-            Event nextEvent = events.get(0);  // Assuming this is sorted by date
-
-            // Get user preference for time format
-            SharedPreferences sharedPreferences = getSharedPreferences("ThemePref", MODE_PRIVATE);
-            boolean is24HourFormat = sharedPreferences.getBoolean("is24HourFormat", false);
-
-            // Format time based on user preference
-            SimpleDateFormat timeFormat;
-            if (is24HourFormat) {
-                timeFormat = new SimpleDateFormat("HH:mm", Locale.getDefault());  // 24-hour format
-            } else {
-                timeFormat = new SimpleDateFormat("hh:mm a", Locale.getDefault());  // 12-hour format with AM/PM
-            }
-
-            // Display the next event with formatted time
-            latestSchedule.setText("Next: " + nextEvent.getName() + " at " + timeFormat.format(nextEvent.getDateTime()));
-        } else {
-            latestSchedule.setText("No upcoming schedule");
-        }
     }
 
     @Override
