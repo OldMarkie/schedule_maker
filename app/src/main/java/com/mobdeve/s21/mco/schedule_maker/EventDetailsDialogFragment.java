@@ -17,13 +17,12 @@ import java.util.Locale;
 
 public class EventDetailsDialogFragment extends DialogFragment {
 
-    private TextView eventName, eventDate;
+    private TextView eventName, eventDate, eventDescription, eventLocation, eventRecurrence;
     private Button editButton, deleteButton;
 
     private Event event;
     private OnEventActionListener listener;
 
-    // Use this interface to handle edit and delete actions in the host activity
     public interface OnEventActionListener {
         void onEventDelete(Event event);
         void onEventEdit(Event event);
@@ -47,11 +46,16 @@ public class EventDetailsDialogFragment extends DialogFragment {
 
         eventName = view.findViewById(R.id.eventName);
         eventDate = view.findViewById(R.id.eventDate);
+        eventDescription = view.findViewById(R.id.eventDescription);
+        eventLocation = view.findViewById(R.id.eventLocation);
+        eventRecurrence = view.findViewById(R.id.eventRecurrence);
         editButton = view.findViewById(R.id.editButton);
         deleteButton = view.findViewById(R.id.deleteButton);
 
         // Set event details
         eventName.setText(event.getName());
+        eventDescription.setText(event.getDescription());
+        eventLocation.setText(event.getLocation());
 
         // Get user preference for 24-hour or 12-hour format
         SharedPreferences sharedPreferences = getContext().getSharedPreferences("ThemePref", getContext().MODE_PRIVATE);
@@ -60,12 +64,18 @@ public class EventDetailsDialogFragment extends DialogFragment {
         // Set the correct time format based on preference
         SimpleDateFormat dateFormat;
         if (is24HourFormat) {
-            dateFormat = new SimpleDateFormat("MMM d, yyyy HH:mm", Locale.getDefault());  // 24-hour format
+            dateFormat = new SimpleDateFormat("MMM d, yyyy HH:mm", Locale.getDefault());
         } else {
-            dateFormat = new SimpleDateFormat("MMM d, yyyy h:mm a", Locale.getDefault());  // 12-hour AM/PM format
+            dateFormat = new SimpleDateFormat("MMM d, yyyy h:mm a", Locale.getDefault());
         }
-
         eventDate.setText(dateFormat.format(event.getDateTime()));
+
+        // Show if it's a weekly or one-time event
+        if (event.isWeekly()) {
+            eventRecurrence.setText("This is a weekly event.");
+        } else {
+            eventRecurrence.setText("This is a one-time event.");
+        }
 
         // Handle the edit button click
         editButton.setOnClickListener(new View.OnClickListener() {
