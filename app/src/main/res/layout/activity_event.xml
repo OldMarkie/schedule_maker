@@ -34,7 +34,7 @@
                 android:layout_gravity="center"
                 android:foregroundGravity="center"
                 android:gravity="center"
-                android:text="Click on The Buttons To Add Schedules" />
+                android:text="Tap on The Buttons To Add Schedules" />
         </FrameLayout>
 
         <LinearLayout

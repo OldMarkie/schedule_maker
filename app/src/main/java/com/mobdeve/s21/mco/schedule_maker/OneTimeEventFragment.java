@@ -13,6 +13,7 @@ import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentManager;
 
 import java.text.ParseException;
 import java.util.Calendar;
@@ -26,6 +27,7 @@ public class OneTimeEventFragment extends Fragment {
     private EditText eventDateInput;
     private EditText eventTimeInput;
     private Button saveButton;
+    private EventActivity eventActivity;
 
     @Nullable
     @Override
@@ -109,6 +111,12 @@ public class OneTimeEventFragment extends Fragment {
 
         // Notify user
         Toast.makeText(getActivity(), "One-Time Event Saved!", Toast.LENGTH_SHORT).show();
-        getActivity().onBackPressed(); // Go back to the previous screen
+
+        // Clear the back stack to return to EventActivity
+        FragmentManager fragmentManager = getParentFragmentManager();
+        fragmentManager.popBackStack(null, FragmentManager.POP_BACK_STACK_INCLUSIVE);
+
+        ((EventActivity) getActivity()).showHintTextView();
+        //getActivity().onBackPressed(); // Go back to the previous screen
     }
 }

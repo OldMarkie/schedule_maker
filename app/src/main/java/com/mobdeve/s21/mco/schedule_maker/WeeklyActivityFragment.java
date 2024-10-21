@@ -12,6 +12,7 @@ import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentManager;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -26,6 +27,7 @@ public class WeeklyActivityFragment extends Fragment {
     private CheckBox checkMonday, checkTuesday, checkWednesday, checkThursday, checkFriday, checkSaturday, checkSunday;
     private EditText mondayTimeInput, tuesdayTimeInput, wednesdayTimeInput, thursdayTimeInput, fridayTimeInput, saturdayTimeInput, sundayTimeInput;
     private Button saveButton;
+    private EventActivity eventActivity;
 
     @Nullable
     @Override
@@ -192,8 +194,16 @@ public class WeeklyActivityFragment extends Fragment {
 
             // Show a message to the user
             Toast.makeText(getActivity(), "Events saved successfully!", Toast.LENGTH_SHORT).show();
+
+            // Clear the back stack to return to EventActivity
+            FragmentManager fragmentManager = getParentFragmentManager();
+            fragmentManager.popBackStack(null, FragmentManager.POP_BACK_STACK_INCLUSIVE);
+
+            // After saving, show the hint text view again
+            ((EventActivity) getActivity()).showHintTextView();
+
             // Go back to the previous fragment
-            requireActivity().getSupportFragmentManager().popBackStack();
+            //requireActivity().getSupportFragmentManager().popBackStack();
         } else {
             // Handle one-time event case if needed
             Toast.makeText(getActivity(), "Please select at least one day for the weekly event.", Toast.LENGTH_SHORT).show();

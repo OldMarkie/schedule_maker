@@ -86,4 +86,7 @@ public class EventActivity extends AppCompatActivity {
             return false;
         });
     }
+     public void showHintTextView(){
+        hintTextView.setVisibility(View.VISIBLE);
+     }
 }
