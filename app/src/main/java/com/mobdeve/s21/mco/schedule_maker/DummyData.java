@@ -24,11 +24,10 @@ public class DummyData {
             if (event.isWeekly()) {
                 // Weekly recurring events: match the day of the week
                 if (eventDate.get(Calendar.DAY_OF_WEEK) == selectedDate.get(Calendar.DAY_OF_WEEK)) {
-                    filteredEvents.add(event);  // If the event recurs on this weekday, add it to the list
+                    filteredEvents.add(event);
                 }
             }
         }
-
 
         return filteredEvents;
     }
@@ -77,11 +76,10 @@ public class DummyData {
 
     // Return all events (one-time and weekly events) sorted by date
     public static List<Event> getEvents() {
-        // Sort events by date
         Collections.sort(eventList, new Comparator<Event>() {
             @Override
             public int compare(Event e1, Event e2) {
-                return e1.getDateTime().compareTo(e2.getDateTime());  // Sort in ascending order by date
+                return e1.getDateTime().compareTo(e2.getDateTime());
             }
         });
         return eventList;

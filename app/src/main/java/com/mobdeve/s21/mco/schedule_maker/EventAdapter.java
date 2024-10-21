@@ -46,9 +46,9 @@ public class EventAdapter extends RecyclerView.Adapter<EventAdapter.EventViewHol
         // Set the correct time format based on preference
         SimpleDateFormat dateFormat;
         if (is24HourFormat) {
-            dateFormat = new SimpleDateFormat("MMM d, yyyy HH:mm", Locale.getDefault());  // 24-hour format
+            dateFormat = new SimpleDateFormat("MMM d, yyyy HH:mm", Locale.getDefault());
         } else {
-            dateFormat = new SimpleDateFormat("MMM d, yyyy h:mm a", Locale.getDefault());  // 12-hour AM/PM format
+            dateFormat = new SimpleDateFormat("MMM d, yyyy h:mm a", Locale.getDefault());
         }
 
         holder.eventDate.setText(dateFormat.format(event.getDateTime()));

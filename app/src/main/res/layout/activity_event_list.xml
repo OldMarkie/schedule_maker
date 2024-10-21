@@ -30,27 +30,13 @@
                 android:id="@+id/calendarView"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginBottom="16dp" />
-
-            <TextView
-                android:id="@+id/weeklyScheduleTitle"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginBottom="8dp"
-                android:text="Weekly Schedule"
-                android:textSize="18sp"
-                android:textStyle="bold" />
-
-            <androidx.recyclerview.widget.RecyclerView
-                android:id="@+id/recyclerViewWeekly"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content" />
+                android:layout_marginBottom="8dp" />
 
             <TextView
                 android:id="@+id/eventsForDateTitle"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="16dp"
+                android:layout_marginTop="8dp"
                 android:layout_marginBottom="8dp"
                 android:text="Events for Selected Date"
                 android:textSize="18sp"

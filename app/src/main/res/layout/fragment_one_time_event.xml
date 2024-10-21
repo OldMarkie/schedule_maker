@@ -23,6 +23,20 @@
         android:layout_height="wrap_content"
         android:hint="Location" />
 
+    <EditText
+        android:id="@+id/eventDateInput"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="Select Date"
+        android:focusable="false" />
+
+    <EditText
+        android:id="@+id/eventTimeInput"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="Select Time"
+        android:focusable="false" />
+
     <Button
         android:id="@+id/saveButton"
         android:layout_width="match_parent"

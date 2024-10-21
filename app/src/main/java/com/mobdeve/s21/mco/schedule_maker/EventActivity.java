@@ -22,6 +22,7 @@ public class EventActivity extends AppCompatActivity {
 
     private Button oneTimeEventButton;
     private Button weeklyEventButton;
+    private TextView hintTextView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -37,10 +38,12 @@ public class EventActivity extends AppCompatActivity {
 
         oneTimeEventButton = findViewById(R.id.oneTimeEventButton);
         weeklyEventButton = findViewById(R.id.weeklyEventButton);
+        hintTextView = findViewById(R.id.hintTV);
 
         // One-time event button logic
         oneTimeEventButton.setOnClickListener(v -> {
             // Navigate to fragment for one-time event details
+            hintTextView.setVisibility(View.INVISIBLE);
             getSupportFragmentManager().beginTransaction()
                     .replace(R.id.fragment_container, new OneTimeEventFragment())
                     .addToBackStack(null)
@@ -49,6 +52,7 @@ public class EventActivity extends AppCompatActivity {
 
         // Weekly event button logic
         weeklyEventButton.setOnClickListener(v -> {
+            hintTextView.setVisibility(View.INVISIBLE);
             // Navigate to fragment for weekly activity details
             getSupportFragmentManager().beginTransaction()
                     .replace(R.id.fragment_container, new WeeklyActivityFragment())
