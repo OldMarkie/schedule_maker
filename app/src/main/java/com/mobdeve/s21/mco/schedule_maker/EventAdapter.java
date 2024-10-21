@@ -44,14 +44,22 @@ public class EventAdapter extends RecyclerView.Adapter<EventAdapter.EventViewHol
         boolean is24HourFormat = sharedPreferences.getBoolean("is24HourFormat", false);
 
         // Set the correct time format based on preference
-        SimpleDateFormat dateFormat;
+        SimpleDateFormat timeFormat;
         if (is24HourFormat) {
-            dateFormat = new SimpleDateFormat("MMM d, yyyy HH:mm", Locale.getDefault());
+            timeFormat = new SimpleDateFormat("HH:mm", Locale.getDefault());
         } else {
-            dateFormat = new SimpleDateFormat("MMM d, yyyy h:mm a", Locale.getDefault());
+            timeFormat = new SimpleDateFormat("h:mm a", Locale.getDefault());
         }
 
-        holder.eventDate.setText(dateFormat.format(event.getDateTime()));
+        // Format and set only the time in the eventTime TextView
+        holder.eventTime.setText(timeFormat.format(event.getDateTime()));
+
+        // Set the recurrence text (e.g., Weekly or One-time)
+        if (event.isWeekly()) {
+            holder.eventRecurrence.setText("Weekly");
+        } else {
+            holder.eventRecurrence.setText("One-time");
+        }
 
         // Set click listener to show event details
         holder.itemView.setOnClickListener(v -> {
@@ -67,12 +75,14 @@ public class EventAdapter extends RecyclerView.Adapter<EventAdapter.EventViewHol
 
     public static class EventViewHolder extends RecyclerView.ViewHolder {
         public TextView eventName;
-        public TextView eventDate;
+        public TextView eventTime; // This was previously named `eventDate`
+        public TextView eventRecurrence;
 
         public EventViewHolder(View itemView) {
             super(itemView);
             eventName = itemView.findViewById(R.id.eventName);
-            eventDate = itemView.findViewById(R.id.eventDate);
+            eventTime = itemView.findViewById(R.id.eventTime); // Rename `eventDate` to `eventTime`
+            eventRecurrence = itemView.findViewById(R.id.eventRecurrence); // Add `eventRecurrence` if it's in your layout
         }
     }
 }

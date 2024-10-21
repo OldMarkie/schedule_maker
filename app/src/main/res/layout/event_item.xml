@@ -18,14 +18,24 @@
         android:text="Event Name"
         android:textColor="@android:color/black" />
 
-    <!-- Event Date and Time -->
+    <!-- Event Time (time only) -->
     <TextView
-        android:id="@+id/eventDate"
+        android:id="@+id/eventTime"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:textSize="16sp"
-        android:text="Event Date and Time"
+        android:text="Event Time"
         android:textColor="@android:color/darker_gray"
+        android:layout_marginTop="4dp" />
+
+    <!-- Event Recurrence (Weekly or One-time) -->
+    <TextView
+        android:id="@+id/eventRecurrence"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textSize="14sp"
+        android:text="Recurrence Type"
+        android:textColor="@android:color/black"
         android:layout_marginTop="4dp" />
 
 </LinearLayout>
