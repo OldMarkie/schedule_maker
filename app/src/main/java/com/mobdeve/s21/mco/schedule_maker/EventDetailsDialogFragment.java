@@ -17,13 +17,12 @@ import java.util.Locale;
 
 public class EventDetailsDialogFragment extends DialogFragment {
 
-    private TextView eventName, eventDate;
+    private TextView eventName, eventTime, eventRecurrence, eventDescription, eventLocation;
     private Button editButton, deleteButton;
 
     private Event event;
     private OnEventActionListener listener;
 
-    // Use this interface to handle edit and delete actions in the host activity
     public interface OnEventActionListener {
         void onEventDelete(Event event);
         void onEventEdit(Event event);
@@ -46,7 +45,10 @@ public class EventDetailsDialogFragment extends DialogFragment {
         View view = inflater.inflate(R.layout.dialog_event_details, null);
 
         eventName = view.findViewById(R.id.eventName);
-        eventDate = view.findViewById(R.id.eventDate);
+        eventTime = view.findViewById(R.id.eventTime);
+        eventRecurrence = view.findViewById(R.id.eventRecurrence);
+        eventDescription = view.findViewById(R.id.eventDescription); // Initialize eventDescription
+        eventLocation = view.findViewById(R.id.eventLocation); // Initialize eventLocation
         editButton = view.findViewById(R.id.editButton);
         deleteButton = view.findViewById(R.id.deleteButton);
 
@@ -58,14 +60,25 @@ public class EventDetailsDialogFragment extends DialogFragment {
         boolean is24HourFormat = sharedPreferences.getBoolean("is24HourFormat", false);
 
         // Set the correct time format based on preference
-        SimpleDateFormat dateFormat;
+        SimpleDateFormat timeFormat;
         if (is24HourFormat) {
-            dateFormat = new SimpleDateFormat("MMM d, yyyy HH:mm", Locale.getDefault());  // 24-hour format
+            timeFormat = new SimpleDateFormat("HH:mm", Locale.getDefault());  // 24-hour format
         } else {
-            dateFormat = new SimpleDateFormat("MMM d, yyyy h:mm a", Locale.getDefault());  // 12-hour AM/PM format
+            timeFormat = new SimpleDateFormat("h:mm a", Locale.getDefault());  // 12-hour AM/PM format
         }
 
-        eventDate.setText(dateFormat.format(event.getDateTime()));
+        eventTime.setText(timeFormat.format(event.getDateTime()));
+
+        // Show if it's a weekly or one-time event
+        if (event.isWeekly()) {
+            eventRecurrence.setText("Weekly Event");
+        } else {
+            eventRecurrence.setText("One-time Event");
+        }
+
+        // Set event description and location
+        eventDescription.setText(event.getDescription()); // Assuming getDescription() method exists in Event class
+        eventLocation.setText(event.getLocation()); // Assuming getLocation() method exists in Event class
 
         // Handle the edit button click
         editButton.setOnClickListener(new View.OnClickListener() {
@@ -96,5 +109,4 @@ public class EventDetailsDialogFragment extends DialogFragment {
 
         return builder.create();
     }
-
 }
