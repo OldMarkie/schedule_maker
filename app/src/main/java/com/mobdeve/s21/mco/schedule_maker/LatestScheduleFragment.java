@@ -1,5 +1,6 @@
 package com.mobdeve.s21.mco.schedule_maker;
 
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -38,11 +39,17 @@ public class LatestScheduleFragment extends Fragment {
 
     private void loadLatestSchedule() {
         List<Event> events = DummyData.getEvents();  // Fetch the events from a data source
+
         if (!events.isEmpty()) {
             Event nextEvent = events.get(0);  // Assuming this is sorted by date
 
-            // Format the time
-            SimpleDateFormat timeFormat = new SimpleDateFormat("hh:mm a", Locale.getDefault()); // Adjust to 24-hour if needed
+            // Retrieve time format preference from SharedPreferences
+            SharedPreferences sharedPreferences = requireContext().getSharedPreferences("ThemePref", requireContext().MODE_PRIVATE);
+            boolean is24HourFormat = sharedPreferences.getBoolean("is24HourFormat", false);
+
+            // Choose the appropriate time format
+            String timePattern = is24HourFormat ? "HH:mm" : "hh:mm a";
+            SimpleDateFormat timeFormat = new SimpleDateFormat(timePattern, Locale.getDefault());
 
             // Set text to the TextViews
             latestSchedule.setText("Next: " + nextEvent.getName() + " at " + timeFormat.format(nextEvent.getDateTime()));
@@ -54,4 +61,5 @@ public class LatestScheduleFragment extends Fragment {
             eventLocation.setText("");
         }
     }
+
 }
