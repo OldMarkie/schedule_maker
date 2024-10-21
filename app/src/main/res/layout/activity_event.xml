@@ -6,65 +6,69 @@
     android:orientation="vertical"
     android:padding="16dp">
 
-    <!-- Event name input -->
     <TextView
-        android:id="@+id/pageTitle"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_gravity="center"
-        android:layout_weight="0.05"
-        android:text="Home"
-        android:textAllCaps="true"
-        android:textSize="24sp"
+        android:text="Add Events"
+        android:textSize="34sp"
         android:textStyle="bold" />
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_weight="1"
+        android:gravity="center"
         android:orientation="vertical">
 
-        <LinearLayout
+        <FrameLayout
+            android:id="@+id/fragment_container"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="vertical">
-
-            <EditText
-                android:id="@+id/eventNameInput"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:hint="Enter event name" />
+            android:layout_height="0dp"
+            android:layout_gravity="center"
+            android:layout_weight="1">
 
             <TextView
-                android:id="@+id/eventDateInput"
+                android:id="@+id/hintTV"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:foregroundGravity="center"
+                android:gravity="center"
+                android:text="Tap on The Buttons To Add Schedules" />
+        </FrameLayout>
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:gravity="center|left"
+            android:orientation="vertical"
+            android:paddingTop="8dp"
+            android:paddingBottom="8dp">
+
+            <Button
+                android:id="@+id/oneTimeEventButton"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:clickable="true"
-                android:focusable="false"
-                android:hint="Select event date"
-                android:padding="10dp"
-                android:textSize="16sp" />
+                android:layout_margin="8dp"
+                android:text="Add One-Time Event" />
+
+            <Button
+                android:id="@+id/weeklyEventButton"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_margin="8dp"
+                android:text="Add Weekly Activity" />
         </LinearLayout>
 
-        <Space
-            android:layout_width="match_parent"
-            android:layout_height="20dp" />
+        <!-- Fragment container added here -->
 
-        <Button
-            android:id="@+id/saveButton"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="Save Event" />
     </LinearLayout>
 
-    <!-- Event date input (clickable to open DatePicker) -->
-
-    <!-- Save button -->
-
-    <!-- Bottom Navigation Bar -->
     <com.google.android.material.bottomnavigation.BottomNavigationView
         android:id="@+id/bottomNavigationView"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:layout_gravity="bottom"
         app:menu="@menu/bottom_nav_menu" />
+
 </LinearLayout>
