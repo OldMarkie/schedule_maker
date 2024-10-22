@@ -23,6 +23,8 @@ public class LatestScheduleFragment extends Fragment {
     private TextView eventLocation;
     private TextView upcomingOrNon;
     private TextView eventTime;
+    private TextView descTitle;
+    private TextView locTitle;
 
     @Nullable
     @Override
@@ -32,10 +34,12 @@ public class LatestScheduleFragment extends Fragment {
 
         // Initialize TextViews
         latestSchedule = view.findViewById(R.id.latestSchedule);
-        eventDescription = view.findViewById(R.id.eventDescription);  // Initialize new TextView
-        eventLocation = view.findViewById(R.id.eventLocation);        // Initialize new TextView
+        eventDescription = view.findViewById(R.id.eventDescription);
+        eventLocation = view.findViewById(R.id.eventLocation);
         upcomingOrNon = view.findViewById(R.id.UpcomingOrNon);
         eventTime = view.findViewById(R.id.eventTimeTV);
+        descTitle = view.findViewById(R.id.descTitleTV);
+        locTitle = view.findViewById(R.id.locTitleTV);
 
 
         // Load the latest schedule
@@ -74,15 +78,17 @@ public class LatestScheduleFragment extends Fragment {
             // Set text to the TextViews
             upcomingOrNon.setText("Upcoming");
             latestSchedule.setText(nextEvent.getName());
-            eventTime.setText(timeFormat.format(nextEvent.getStartTime()) + " - " + timeFormat.format(nextEvent.getStartTime()) + " (" + dayOfWeek +")" );
-            eventDescription.setText("Description:\n" + nextEvent.getDescription());
-            eventLocation.setText("Location:\n" + nextEvent.getLocation());
+            eventTime.setText(timeFormat.format(nextEvent.getStartTime()) + " - " + timeFormat.format(nextEvent.getEndTime()) + " (" + dayOfWeek +")" );
+            eventDescription.setText(nextEvent.getDescription());
+            eventLocation.setText(nextEvent.getLocation());
         } else {
-            upcomingOrNon.setText("No Upcoming Schedule For Today");
+            upcomingOrNon.setText("No Schedule Stored");
             latestSchedule.setText("");
             eventTime.setText("");
             eventDescription.setText("");
             eventLocation.setText("");
+            locTitle.setText("");
+            descTitle.setText("");
         }
     }
 
