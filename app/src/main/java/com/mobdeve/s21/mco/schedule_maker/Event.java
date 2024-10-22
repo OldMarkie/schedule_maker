@@ -6,14 +6,16 @@ public class Event {
     private String name;
     private String description;
     private String location;
-    private Date dateTime;  // Date and time for the event
+    private Date startTime;  // Start time of the event
+    private Date endTime;    // End time of the event
     private boolean isWeekly; // Indicates if the event is recurring weekly
 
-    public Event(String name, String description, String location, Date dateTime, boolean isWeekly) {
+    public Event(String name, String description, String location, Date startTime, Date endTime, boolean isWeekly) {
         this.name = name;
         this.description = description;
         this.location = location;
-        this.dateTime = dateTime;
+        this.startTime = startTime;
+        this.endTime = endTime;
         this.isWeekly = isWeekly;
     }
 
@@ -29,8 +31,12 @@ public class Event {
         return location;
     }
 
-    public Date getDateTime() {
-        return dateTime;
+    public Date getStartTime() {
+        return startTime;
+    }
+
+    public Date getEndTime() {
+        return endTime;
     }
 
     public boolean isWeekly() {

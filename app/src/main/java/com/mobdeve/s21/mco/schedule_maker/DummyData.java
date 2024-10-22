@@ -19,7 +19,7 @@ public class DummyData {
 
         for (Event event : eventList) {
             Calendar eventDate = Calendar.getInstance();
-            eventDate.setTime(event.getDateTime());
+            eventDate.setTime(event.getStartTime()); // Changed to getStartTime()
 
             if (event.isWeekly()) {
                 // Weekly recurring events: match the day of the week
@@ -40,7 +40,7 @@ public class DummyData {
 
         for (Event event : eventList) {
             Calendar eventDate = Calendar.getInstance();
-            eventDate.setTime(event.getDateTime());
+            eventDate.setTime(event.getStartTime()); // Changed to getStartTime()
 
             if (event.isWeekly()) {
                 // For weekly events, check if the day of the week matches
@@ -74,12 +74,12 @@ public class DummyData {
         eventList.remove(event);
     }
 
-    // Return all events (one-time and weekly events) sorted by date
+    // Return all events (one-time and weekly events) sorted by start time
     public static List<Event> getEvents() {
         Collections.sort(eventList, new Comparator<Event>() {
             @Override
             public int compare(Event e1, Event e2) {
-                return e1.getDateTime().compareTo(e2.getDateTime());
+                return e1.getStartTime().compareTo(e2.getStartTime()); // Changed to getStartTime()
             }
         });
         return eventList;

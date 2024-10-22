@@ -32,6 +32,7 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="8dp"
         android:text="Friday"
+        android:textAllCaps="true"
         android:textSize="34sp"
         android:textStyle="bold" />
 
@@ -58,7 +59,7 @@
     <androidx.fragment.app.FragmentContainerView
         android:id="@+id/fragmentContainerView"
         android:name="com.mobdeve.s21.mco.schedule_maker.LatestScheduleFragment"
-        android:layout_width="wrap_content"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_weight="1" />
 
