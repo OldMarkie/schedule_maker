@@ -26,8 +26,8 @@ public class OneTimeEventFragment extends Fragment {
     private EditText eventLocationInput;
     private EditText eventDateInput;
     private EditText eventTimeInput;
+    private EditText eventEndTimeInput; // Added for end time
     private Button saveButton;
-    private EventActivity eventActivity;
 
     @Nullable
     @Override
@@ -40,13 +40,15 @@ public class OneTimeEventFragment extends Fragment {
         eventLocationInput = view.findViewById(R.id.eventLocationInput);
         eventDateInput = view.findViewById(R.id.eventDateInput);
         eventTimeInput = view.findViewById(R.id.eventTimeInput);
+        eventEndTimeInput = view.findViewById(R.id.eventEndTimeInput); // Initialize end time input
         saveButton = view.findViewById(R.id.saveButton);
 
         // Set up date picker dialog
         eventDateInput.setOnClickListener(v -> showDatePicker());
 
-        // Set up time picker dialog
-        eventTimeInput.setOnClickListener(v -> showTimePicker());
+        // Set up time picker dialogs
+        eventTimeInput.setOnClickListener(v -> showTimePicker(eventTimeInput));
+        eventEndTimeInput.setOnClickListener(v -> showTimePicker(eventEndTimeInput)); // End time picker
 
         saveButton.setOnClickListener(v -> saveEvent());
 
@@ -67,7 +69,7 @@ public class OneTimeEventFragment extends Fragment {
         datePickerDialog.show();
     }
 
-    private void showTimePicker() {
+    private void showTimePicker(EditText timeInput) {
         final Calendar calendar = Calendar.getInstance();
         int hour = calendar.get(Calendar.HOUR_OF_DAY);
         int minute = calendar.get(Calendar.MINUTE);
@@ -75,7 +77,7 @@ public class OneTimeEventFragment extends Fragment {
         TimePickerDialog timePickerDialog = new TimePickerDialog(getActivity(),
                 (view, selectedHour, selectedMinute) -> {
                     String formattedTime = String.format("%02d:%02d", selectedHour, selectedMinute);
-                    eventTimeInput.setText(formattedTime);
+                    timeInput.setText(formattedTime);
                 }, hour, minute, true);
         timePickerDialog.show();
     }
@@ -86,28 +88,36 @@ public class OneTimeEventFragment extends Fragment {
         String eventLocation = eventLocationInput.getText().toString().trim();
         String eventDate = eventDateInput.getText().toString().trim();
         String eventTime = eventTimeInput.getText().toString().trim();
+        String eventEndTime = eventEndTimeInput.getText().toString().trim(); // Get end time
 
-        if (eventName.isEmpty() || eventDescription.isEmpty() || eventLocation.isEmpty() || eventDate.isEmpty() || eventTime.isEmpty()) {
+        if (eventName.isEmpty() || eventDescription.isEmpty() || eventLocation.isEmpty() || eventDate.isEmpty() || eventTime.isEmpty() || eventEndTime.isEmpty()) {
             Toast.makeText(getActivity(), "Please fill in all fields", Toast.LENGTH_SHORT).show();
             return;
         }
 
-        // Combine date and time into a single Date object
-        String dateTimeString = eventDate + " " + eventTime;
+        // Combine date and time into a single Date object for start and end
+        String startDateTimeString = eventDate + " " + eventTime;
+        String endDateTimeString = eventDate + " " + eventEndTime;
         SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy HH:mm");
-        Date eventDateTime;
+        Date eventStartDateTime;
+        Date eventEndDateTime;
+
         try {
-            eventDateTime = dateFormat.parse(dateTimeString);
+            eventStartDateTime = dateFormat.parse(startDateTimeString);
+            eventEndDateTime = dateFormat.parse(endDateTimeString);
         } catch (ParseException e) {
             Toast.makeText(getActivity(), "Invalid date or time format", Toast.LENGTH_SHORT).show();
             return;
         }
 
-        // Create a new Event object
-        Event newEvent = new Event(eventName, eventDescription, eventLocation, eventDateTime, false); // Assuming isWeekly is false for one-time events
+        // Create a new Event object with startTime and endTime
+        Event newEvent = new Event(eventName, eventDescription, eventLocation, eventStartDateTime, eventEndDateTime, false); // isWeekly is false for one-time events
 
-        // Save the event using DummyData
-        DummyData.addEvent(newEvent);
+        // Save the event using DummyData and check for conflict
+        if (!DummyData.addEvent(newEvent)) {
+            Toast.makeText(getActivity(), "Event time conflict!", Toast.LENGTH_SHORT).show();
+            return;
+        }
 
         // Notify user
         Toast.makeText(getActivity(), "One-Time Event Saved!", Toast.LENGTH_SHORT).show();
@@ -117,6 +127,6 @@ public class OneTimeEventFragment extends Fragment {
         fragmentManager.popBackStack(null, FragmentManager.POP_BACK_STACK_INCLUSIVE);
 
         ((EventActivity) getActivity()).showHintTextView();
-        //getActivity().onBackPressed(); // Go back to the previous screen
     }
+
 }

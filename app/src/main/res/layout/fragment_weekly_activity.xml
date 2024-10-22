@@ -31,13 +31,6 @@
         android:gravity="center"
         android:text="Save" />
 
-    <LinearLayout
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:orientation="vertical">
-
-    </LinearLayout>
-
     <ScrollView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -54,96 +47,208 @@
                 android:paddingTop="10dp"
                 android:text="Select Days:" />
 
+            <!-- Monday -->
             <CheckBox
                 android:id="@+id/checkMonday"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="Monday" />
 
-            <EditText
-                android:id="@+id/mondayTimeInput"
+            <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:hint="Monday Time"
-                android:inputType="datetime" />
+                android:orientation="horizontal">
 
+                <EditText
+                    android:id="@+id/mondayStartTimeInput"
+                    android:layout_width="0dp"
+                    android:layout_weight="1"
+                    android:layout_height="wrap_content"
+                    android:hint="Start Time"
+                    android:inputType="time" />
+
+                <EditText
+                    android:id="@+id/mondayEndTimeInput"
+                    android:layout_width="0dp"
+                    android:layout_weight="1"
+                    android:layout_height="wrap_content"
+                    android:hint="End Time"
+                    android:inputType="time" />
+            </LinearLayout>
+
+            <!-- Tuesday -->
             <CheckBox
                 android:id="@+id/checkTuesday"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="Tuesday" />
 
-            <EditText
-                android:id="@+id/tuesdayTimeInput"
+            <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:hint="Tuesday Time"
-                android:inputType="datetime" />
+                android:orientation="horizontal">
 
+                <EditText
+                    android:id="@+id/tuesdayStartTimeInput"
+                    android:layout_width="0dp"
+                    android:layout_weight="1"
+                    android:layout_height="wrap_content"
+                    android:hint="Start Time"
+                    android:inputType="time" />
+
+                <EditText
+                    android:id="@+id/tuesdayEndTimeInput"
+                    android:layout_width="0dp"
+                    android:layout_weight="1"
+                    android:layout_height="wrap_content"
+                    android:hint="End Time"
+                    android:inputType="time" />
+            </LinearLayout>
+
+            <!-- Wednesday -->
             <CheckBox
                 android:id="@+id/checkWednesday"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="Wednesday" />
 
-            <EditText
-                android:id="@+id/wednesdayTimeInput"
+            <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:hint="Wednesday Time"
-                android:inputType="datetime" />
+                android:orientation="horizontal">
 
+                <EditText
+                    android:id="@+id/wednesdayStartTimeInput"
+                    android:layout_width="0dp"
+                    android:layout_weight="1"
+                    android:layout_height="wrap_content"
+                    android:hint="Start Time"
+                    android:inputType="time" />
+
+                <EditText
+                    android:id="@+id/wednesdayEndTimeInput"
+                    android:layout_width="0dp"
+                    android:layout_weight="1"
+                    android:layout_height="wrap_content"
+                    android:hint="End Time"
+                    android:inputType="time" />
+            </LinearLayout>
+
+            <!-- Thursday -->
             <CheckBox
                 android:id="@+id/checkThursday"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="Thursday" />
 
-            <EditText
-                android:id="@+id/thursdayTimeInput"
+            <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:hint="Thursday Time"
-                android:inputType="datetime" />
+                android:orientation="horizontal">
 
+                <EditText
+                    android:id="@+id/thursdayStartTimeInput"
+                    android:layout_width="0dp"
+                    android:layout_weight="1"
+                    android:layout_height="wrap_content"
+                    android:hint="Start Time"
+                    android:inputType="time" />
+
+                <EditText
+                    android:id="@+id/thursdayEndTimeInput"
+                    android:layout_width="0dp"
+                    android:layout_weight="1"
+                    android:layout_height="wrap_content"
+                    android:hint="End Time"
+                    android:inputType="time" />
+            </LinearLayout>
+
+            <!-- Friday -->
             <CheckBox
                 android:id="@+id/checkFriday"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="Friday" />
 
-            <EditText
-                android:id="@+id/fridayTimeInput"
+            <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:hint="Friday Time"
-                android:inputType="datetime" />
+                android:orientation="horizontal">
 
+                <EditText
+                    android:id="@+id/fridayStartTimeInput"
+                    android:layout_width="0dp"
+                    android:layout_weight="1"
+                    android:layout_height="wrap_content"
+                    android:hint="Start Time"
+                    android:inputType="time" />
+
+                <EditText
+                    android:id="@+id/fridayEndTimeInput"
+                    android:layout_width="0dp"
+                    android:layout_weight="1"
+                    android:layout_height="wrap_content"
+                    android:hint="End Time"
+                    android:inputType="time" />
+            </LinearLayout>
+
+            <!-- Saturday -->
             <CheckBox
                 android:id="@+id/checkSaturday"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="Saturday" />
 
-            <EditText
-                android:id="@+id/saturdayTimeInput"
+            <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:hint="Saturday Time"
-                android:inputType="datetime" />
+                android:orientation="horizontal">
 
+                <EditText
+                    android:id="@+id/saturdayStartTimeInput"
+                    android:layout_width="0dp"
+                    android:layout_weight="1"
+                    android:layout_height="wrap_content"
+                    android:hint="Start Time"
+                    android:inputType="time" />
+
+                <EditText
+                    android:id="@+id/saturdayEndTimeInput"
+                    android:layout_width="0dp"
+                    android:layout_weight="1"
+                    android:layout_height="wrap_content"
+                    android:hint="End Time"
+                    android:inputType="time" />
+            </LinearLayout>
+
+            <!-- Sunday -->
             <CheckBox
                 android:id="@+id/checkSunday"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="Sunday" />
 
-            <EditText
-                android:id="@+id/sundayTimeInput"
+            <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:hint="Sunday Time"
-                android:inputType="datetime" />
+                android:orientation="horizontal">
+
+                <EditText
+                    android:id="@+id/sundayStartTimeInput"
+                    android:layout_width="0dp"
+                    android:layout_weight="1"
+                    android:layout_height="wrap_content"
+                    android:hint="Start Time"
+                    android:inputType="time" />
+
+                <EditText
+                    android:id="@+id/sundayEndTimeInput"
+                    android:layout_width="0dp"
+                    android:layout_weight="1"
+                    android:layout_height="wrap_content"
+                    android:hint="End Time"
+                    android:inputType="time" />
+            </LinearLayout>
 
         </LinearLayout>
     </ScrollView>

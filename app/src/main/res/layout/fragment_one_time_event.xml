@@ -34,7 +34,14 @@
         android:id="@+id/eventTimeInput"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:hint="Select Time"
+        android:hint="Select Start Time"
+        android:focusable="false" />
+
+    <EditText
+        android:id="@+id/eventEndTimeInput"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="Select End Time"
         android:focusable="false" />
 
     <Button

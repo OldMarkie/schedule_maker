@@ -19,7 +19,7 @@ public class DummyData {
 
         for (Event event : eventList) {
             Calendar eventDate = Calendar.getInstance();
-            eventDate.setTime(event.getDateTime());
+            eventDate.setTime(event.getStartTime()); // Changed to getStartTime()
 
             if (event.isWeekly()) {
                 // Weekly recurring events: match the day of the week
@@ -40,7 +40,7 @@ public class DummyData {
 
         for (Event event : eventList) {
             Calendar eventDate = Calendar.getInstance();
-            eventDate.setTime(event.getDateTime());
+            eventDate.setTime(event.getStartTime()); // Changed to getStartTime()
 
             if (event.isWeekly()) {
                 // For weekly events, check if the day of the week matches
@@ -64,22 +64,38 @@ public class DummyData {
                 cal1.get(Calendar.DAY_OF_YEAR) == cal2.get(Calendar.DAY_OF_YEAR);
     }
 
-    // Method to add an event (one-time or weekly)
-    public static void addEvent(Event event) {
-        eventList.add(event);
+    // Method to check if an event overlaps with existing events
+    public static boolean isEventTimeConflict(Date startTime, Date endTime) {
+        for (Event event : eventList) {
+            // Check if the event overlaps with any existing event
+            if (startTime.before(event.getEndTime()) && endTime.after(event.getStartTime())) {
+                return true; // There is a conflict
+            }
+        }
+        return false; // No conflict
     }
+
+    // Method to add an event (one-time or weekly)
+    public static boolean addEvent(Event event) {
+        if (isEventTimeConflict(event.getStartTime(), event.getEndTime())) {
+            return false; // Event not added due to conflict
+        }
+        eventList.add(event);
+        return true; // Event added successfully
+    }
+
 
     // Method to delete an event
     public static void deleteEvent(Event event) {
         eventList.remove(event);
     }
 
-    // Return all events (one-time and weekly events) sorted by date
+    // Return all events (one-time and weekly events) sorted by start time
     public static List<Event> getEvents() {
         Collections.sort(eventList, new Comparator<Event>() {
             @Override
             public int compare(Event e1, Event e2) {
-                return e1.getDateTime().compareTo(e2.getDateTime());
+                return e1.getStartTime().compareTo(e2.getStartTime()); // Changed to getStartTime()
             }
         });
         return eventList;

@@ -8,30 +8,21 @@
 
 
     <!-- Title of the page -->
-    <TextView
-        android:id="@+id/pageTitle"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_gravity="center"
-        android:text="Home"
-        android:textAllCaps="true"
-        android:textSize="55sp"
-        android:textStyle="bold" />
 
     <!-- Content of the activity -->
 
+    <!-- Digital Clock at the top-center of the screen -->
     <Space
         android:layout_width="match_parent"
-        android:layout_height="40dp"
-        android:layout_weight="0" />
+        android:layout_height="wrap_content"
+        android:layout_weight="0.5" />
 
-    <!-- Digital Clock at the top-center of the screen -->
     <TextView
         android:id="@+id/digitalClock"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="00:00:00"
-        android:textSize="45sp"
+        android:text="00:00"
+        android:textSize="96sp"
         android:textStyle="bold" />
 
     <!-- Current day below the clock -->
@@ -41,7 +32,8 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="8dp"
         android:text="Friday"
-        android:textSize="24sp"
+        android:textAllCaps="true"
+        android:textSize="34sp"
         android:textStyle="bold" />
 
     <!-- Current date (month, day, year) below the day -->
@@ -51,7 +43,7 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="4dp"
         android:text="Jan 1, 2025"
-        android:textSize="20sp" />
+        android:textSize="24sp" />
 
     <!-- Latest schedule displayed below the clock -->
 
@@ -67,7 +59,7 @@
     <androidx.fragment.app.FragmentContainerView
         android:id="@+id/fragmentContainerView"
         android:name="com.mobdeve.s21.mco.schedule_maker.LatestScheduleFragment"
-        android:layout_width="wrap_content"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_weight="1" />
 

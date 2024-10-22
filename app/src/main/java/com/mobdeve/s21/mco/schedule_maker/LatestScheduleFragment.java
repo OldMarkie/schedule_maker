@@ -11,6 +11,8 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 
 import java.text.SimpleDateFormat;
+import java.util.Calendar;
+import java.util.Date;
 import java.util.List;
 import java.util.Locale;
 
@@ -19,6 +21,10 @@ public class LatestScheduleFragment extends Fragment {
     private TextView latestSchedule;
     private TextView eventDescription;
     private TextView eventLocation;
+    private TextView upcomingOrNon;
+    private TextView eventTime;
+    private TextView descTitle;
+    private TextView locTitle;
 
     @Nullable
     @Override
@@ -28,8 +34,13 @@ public class LatestScheduleFragment extends Fragment {
 
         // Initialize TextViews
         latestSchedule = view.findViewById(R.id.latestSchedule);
-        eventDescription = view.findViewById(R.id.eventDescription);  // Initialize new TextView
-        eventLocation = view.findViewById(R.id.eventLocation);        // Initialize new TextView
+        eventDescription = view.findViewById(R.id.eventDescription);
+        eventLocation = view.findViewById(R.id.eventLocation);
+        upcomingOrNon = view.findViewById(R.id.UpcomingOrNon);
+        eventTime = view.findViewById(R.id.eventTimeTV);
+        descTitle = view.findViewById(R.id.descTitleTV);
+        locTitle = view.findViewById(R.id.locTitleTV);
+
 
         // Load the latest schedule
         loadLatestSchedule();
@@ -51,14 +62,33 @@ public class LatestScheduleFragment extends Fragment {
             String timePattern = is24HourFormat ? "HH:mm" : "hh:mm a";
             SimpleDateFormat timeFormat = new SimpleDateFormat(timePattern, Locale.getDefault());
 
+            // Get start time
+            Date startTime = nextEvent.getStartTime();
+
+            // Create a Calendar instance and set the time
+            Calendar calendar = Calendar.getInstance();
+            calendar.setTime(startTime);
+
+            SimpleDateFormat dayFormat = new SimpleDateFormat("EEEE"); // Full name of the day
+
+            // Get the day of the week
+            String dayOfWeek = dayFormat.format(startTime); // Get the full name of the day
+
+
             // Set text to the TextViews
-            latestSchedule.setText("Next: " + nextEvent.getName() + " at " + timeFormat.format(nextEvent.getDateTime()));
-            eventDescription.setText("Description: " + nextEvent.getDescription());
-            eventLocation.setText("Location: " + nextEvent.getLocation());
+            upcomingOrNon.setText("Upcoming");
+            latestSchedule.setText(nextEvent.getName());
+            eventTime.setText(timeFormat.format(nextEvent.getStartTime()) + " - " + timeFormat.format(nextEvent.getEndTime()) + " (" + dayOfWeek +")" );
+            eventDescription.setText(nextEvent.getDescription());
+            eventLocation.setText(nextEvent.getLocation());
         } else {
-            latestSchedule.setText("No upcoming schedule");
+            upcomingOrNon.setText("No Schedule Stored");
+            latestSchedule.setText("");
+            eventTime.setText("");
             eventDescription.setText("");
             eventLocation.setText("");
+            locTitle.setText("");
+            descTitle.setText("");
         }
     }
 

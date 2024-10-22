@@ -25,9 +25,14 @@ public class WeeklyActivityFragment extends Fragment {
     private EditText activityDescriptionInput;
     private EditText activityLocationInput;
     private CheckBox checkMonday, checkTuesday, checkWednesday, checkThursday, checkFriday, checkSaturday, checkSunday;
-    private EditText mondayTimeInput, tuesdayTimeInput, wednesdayTimeInput, thursdayTimeInput, fridayTimeInput, saturdayTimeInput, sundayTimeInput;
+    private EditText mondayStartTimeInput, mondayEndTimeInput;
+    private EditText tuesdayStartTimeInput, tuesdayEndTimeInput;
+    private EditText wednesdayStartTimeInput, wednesdayEndTimeInput;
+    private EditText thursdayStartTimeInput, thursdayEndTimeInput;
+    private EditText fridayStartTimeInput, fridayEndTimeInput;
+    private EditText saturdayStartTimeInput, saturdayEndTimeInput;
+    private EditText sundayStartTimeInput, sundayEndTimeInput;
     private Button saveButton;
-    private EventActivity eventActivity;
 
     @Nullable
     @Override
@@ -39,19 +44,26 @@ public class WeeklyActivityFragment extends Fragment {
         activityDescriptionInput = view.findViewById(R.id.activityDescriptionInput);
         activityLocationInput = view.findViewById(R.id.activityLocationInput);
         checkMonday = view.findViewById(R.id.checkMonday);
-        mondayTimeInput = view.findViewById(R.id.mondayTimeInput);
+        mondayStartTimeInput = view.findViewById(R.id.mondayStartTimeInput);
+        mondayEndTimeInput = view.findViewById(R.id.mondayEndTimeInput);
         checkTuesday = view.findViewById(R.id.checkTuesday);
-        tuesdayTimeInput = view.findViewById(R.id.tuesdayTimeInput);
+        tuesdayStartTimeInput = view.findViewById(R.id.tuesdayStartTimeInput);
+        tuesdayEndTimeInput = view.findViewById(R.id.tuesdayEndTimeInput);
         checkWednesday = view.findViewById(R.id.checkWednesday);
-        wednesdayTimeInput = view.findViewById(R.id.wednesdayTimeInput);
+        wednesdayStartTimeInput = view.findViewById(R.id.wednesdayStartTimeInput);
+        wednesdayEndTimeInput = view.findViewById(R.id.wednesdayEndTimeInput);
         checkThursday = view.findViewById(R.id.checkThursday);
-        thursdayTimeInput = view.findViewById(R.id.thursdayTimeInput);
+        thursdayStartTimeInput = view.findViewById(R.id.thursdayStartTimeInput);
+        thursdayEndTimeInput = view.findViewById(R.id.thursdayEndTimeInput);
         checkFriday = view.findViewById(R.id.checkFriday);
-        fridayTimeInput = view.findViewById(R.id.fridayTimeInput);
+        fridayStartTimeInput = view.findViewById(R.id.fridayStartTimeInput);
+        fridayEndTimeInput = view.findViewById(R.id.fridayEndTimeInput);
         checkSaturday = view.findViewById(R.id.checkSaturday);
-        saturdayTimeInput = view.findViewById(R.id.saturdayTimeInput);
+        saturdayStartTimeInput = view.findViewById(R.id.saturdayStartTimeInput);
+        saturdayEndTimeInput = view.findViewById(R.id.saturdayEndTimeInput);
         checkSunday = view.findViewById(R.id.checkSunday);
-        sundayTimeInput = view.findViewById(R.id.sundayTimeInput);
+        sundayStartTimeInput = view.findViewById(R.id.sundayStartTimeInput);
+        sundayEndTimeInput = view.findViewById(R.id.sundayEndTimeInput);
         saveButton = view.findViewById(R.id.saveButton);
 
         // Initially set all time inputs to be gone
@@ -69,47 +81,36 @@ public class WeeklyActivityFragment extends Fragment {
 
     private void setupCheckBoxListeners() {
         checkMonday.setOnCheckedChangeListener((buttonView, isChecked) -> {
-            mondayTimeInput.setVisibility(isChecked ? View.VISIBLE : View.GONE);
-            if (isChecked) {
-                mondayTimeInput.setOnClickListener(v -> showTimePicker(mondayTimeInput));
-            }
+            toggleTimeInputs(mondayStartTimeInput, mondayEndTimeInput, isChecked);
         });
         checkTuesday.setOnCheckedChangeListener((buttonView, isChecked) -> {
-            tuesdayTimeInput.setVisibility(isChecked ? View.VISIBLE : View.GONE);
-            if (isChecked) {
-                tuesdayTimeInput.setOnClickListener(v -> showTimePicker(tuesdayTimeInput));
-            }
+            toggleTimeInputs(tuesdayStartTimeInput, tuesdayEndTimeInput, isChecked);
         });
         checkWednesday.setOnCheckedChangeListener((buttonView, isChecked) -> {
-            wednesdayTimeInput.setVisibility(isChecked ? View.VISIBLE : View.GONE);
-            if (isChecked) {
-                wednesdayTimeInput.setOnClickListener(v -> showTimePicker(wednesdayTimeInput));
-            }
+            toggleTimeInputs(wednesdayStartTimeInput, wednesdayEndTimeInput, isChecked);
         });
         checkThursday.setOnCheckedChangeListener((buttonView, isChecked) -> {
-            thursdayTimeInput.setVisibility(isChecked ? View.VISIBLE : View.GONE);
-            if (isChecked) {
-                thursdayTimeInput.setOnClickListener(v -> showTimePicker(thursdayTimeInput));
-            }
+            toggleTimeInputs(thursdayStartTimeInput, thursdayEndTimeInput, isChecked);
         });
         checkFriday.setOnCheckedChangeListener((buttonView, isChecked) -> {
-            fridayTimeInput.setVisibility(isChecked ? View.VISIBLE : View.GONE);
-            if (isChecked) {
-                fridayTimeInput.setOnClickListener(v -> showTimePicker(fridayTimeInput));
-            }
+            toggleTimeInputs(fridayStartTimeInput, fridayEndTimeInput, isChecked);
         });
         checkSaturday.setOnCheckedChangeListener((buttonView, isChecked) -> {
-            saturdayTimeInput.setVisibility(isChecked ? View.VISIBLE : View.GONE);
-            if (isChecked) {
-                saturdayTimeInput.setOnClickListener(v -> showTimePicker(saturdayTimeInput));
-            }
+            toggleTimeInputs(saturdayStartTimeInput, saturdayEndTimeInput, isChecked);
         });
         checkSunday.setOnCheckedChangeListener((buttonView, isChecked) -> {
-            sundayTimeInput.setVisibility(isChecked ? View.VISIBLE : View.GONE);
-            if (isChecked) {
-                sundayTimeInput.setOnClickListener(v -> showTimePicker(sundayTimeInput));
-            }
+            toggleTimeInputs(sundayStartTimeInput, sundayEndTimeInput, isChecked);
         });
+    }
+
+    private void toggleTimeInputs(EditText startInput, EditText endInput, boolean isChecked) {
+        int visibility = isChecked ? View.VISIBLE : View.GONE;
+        startInput.setVisibility(visibility);
+        endInput.setVisibility(visibility);
+        if (isChecked) {
+            startInput.setOnClickListener(v -> showTimePicker(startInput));
+            endInput.setOnClickListener(v -> showTimePicker(endInput));
+        }
     }
 
     private void showTimePicker(final EditText timeInput) {
@@ -144,52 +145,31 @@ public class WeeklyActivityFragment extends Fragment {
             // Iterate through each day of the week and save events accordingly
             if (checkMonday.isChecked()) {
                 baseDate.set(Calendar.DAY_OF_WEEK, Calendar.MONDAY);
-                Event newEvent = createWeeklyEvent(activityName, activityDescription, activityLocation, baseDate, mondayTimeInput);
-                if (newEvent != null) {
-                    DummyData.addEvent(newEvent);
-                }
+                createWeeklyEvent(activityName, activityDescription, activityLocation, baseDate, mondayStartTimeInput, mondayEndTimeInput);
             }
             if (checkTuesday.isChecked()) {
                 baseDate.set(Calendar.DAY_OF_WEEK, Calendar.TUESDAY);
-                Event newEvent = createWeeklyEvent(activityName, activityDescription, activityLocation, baseDate, tuesdayTimeInput);
-                if (newEvent != null) {
-                    DummyData.addEvent(newEvent);
-                }
+                createWeeklyEvent(activityName, activityDescription, activityLocation, baseDate, tuesdayStartTimeInput, tuesdayEndTimeInput);
             }
             if (checkWednesday.isChecked()) {
                 baseDate.set(Calendar.DAY_OF_WEEK, Calendar.WEDNESDAY);
-                Event newEvent = createWeeklyEvent(activityName, activityDescription, activityLocation, baseDate, wednesdayTimeInput);
-                if (newEvent != null) {
-                    DummyData.addEvent(newEvent);
-                }
+                createWeeklyEvent(activityName, activityDescription, activityLocation, baseDate, wednesdayStartTimeInput, wednesdayEndTimeInput);
             }
             if (checkThursday.isChecked()) {
                 baseDate.set(Calendar.DAY_OF_WEEK, Calendar.THURSDAY);
-                Event newEvent = createWeeklyEvent(activityName, activityDescription, activityLocation, baseDate, thursdayTimeInput);
-                if (newEvent != null) {
-                    DummyData.addEvent(newEvent);
-                }
+                createWeeklyEvent(activityName, activityDescription, activityLocation, baseDate, thursdayStartTimeInput, thursdayEndTimeInput);
             }
             if (checkFriday.isChecked()) {
                 baseDate.set(Calendar.DAY_OF_WEEK, Calendar.FRIDAY);
-                Event newEvent = createWeeklyEvent(activityName, activityDescription, activityLocation, baseDate, fridayTimeInput);
-                if (newEvent != null) {
-                    DummyData.addEvent(newEvent);
-                }
+                createWeeklyEvent(activityName, activityDescription, activityLocation, baseDate, fridayStartTimeInput, fridayEndTimeInput);
             }
             if (checkSaturday.isChecked()) {
                 baseDate.set(Calendar.DAY_OF_WEEK, Calendar.SATURDAY);
-                Event newEvent = createWeeklyEvent(activityName, activityDescription, activityLocation, baseDate, saturdayTimeInput);
-                if (newEvent != null) {
-                    DummyData.addEvent(newEvent);
-                }
+                createWeeklyEvent(activityName, activityDescription, activityLocation, baseDate, saturdayStartTimeInput, saturdayEndTimeInput);
             }
             if (checkSunday.isChecked()) {
                 baseDate.set(Calendar.DAY_OF_WEEK, Calendar.SUNDAY);
-                Event newEvent = createWeeklyEvent(activityName, activityDescription, activityLocation, baseDate, sundayTimeInput);
-                if (newEvent != null) {
-                    DummyData.addEvent(newEvent);
-                }
+                createWeeklyEvent(activityName, activityDescription, activityLocation, baseDate, sundayStartTimeInput, sundayEndTimeInput);
             }
 
             // Show a message to the user
@@ -202,32 +182,41 @@ public class WeeklyActivityFragment extends Fragment {
             // After saving, show the hint text view again
             ((EventActivity) getActivity()).showHintTextView();
 
-            // Go back to the previous fragment
-            //requireActivity().getSupportFragmentManager().popBackStack();
         } else {
             // Handle one-time event case if needed
             Toast.makeText(getActivity(), "Please select at least one day for the weekly event.", Toast.LENGTH_SHORT).show();
         }
     }
 
-    // Helper method to create a weekly event based on the selected time
-    private Event createWeeklyEvent(String name, String description, String location, Calendar baseDate, EditText timeInput) {
-        Date eventTime = parseTime(timeInput.getText().toString());
-        if (eventTime != null) {
-            // Combine the base date with the event time (hour and minute)
-            Calendar eventCalendar = Calendar.getInstance();
-            eventCalendar.set(Calendar.YEAR, baseDate.get(Calendar.YEAR));
-            eventCalendar.set(Calendar.MONTH, baseDate.get(Calendar.MONTH));
-            eventCalendar.set(Calendar.DAY_OF_MONTH, baseDate.get(Calendar.DAY_OF_MONTH));
-            eventCalendar.set(Calendar.HOUR_OF_DAY, eventTime.getHours());
-            eventCalendar.set(Calendar.MINUTE, eventTime.getMinutes());
+    private void createWeeklyEvent(String name, String description, String location, Calendar baseDate, EditText startTimeInput, EditText endTimeInput) {
+        Date startTime = parseTime(startTimeInput.getText().toString());
+        Date endTime = parseTime(endTimeInput.getText().toString());
 
-            return new Event(name, description, location, eventCalendar.getTime(), true); // true for weekly events
+        if (startTime != null && endTime != null) {
+            // Combine the base date with the event time (hour and minute)
+            Calendar startEventCalendar = Calendar.getInstance();
+            startEventCalendar.set(Calendar.YEAR, baseDate.get(Calendar.YEAR));
+            startEventCalendar.set(Calendar.MONTH, baseDate.get(Calendar.MONTH));
+            startEventCalendar.set(Calendar.DAY_OF_MONTH, baseDate.get(Calendar.DAY_OF_MONTH));
+            startEventCalendar.set(Calendar.HOUR_OF_DAY, startTime.getHours());
+            startEventCalendar.set(Calendar.MINUTE, startTime.getMinutes());
+
+            Calendar endEventCalendar = Calendar.getInstance();
+            endEventCalendar.set(Calendar.YEAR, baseDate.get(Calendar.YEAR));
+            endEventCalendar.set(Calendar.MONTH, baseDate.get(Calendar.MONTH));
+            endEventCalendar.set(Calendar.DAY_OF_MONTH, baseDate.get(Calendar.DAY_OF_MONTH));
+            endEventCalendar.set(Calendar.HOUR_OF_DAY, endTime.getHours());
+            endEventCalendar.set(Calendar.MINUTE, endTime.getMinutes());
+
+            // Try to add the event and check for conflict
+            if (!DummyData.addEvent(new Event(name, description, location, startEventCalendar.getTime(), endEventCalendar.getTime(), true))) {
+                Toast.makeText(getActivity(), "Event time conflict for " + baseDate.getDisplayName(Calendar.DAY_OF_WEEK, Calendar.LONG, getResources().getConfiguration().locale), Toast.LENGTH_SHORT).show();
+            }
         } else {
             Toast.makeText(getActivity(), "Invalid time for " + baseDate.getDisplayName(Calendar.DAY_OF_WEEK, Calendar.LONG, getResources().getConfiguration().locale), Toast.LENGTH_SHORT).show();
-            return null; // return null if the time was invalid
         }
     }
+
 
     private Date parseTime(String time) {
         SimpleDateFormat sdf = new SimpleDateFormat("HH:mm");
@@ -240,12 +229,19 @@ public class WeeklyActivityFragment extends Fragment {
     }
 
     private void setTimeInputVisibility() {
-        mondayTimeInput.setVisibility(View.GONE);
-        tuesdayTimeInput.setVisibility(View.GONE);
-        wednesdayTimeInput.setVisibility(View.GONE);
-        thursdayTimeInput.setVisibility(View.GONE);
-        fridayTimeInput.setVisibility(View.GONE);
-        saturdayTimeInput.setVisibility(View.GONE);
-        sundayTimeInput.setVisibility(View.GONE);
+        mondayStartTimeInput.setVisibility(View.GONE);
+        mondayEndTimeInput.setVisibility(View.GONE);
+        tuesdayStartTimeInput.setVisibility(View.GONE);
+        tuesdayEndTimeInput.setVisibility(View.GONE);
+        wednesdayStartTimeInput.setVisibility(View.GONE);
+        wednesdayEndTimeInput.setVisibility(View.GONE);
+        thursdayStartTimeInput.setVisibility(View.GONE);
+        thursdayEndTimeInput.setVisibility(View.GONE);
+        fridayStartTimeInput.setVisibility(View.GONE);
+        fridayEndTimeInput.setVisibility(View.GONE);
+        saturdayStartTimeInput.setVisibility(View.GONE);
+        saturdayEndTimeInput.setVisibility(View.GONE);
+        sundayStartTimeInput.setVisibility(View.GONE);
+        sundayEndTimeInput.setVisibility(View.GONE);
     }
 }
