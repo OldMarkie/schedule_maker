@@ -5,12 +5,13 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 
 class BasicViewModel : ViewModel() {
-    private val _events = MutableLiveData<List<Event>>() // Use Event instead of MyEvent
+    private val _events = MutableLiveData<List<Event>>()
     val events: LiveData<List<Event>> = _events
 
-    // Example method to load events (replace with your own logic)
     fun loadEvents() {
-        // Load or fetch events and post value to _events
-        // _events.postValue(fetchedEvents)
+        // Simulate loading events (replace this with actual loading logic)
+        val fetchedEvents = DummyData.getEvents() // Get all events from DummyData
+        _events.postValue(fetchedEvents)
     }
 }
+
