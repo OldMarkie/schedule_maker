@@ -1,0 +1,18 @@
+<com.alamkanak.weekview.WeekView android:id="@+id/weekView"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+
+    app:eventTextColor="@color/white"
+    app:timeColumnTextSize="12sp"
+    app:hourHeight="60dp"
+    app:timeColumnPadding="8dp"
+
+    app:timeColumnBackgroundColor="@color/white"
+    app:headerPadding="12dp"
+    app:columnGap="8dp"
+    app:numberOfVisibleDays="3"
+
+    app:dayBackgroundColor="@color/white"
+
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:android="http://schemas.android.com/apk/res/android" />

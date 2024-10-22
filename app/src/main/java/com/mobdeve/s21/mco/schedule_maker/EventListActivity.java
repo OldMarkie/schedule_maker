@@ -5,6 +5,7 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.widget.Button; // Import Button
 import android.widget.CalendarView;
 import android.widget.TextView;
 import androidx.appcompat.app.AppCompatActivity;
@@ -27,6 +28,7 @@ public class EventListActivity extends AppCompatActivity {
     private TextView pageTitle, eventsForDateTitle;
     private CalendarView calendarView;
     private Date currentSelectedDate;
+    private Button weeklyEventButton; // Declare the button
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -41,6 +43,7 @@ public class EventListActivity extends AppCompatActivity {
         calendarView = findViewById(R.id.calendarView);
         recyclerView = findViewById(R.id.recyclerView);
         eventsForDateTitle = findViewById(R.id.eventsForDateTitle);
+        weeklyEventButton = findViewById(R.id.weeklyEventButton); // Initialize the button
 
         // Disable past dates in the CalendarView
         calendarView.setMinDate(System.currentTimeMillis() - 1000);  // Disable past dates
@@ -72,6 +75,13 @@ public class EventListActivity extends AppCompatActivity {
             selectedDate.set(year, month, dayOfMonth);
             currentSelectedDate = selectedDate.getTime();  // Update the current selected date
             loadEventsForDate(currentSelectedDate);
+        });
+
+        // Handle click for weekly event button
+        weeklyEventButton.setOnClickListener(v -> {
+            // Start the WeeklyEventActivity or Fragment
+            Intent intent = new Intent(EventListActivity.this, BasicActivity.class);
+            startActivity(intent);
         });
 
         // Set up BottomNavigationView
