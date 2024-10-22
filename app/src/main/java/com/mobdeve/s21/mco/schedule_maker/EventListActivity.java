@@ -110,7 +110,14 @@ public class EventListActivity extends AppCompatActivity {
         eventsForDateTitle.setText("Events for " + selectedDateString);
 
         eventList.clear();  // Clear current event list
-        eventList.addAll(DummyData.getEventsForDate(date));  // Load events for the selected date
+        List<Event> eventsForDate = DummyData.getEventsForDate(date);  // Fetch events for the selected date
+
+        if (eventsForDate.isEmpty()) {
+            eventsForDateTitle.setText("No Scheduled Events For " + selectedDateString);
+        } else {
+            eventList.addAll(eventsForDate);  // Add events if available
+        }
+
         eventAdapter.notifyDataSetChanged();  // Notify the adapter to refresh the RecyclerView
     }
 
