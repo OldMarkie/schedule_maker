@@ -113,8 +113,11 @@ public class OneTimeEventFragment extends Fragment {
         // Create a new Event object with startTime and endTime
         Event newEvent = new Event(eventName, eventDescription, eventLocation, eventStartDateTime, eventEndDateTime, false); // isWeekly is false for one-time events
 
-        // Save the event using DummyData
-        DummyData.addEvent(newEvent);
+        // Save the event using DummyData and check for conflict
+        if (!DummyData.addEvent(newEvent)) {
+            Toast.makeText(getActivity(), "Event time conflict!", Toast.LENGTH_SHORT).show();
+            return;
+        }
 
         // Notify user
         Toast.makeText(getActivity(), "One-Time Event Saved!", Toast.LENGTH_SHORT).show();
@@ -125,4 +128,5 @@ public class OneTimeEventFragment extends Fragment {
 
         ((EventActivity) getActivity()).showHintTextView();
     }
+
 }

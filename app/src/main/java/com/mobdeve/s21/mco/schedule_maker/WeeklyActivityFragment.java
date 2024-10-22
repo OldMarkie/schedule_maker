@@ -208,11 +208,15 @@ public class WeeklyActivityFragment extends Fragment {
             endEventCalendar.set(Calendar.HOUR_OF_DAY, endTime.getHours());
             endEventCalendar.set(Calendar.MINUTE, endTime.getMinutes());
 
-            DummyData.addEvent(new Event(name, description, location, startEventCalendar.getTime(), endEventCalendar.getTime(), true)); // true for weekly events
+            // Try to add the event and check for conflict
+            if (!DummyData.addEvent(new Event(name, description, location, startEventCalendar.getTime(), endEventCalendar.getTime(), true))) {
+                Toast.makeText(getActivity(), "Event time conflict for " + baseDate.getDisplayName(Calendar.DAY_OF_WEEK, Calendar.LONG, getResources().getConfiguration().locale), Toast.LENGTH_SHORT).show();
+            }
         } else {
             Toast.makeText(getActivity(), "Invalid time for " + baseDate.getDisplayName(Calendar.DAY_OF_WEEK, Calendar.LONG, getResources().getConfiguration().locale), Toast.LENGTH_SHORT).show();
         }
     }
+
 
     private Date parseTime(String time) {
         SimpleDateFormat sdf = new SimpleDateFormat("HH:mm");

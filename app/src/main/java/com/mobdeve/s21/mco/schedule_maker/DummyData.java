@@ -64,10 +64,26 @@ public class DummyData {
                 cal1.get(Calendar.DAY_OF_YEAR) == cal2.get(Calendar.DAY_OF_YEAR);
     }
 
-    // Method to add an event (one-time or weekly)
-    public static void addEvent(Event event) {
-        eventList.add(event);
+    // Method to check if an event overlaps with existing events
+    public static boolean isEventTimeConflict(Date startTime, Date endTime) {
+        for (Event event : eventList) {
+            // Check if the event overlaps with any existing event
+            if (startTime.before(event.getEndTime()) && endTime.after(event.getStartTime())) {
+                return true; // There is a conflict
+            }
+        }
+        return false; // No conflict
     }
+
+    // Method to add an event (one-time or weekly)
+    public static boolean addEvent(Event event) {
+        if (isEventTimeConflict(event.getStartTime(), event.getEndTime())) {
+            return false; // Event not added due to conflict
+        }
+        eventList.add(event);
+        return true; // Event added successfully
+    }
+
 
     // Method to delete an event
     public static void deleteEvent(Event event) {

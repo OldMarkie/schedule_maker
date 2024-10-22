@@ -75,8 +75,8 @@ public class LatestScheduleFragment extends Fragment {
             upcomingOrNon.setText("Upcoming");
             latestSchedule.setText(nextEvent.getName());
             eventTime.setText(timeFormat.format(nextEvent.getStartTime()) + " - " + timeFormat.format(nextEvent.getStartTime()) + " (" + dayOfWeek +")" );
-            eventDescription.setText("Description: " + nextEvent.getDescription());
-            eventLocation.setText("Location: " + nextEvent.getLocation());
+            eventDescription.setText("Description:\n" + nextEvent.getDescription());
+            eventLocation.setText("Location:\n" + nextEvent.getLocation());
         } else {
             upcomingOrNon.setText("No Upcoming Schedule For Today");
             latestSchedule.setText("");
