@@ -13,11 +13,15 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
+import androidx.work.OneTimeWorkRequest;
+import androidx.work.WorkManager;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.concurrent.TimeUnit;
+
 
 public class WeeklyActivityFragment extends Fragment {
 
@@ -193,28 +197,45 @@ public class WeeklyActivityFragment extends Fragment {
         Date endTime = parseTime(endTimeInput.getText().toString());
 
         if (startTime != null && endTime != null) {
-            // Combine the base date with the event time (hour and minute)
-            Calendar startEventCalendar = Calendar.getInstance();
-            startEventCalendar.set(Calendar.YEAR, baseDate.get(Calendar.YEAR));
-            startEventCalendar.set(Calendar.MONTH, baseDate.get(Calendar.MONTH));
-            startEventCalendar.set(Calendar.DAY_OF_MONTH, baseDate.get(Calendar.DAY_OF_MONTH));
-            startEventCalendar.set(Calendar.HOUR_OF_DAY, startTime.getHours());
-            startEventCalendar.set(Calendar.MINUTE, startTime.getMinutes());
+            // Create the weekly event for the next 6 months
+            Calendar currentEventDate = (Calendar) baseDate.clone();
+            Calendar endDate = Calendar.getInstance();
+            endDate.add(Calendar.MONTH, 6); // Set end date to 6 months from now
 
-            Calendar endEventCalendar = Calendar.getInstance();
-            endEventCalendar.set(Calendar.YEAR, baseDate.get(Calendar.YEAR));
-            endEventCalendar.set(Calendar.MONTH, baseDate.get(Calendar.MONTH));
-            endEventCalendar.set(Calendar.DAY_OF_MONTH, baseDate.get(Calendar.DAY_OF_MONTH));
-            endEventCalendar.set(Calendar.HOUR_OF_DAY, endTime.getHours());
-            endEventCalendar.set(Calendar.MINUTE, endTime.getMinutes());
+            while (currentEventDate.before(endDate)) {
+                Calendar startEventCalendar = (Calendar) currentEventDate.clone();
+                startEventCalendar.set(Calendar.HOUR_OF_DAY, startTime.getHours());
+                startEventCalendar.set(Calendar.MINUTE, startTime.getMinutes());
 
-            // Try to add the event and check for conflict
-            if (!DummyData.addEvent(new Event(name, description, location, startEventCalendar.getTime(), endEventCalendar.getTime(), true))) {
-                Toast.makeText(getActivity(), "Event time conflict for " + baseDate.getDisplayName(Calendar.DAY_OF_WEEK, Calendar.LONG, getResources().getConfiguration().locale), Toast.LENGTH_SHORT).show();
+                Calendar endEventCalendar = (Calendar) currentEventDate.clone();
+                endEventCalendar.set(Calendar.HOUR_OF_DAY, endTime.getHours());
+                endEventCalendar.set(Calendar.MINUTE, endTime.getMinutes());
+
+                // Add this event to your events data
+                if (!DummyData.addEvent(new Event(name, description, location, startEventCalendar.getTime(), endEventCalendar.getTime(), true))) {
+                    Toast.makeText(getActivity(), "Event time conflict for " + baseDate.getDisplayName(Calendar.DAY_OF_WEEK, Calendar.LONG, getResources().getConfiguration().locale), Toast.LENGTH_SHORT).show();
+                    return;
+                }
+
+                // Move to the next week
+                currentEventDate.add(Calendar.WEEK_OF_YEAR, 1);
             }
+
+            // Optionally: Schedule a job to extend the events further after 6 months
+            scheduleEventExtension(baseDate);
         } else {
             Toast.makeText(getActivity(), "Invalid time for " + baseDate.getDisplayName(Calendar.DAY_OF_WEEK, Calendar.LONG, getResources().getConfiguration().locale), Toast.LENGTH_SHORT).show();
         }
+    }
+
+    private void scheduleEventExtension(Calendar baseDate) {
+        // Schedule a task to extend the events by another 6 months after this period
+
+        // Example using WorkManager (You need to add WorkManager dependencies first):
+        WorkManager.getInstance(getActivity())
+                .enqueue(new OneTimeWorkRequest.Builder(EventExtensionWorker.class)
+                        .setInitialDelay(365, TimeUnit.DAYS) // Delay for 6 months
+                        .build());
     }
 
 

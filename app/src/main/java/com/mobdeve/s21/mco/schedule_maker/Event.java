@@ -42,4 +42,8 @@ public class Event {
     public boolean isWeekly() {
         return isWeekly;
     }
+
+    public void setEndTime(Date time) {
+        this.endTime = endTime;
+    }
 }
