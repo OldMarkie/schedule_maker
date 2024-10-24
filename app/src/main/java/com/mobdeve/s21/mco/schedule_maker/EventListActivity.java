@@ -60,7 +60,10 @@ public class EventListActivity extends AppCompatActivity {
 
             @Override
             public void onEventEdit(Event event) {
-                // Edit event logic
+                // Pass the event data to the editing activity
+                Intent intent = new Intent(EventListActivity.this, EditEventActivity.class);
+                intent.putExtra("eventId", event.getId()); // Pass the event ID
+                startActivity(intent);
             }
         });
         recyclerView.setAdapter(eventAdapter);

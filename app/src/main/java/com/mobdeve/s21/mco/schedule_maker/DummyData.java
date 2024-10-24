@@ -19,10 +19,9 @@ public class DummyData {
 
         for (Event event : eventList) {
             Calendar eventDate = Calendar.getInstance();
-            eventDate.setTime(event.getStartTime()); // Changed to getStartTime()
+            eventDate.setTime(event.getStartTime());
 
             if (event.isWeekly()) {
-                // Weekly recurring events: match the day of the week
                 if (eventDate.get(Calendar.DAY_OF_WEEK) == selectedDate.get(Calendar.DAY_OF_WEEK)) {
                     filteredEvents.add(event);
                 }
@@ -40,15 +39,13 @@ public class DummyData {
 
         for (Event event : eventList) {
             Calendar eventDate = Calendar.getInstance();
-            eventDate.setTime(event.getStartTime()); // Changed to getStartTime()
+            eventDate.setTime(event.getStartTime());
 
             if (event.isWeekly()) {
-                // For weekly events, check if the day of the week matches
                 if (eventDate.get(Calendar.DAY_OF_WEEK) == selectedDate.get(Calendar.DAY_OF_WEEK)) {
                     filteredEvents.add(event);
                 }
             } else {
-                // For one-time events, check if the exact date matches
                 if (isSameDay(eventDate, selectedDate)) {
                     filteredEvents.add(event);
                 }
@@ -67,37 +64,45 @@ public class DummyData {
     // Method to check if an event overlaps with existing events
     public static boolean isEventTimeConflict(Date startTime, Date endTime) {
         for (Event event : eventList) {
-            // Check if the event overlaps with any existing event
             if (startTime.before(event.getEndTime()) && endTime.after(event.getStartTime())) {
-                return true; // There is a conflict
+                return true;
             }
         }
-        return false; // No conflict
+        return false;
     }
 
     // Method to add an event (one-time or weekly)
     public static boolean addEvent(Event event) {
         if (isEventTimeConflict(event.getStartTime(), event.getEndTime())) {
-            return false; // Event not added due to conflict
+            return false;
         }
         eventList.add(event);
-        return true; // Event added successfully
+        return true;
     }
-
 
     // Method to delete an event
     public static void deleteEvent(Event event) {
         eventList.remove(event);
     }
 
-    // Return all events (one-time and weekly events) sorted by start time
+    // Return all events sorted by start time
     public static List<Event> getEvents() {
         Collections.sort(eventList, new Comparator<Event>() {
             @Override
             public int compare(Event e1, Event e2) {
-                return e1.getStartTime().compareTo(e2.getStartTime()); // Changed to getStartTime()
+                return e1.getStartTime().compareTo(e2.getStartTime());
             }
         });
         return eventList;
+    }
+
+    // Method to update an existing event
+    public static void updateEvent(Event event) {
+        for (int i = 0; i < eventList.size(); i++) {
+            if (eventList.get(i).getId().equals(event.getId())) {
+                eventList.set(i, event);
+                break;
+            }
+        }
     }
 }
