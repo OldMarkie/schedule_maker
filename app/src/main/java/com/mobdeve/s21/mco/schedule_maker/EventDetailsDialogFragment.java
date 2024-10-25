@@ -67,7 +67,7 @@ public class EventDetailsDialogFragment extends DialogFragment {
             timeFormat = new SimpleDateFormat("h:mm a", Locale.getDefault());  // 12-hour AM/PM format
         }
 
-        eventTime.setText(timeFormat.format(event.getStartTime()));
+        eventTime.setText(timeFormat.format(event.getStartTime()) + " - " + timeFormat.format(event.getEndTime()));
 
         // Show if it's a weekly or one-time event
         if (event.isWeekly()) {
