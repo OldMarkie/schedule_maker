@@ -15,7 +15,7 @@ import androidx.fragment.app.DialogFragment;
 import java.text.SimpleDateFormat;
 import java.util.Locale;
 
-public class EventDetailsDialogFragment extends DialogFragment {
+public class EventDetailsDialogFragment extends DialogFragment{
 
     private TextView eventName, eventTime, eventRecurrence, eventDescription, eventLocation;
     private Button editButton, deleteButton;
@@ -109,4 +109,5 @@ public class EventDetailsDialogFragment extends DialogFragment {
 
         return builder.create();
     }
+
 }

@@ -1,9 +1,10 @@
 package com.mobdeve.s21.mco.schedule_maker;
 
+import java.io.Serializable;
 import java.util.Date;
 import java.util.UUID;
 
-public class Event {
+public class Event implements Serializable {
     private String id;           // Unique identifier for the event
     private String name;
     private String description;
