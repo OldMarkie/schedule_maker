@@ -181,6 +181,7 @@ public class WeeklyActivityFragment extends Fragment {
 
             // After saving, show the hint text view again
             ((EventActivity) getActivity()).showHintTextView();
+            ((EventActivity) getActivity()).showAddWeeklyActivityButton();
 
         } else {
             // Handle one-time event case if needed

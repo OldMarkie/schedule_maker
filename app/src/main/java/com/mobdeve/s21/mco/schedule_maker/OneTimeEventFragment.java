@@ -127,6 +127,7 @@ public class OneTimeEventFragment extends Fragment {
         fragmentManager.popBackStack(null, FragmentManager.POP_BACK_STACK_INCLUSIVE);
 
         ((EventActivity) getActivity()).showHintTextView();
+        ((EventActivity) getActivity()).showAddOneTimeEventButton();
     }
 
 }
