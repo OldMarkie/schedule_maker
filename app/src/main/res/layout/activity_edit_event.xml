@@ -5,41 +5,98 @@
     android:orientation="vertical"
     android:padding="16dp">
 
+    <!-- Radio Group for Event Type -->
+    <RadioGroup
+        android:id="@+id/eventTypeGroup"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <RadioButton
+            android:id="@+id/oneTimeEventRadio"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="One-Time Event"
+            android:checked="true" />
+
+        <RadioButton
+            android:id="@+id/weeklyEventRadio"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Weekly Event" />
+    </RadioGroup>
+
+    <!-- Activity/Event Name Input -->
     <EditText
         android:id="@+id/activityNameInput"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:hint="Activity Name" />
+        android:hint="Activity/Event Name" />
 
+    <!-- Description Input -->
     <EditText
         android:id="@+id/activityDescriptionInput"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:hint="Description" />
 
+    <!-- Location Input -->
     <EditText
         android:id="@+id/activityLocationInput"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:hint="Location" />
 
-    <TextView
+    <!-- Date Input -->
+    <EditText
+        android:id="@+id/eventDateInput"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:paddingTop="10dp"
-        android:text="Select Days:" />
+        android:hint="Select Date"
+        android:focusable="false" />
 
-    <ScrollView
+    <!-- Start Time Input -->
+    <EditText
+        android:id="@+id/eventTimeInput"
         android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:layout_weight="1"
-        android:scrollbars="none">
+        android:layout_height="wrap_content"
+        android:hint="Select Start Time"
+        android:focusable="false" />
+
+    <!-- End Time Input -->
+    <EditText
+        android:id="@+id/eventEndTimeInput"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="Select End Time"
+        android:focusable="false" />
+
+    <!-- Save Button -->
+    <Button
+        android:id="@+id/saveButton"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Save" />
+
+
+    <!-- Weekly Event Selection -->
+    <ScrollView
+        android:id="@+id/weeklyEventContainer"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:visibility="gone">
 
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical">
 
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:paddingTop="10dp"
+                android:text="Select Days:" />
+
+            <!-- Checkbox and Time Inputs for Each Day -->
             <!-- Monday -->
             <CheckBox
                 android:id="@+id/checkMonday"
@@ -55,16 +112,16 @@
                 <EditText
                     android:id="@+id/mondayStartTimeInput"
                     android:layout_width="0dp"
-                    android:layout_height="wrap_content"
                     android:layout_weight="1"
+                    android:layout_height="wrap_content"
                     android:hint="Start Time"
                     android:inputType="time" />
 
                 <EditText
                     android:id="@+id/mondayEndTimeInput"
                     android:layout_width="0dp"
-                    android:layout_height="wrap_content"
                     android:layout_weight="1"
+                    android:layout_height="wrap_content"
                     android:hint="End Time"
                     android:inputType="time" />
             </LinearLayout>
@@ -84,16 +141,16 @@
                 <EditText
                     android:id="@+id/tuesdayStartTimeInput"
                     android:layout_width="0dp"
-                    android:layout_height="wrap_content"
                     android:layout_weight="1"
+                    android:layout_height="wrap_content"
                     android:hint="Start Time"
                     android:inputType="time" />
 
                 <EditText
                     android:id="@+id/tuesdayEndTimeInput"
                     android:layout_width="0dp"
-                    android:layout_height="wrap_content"
                     android:layout_weight="1"
+                    android:layout_height="wrap_content"
                     android:hint="End Time"
                     android:inputType="time" />
             </LinearLayout>
@@ -113,16 +170,16 @@
                 <EditText
                     android:id="@+id/wednesdayStartTimeInput"
                     android:layout_width="0dp"
-                    android:layout_height="wrap_content"
                     android:layout_weight="1"
+                    android:layout_height="wrap_content"
                     android:hint="Start Time"
                     android:inputType="time" />
 
                 <EditText
                     android:id="@+id/wednesdayEndTimeInput"
                     android:layout_width="0dp"
-                    android:layout_height="wrap_content"
                     android:layout_weight="1"
+                    android:layout_height="wrap_content"
                     android:hint="End Time"
                     android:inputType="time" />
             </LinearLayout>
@@ -142,16 +199,16 @@
                 <EditText
                     android:id="@+id/thursdayStartTimeInput"
                     android:layout_width="0dp"
-                    android:layout_height="wrap_content"
                     android:layout_weight="1"
+                    android:layout_height="wrap_content"
                     android:hint="Start Time"
                     android:inputType="time" />
 
                 <EditText
                     android:id="@+id/thursdayEndTimeInput"
                     android:layout_width="0dp"
-                    android:layout_height="wrap_content"
                     android:layout_weight="1"
+                    android:layout_height="wrap_content"
                     android:hint="End Time"
                     android:inputType="time" />
             </LinearLayout>
@@ -171,16 +228,16 @@
                 <EditText
                     android:id="@+id/fridayStartTimeInput"
                     android:layout_width="0dp"
-                    android:layout_height="wrap_content"
                     android:layout_weight="1"
+                    android:layout_height="wrap_content"
                     android:hint="Start Time"
                     android:inputType="time" />
 
                 <EditText
                     android:id="@+id/fridayEndTimeInput"
                     android:layout_width="0dp"
-                    android:layout_height="wrap_content"
                     android:layout_weight="1"
+                    android:layout_height="wrap_content"
                     android:hint="End Time"
                     android:inputType="time" />
             </LinearLayout>
@@ -200,16 +257,16 @@
                 <EditText
                     android:id="@+id/saturdayStartTimeInput"
                     android:layout_width="0dp"
-                    android:layout_height="wrap_content"
                     android:layout_weight="1"
+                    android:layout_height="wrap_content"
                     android:hint="Start Time"
                     android:inputType="time" />
 
                 <EditText
                     android:id="@+id/saturdayEndTimeInput"
                     android:layout_width="0dp"
-                    android:layout_height="wrap_content"
                     android:layout_weight="1"
+                    android:layout_height="wrap_content"
                     android:hint="End Time"
                     android:inputType="time" />
             </LinearLayout>
@@ -229,29 +286,19 @@
                 <EditText
                     android:id="@+id/sundayStartTimeInput"
                     android:layout_width="0dp"
-                    android:layout_height="wrap_content"
                     android:layout_weight="1"
+                    android:layout_height="wrap_content"
                     android:hint="Start Time"
                     android:inputType="time" />
 
                 <EditText
                     android:id="@+id/sundayEndTimeInput"
                     android:layout_width="0dp"
-                    android:layout_height="wrap_content"
                     android:layout_weight="1"
+                    android:layout_height="wrap_content"
                     android:hint="End Time"
                     android:inputType="time" />
             </LinearLayout>
-
         </LinearLayout>
     </ScrollView>
-
-    <Button
-        android:id="@+id/saveButton"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_gravity="center"
-        android:gravity="center"
-        android:text="Save" />
-
 </LinearLayout>

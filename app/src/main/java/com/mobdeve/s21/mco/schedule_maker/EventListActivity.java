@@ -5,13 +5,15 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
-import android.widget.Button; // Import Button
+import android.widget.Button;
 import android.widget.CalendarView;
 import android.widget.TextView;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
+
+
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -20,7 +22,7 @@ import java.util.Date;
 import java.util.List;
 import java.util.Locale;
 
-public class EventListActivity extends AppCompatActivity {
+public class EventListActivity extends AppCompatActivity implements OneTimeEventEditFragment.OnFragmentInteractionListener, WeeklyActivityEditFragment.OnFragmentInteractionListener {
 
     private RecyclerView recyclerView;
     private EventAdapter eventAdapter;
@@ -60,8 +62,18 @@ public class EventListActivity extends AppCompatActivity {
 
             @Override
             public void onEventEdit(Event event) {
-                // Edit event logic
+                if (event.isWeekly()) {
+                    WeeklyActivityEditFragment weeklyEditDialog = new WeeklyActivityEditFragment();
+                    weeklyEditDialog.setDismissListener(EventListActivity.this);
+                    weeklyEditDialog.show(getSupportFragmentManager(), "WeeklyEditDialog");
+                } else {
+                    OneTimeEventEditFragment oneTimeEditDialog = new OneTimeEventEditFragment();
+                    oneTimeEditDialog.setDismissListener(EventListActivity.this);
+                    oneTimeEditDialog.show(getSupportFragmentManager(), "OneTimeEditDialog");
+                }
             }
+
+
         });
         recyclerView.setAdapter(eventAdapter);
 
@@ -143,4 +155,10 @@ public class EventListActivity extends AppCompatActivity {
                 .setNegativeButton("Cancel", null)
                 .show();
     }
+
+    @Override
+    public void onDialogDismissed() {
+        loadEventsForDate(currentSelectedDate); // Reload events when dialog is dismissed
+    }
+
 }

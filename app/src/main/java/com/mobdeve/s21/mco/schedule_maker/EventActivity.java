@@ -43,7 +43,9 @@ public class EventActivity extends AppCompatActivity {
         // One-time event button logic
         oneTimeEventButton.setOnClickListener(v -> {
             // Navigate to fragment for one-time event details
-            hintTextView.setVisibility(View.INVISIBLE);
+            hintTextView.setVisibility(View.GONE);
+            oneTimeEventButton.setVisibility(View.GONE);
+            weeklyEventButton.setVisibility(View.VISIBLE);
             getSupportFragmentManager().beginTransaction()
                     .replace(R.id.fragment_container, new OneTimeEventFragment())
                     .addToBackStack(null)
@@ -52,8 +54,9 @@ public class EventActivity extends AppCompatActivity {
 
         // Weekly event button logic
         weeklyEventButton.setOnClickListener(v -> {
-            hintTextView.setVisibility(View.INVISIBLE);
-            // Navigate to fragment for weekly activity details
+            hintTextView.setVisibility(View.GONE);
+            weeklyEventButton.setVisibility(View.GONE);
+            oneTimeEventButton.setVisibility(View.VISIBLE);
             getSupportFragmentManager().beginTransaction()
                     .replace(R.id.fragment_container, new WeeklyActivityFragment())
                     .addToBackStack(null)
@@ -89,4 +92,12 @@ public class EventActivity extends AppCompatActivity {
      public void showHintTextView(){
         hintTextView.setVisibility(View.VISIBLE);
      }
+
+    public void showAddOneTimeEventButton(){
+        oneTimeEventButton.setVisibility(View.VISIBLE);
+    }
+
+    public void showAddWeeklyActivityButton(){
+        weeklyEventButton.setVisibility(View.VISIBLE);
+    }
 }
