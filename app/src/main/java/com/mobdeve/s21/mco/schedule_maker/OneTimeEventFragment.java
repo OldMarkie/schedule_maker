@@ -1,8 +1,5 @@
 package com.mobdeve.s21.mco.schedule_maker;
 
-import android.app.DatePickerDialog;
-import android.app.TimePickerDialog;
-import android.icu.text.SimpleDateFormat;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -10,12 +7,18 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
+
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 
+import com.google.android.material.datepicker.CalendarConstraints;
+import com.google.android.material.datepicker.MaterialDatePicker;
+import com.google.android.material.timepicker.MaterialTimePicker;
+
 import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
 
@@ -26,7 +29,7 @@ public class OneTimeEventFragment extends Fragment {
     private EditText eventLocationInput;
     private EditText eventDateInput;
     private EditText eventTimeInput;
-    private EditText eventEndTimeInput; // Added for end time
+    private EditText eventEndTimeInput;
     private Button saveButton;
 
     @Nullable
@@ -40,15 +43,15 @@ public class OneTimeEventFragment extends Fragment {
         eventLocationInput = view.findViewById(R.id.eventLocationInput);
         eventDateInput = view.findViewById(R.id.eventDateInput);
         eventTimeInput = view.findViewById(R.id.eventTimeInput);
-        eventEndTimeInput = view.findViewById(R.id.eventEndTimeInput); // Initialize end time input
+        eventEndTimeInput = view.findViewById(R.id.eventEndTimeInput);
         saveButton = view.findViewById(R.id.saveButton);
 
-        // Set up date picker dialog
+        // Set up Material Date Picker
         eventDateInput.setOnClickListener(v -> showDatePicker());
 
-        // Set up time picker dialogs
+        // Set up Material Time Picker
         eventTimeInput.setOnClickListener(v -> showTimePicker(eventTimeInput));
-        eventEndTimeInput.setOnClickListener(v -> showTimePicker(eventEndTimeInput)); // End time picker
+        eventEndTimeInput.setOnClickListener(v -> showTimePicker(eventEndTimeInput));
 
         saveButton.setOnClickListener(v -> saveEvent());
 
@@ -56,30 +59,43 @@ public class OneTimeEventFragment extends Fragment {
     }
 
     private void showDatePicker() {
-        final Calendar calendar = Calendar.getInstance();
-        int year = calendar.get(Calendar.YEAR);
-        int month = calendar.get(Calendar.MONTH);
-        int day = calendar.get(Calendar.DAY_OF_MONTH);
+        // Get today's date in milliseconds
+        long todayInMillis = MaterialDatePicker.todayInUtcMilliseconds();
 
-        DatePickerDialog datePickerDialog = new DatePickerDialog(getActivity(),
-                (view, selectedYear, selectedMonth, selectedDay) -> {
-                    String formattedDate = selectedDay + "/" + (selectedMonth + 1) + "/" + selectedYear;
-                    eventDateInput.setText(formattedDate);
-                }, year, month, day);
-        datePickerDialog.show();
+        // Create a MaterialDatePicker with constraints
+        MaterialDatePicker<Long> datePicker = MaterialDatePicker.Builder.datePicker()
+                .setTitleText("Select Event Date")
+                .setSelection(todayInMillis) // Start with today's date selected
+                .setCalendarConstraints(new CalendarConstraints.Builder()
+                        .setStart(todayInMillis) // Set the minimum date to today
+                        .setEnd(MaterialDatePicker.todayInUtcMilliseconds() + 1000L * 60 * 60 * 24 * 365) // Set the end date to one year from today
+                        .build())
+                .build();
+
+        datePicker.show(getParentFragmentManager(), "DATE_PICKER");
+        datePicker.addOnPositiveButtonClickListener(selection -> {
+            Calendar calendar = Calendar.getInstance();
+            calendar.setTimeInMillis(selection);
+            String formattedDate = new SimpleDateFormat("dd/MM/yyyy").format(calendar.getTime());
+            eventDateInput.setText(formattedDate);
+        });
     }
 
-    private void showTimePicker(EditText timeInput) {
-        final Calendar calendar = Calendar.getInstance();
-        int hour = calendar.get(Calendar.HOUR_OF_DAY);
-        int minute = calendar.get(Calendar.MINUTE);
 
-        TimePickerDialog timePickerDialog = new TimePickerDialog(getActivity(),
-                (view, selectedHour, selectedMinute) -> {
-                    String formattedTime = String.format("%02d:%02d", selectedHour, selectedMinute);
-                    timeInput.setText(formattedTime);
-                }, hour, minute, true);
-        timePickerDialog.show();
+    private void showTimePicker(EditText timeInput) {
+        MaterialTimePicker timePicker = new MaterialTimePicker.Builder()
+                .setTitleText("Select Time")
+                .setPositiveButtonText("OK")
+                .setNegativeButtonText("CANCEL")
+                .setHour(Calendar.getInstance().get(Calendar.HOUR_OF_DAY))
+                .setMinute(Calendar.getInstance().get(Calendar.MINUTE))
+                .build();
+
+        timePicker.show(getParentFragmentManager(), "TIME_PICKER");
+        timePicker.addOnPositiveButtonClickListener(v -> {
+            String formattedTime = String.format("%02d:%02d", timePicker.getHour(), timePicker.getMinute());
+            timeInput.setText(formattedTime);
+        });
     }
 
     private void saveEvent() {
@@ -88,14 +104,15 @@ public class OneTimeEventFragment extends Fragment {
         String eventLocation = eventLocationInput.getText().toString().trim();
         String eventDate = eventDateInput.getText().toString().trim();
         String eventTime = eventTimeInput.getText().toString().trim();
-        String eventEndTime = eventEndTimeInput.getText().toString().trim(); // Get end time
+        String eventEndTime = eventEndTimeInput.getText().toString().trim();
 
-        if (eventName.isEmpty() || eventDescription.isEmpty() || eventLocation.isEmpty() || eventDate.isEmpty() || eventTime.isEmpty() || eventEndTime.isEmpty()) {
+        if (eventName.isEmpty() || eventDescription.isEmpty() || eventLocation.isEmpty() ||
+                eventDate.isEmpty() || eventTime.isEmpty() || eventEndTime.isEmpty()) {
             Toast.makeText(getActivity(), "Please fill in all fields", Toast.LENGTH_SHORT).show();
             return;
         }
 
-        // Combine date and time into a single Date object for start and end
+        // Combine date and time into Date objects
         String startDateTimeString = eventDate + " " + eventTime;
         String endDateTimeString = eventDate + " " + eventEndTime;
         SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy HH:mm");
@@ -105,29 +122,28 @@ public class OneTimeEventFragment extends Fragment {
         try {
             eventStartDateTime = dateFormat.parse(startDateTimeString);
             eventEndDateTime = dateFormat.parse(endDateTimeString);
+
+            // Check if end time is not equal to start time and end time is after start time
+            if (eventEndDateTime.equals(eventStartDateTime) || eventEndDateTime.before(eventStartDateTime)) {
+                Toast.makeText(getActivity(), "End time must be later than start time.", Toast.LENGTH_SHORT).show();
+                return;
+            }
         } catch (ParseException e) {
             Toast.makeText(getActivity(), "Invalid date or time format", Toast.LENGTH_SHORT).show();
             return;
         }
 
-        // Create a new Event object with startTime and endTime
-        Event newEvent = new Event(eventName, eventDescription, eventLocation, eventStartDateTime, eventEndDateTime, false); // isWeekly is false for one-time events
-
-        // Save the event using DummyData and check for conflict
+        // Create and save new Event
+        Event newEvent = new Event(eventName, eventDescription, eventLocation, eventStartDateTime, eventEndDateTime, false);
         if (!DummyData.addEvent(newEvent)) {
             Toast.makeText(getActivity(), "Event time conflict!", Toast.LENGTH_SHORT).show();
             return;
         }
 
-        // Notify user
         Toast.makeText(getActivity(), "One-Time Event Saved!", Toast.LENGTH_SHORT).show();
-
-        // Clear the back stack to return to EventActivity
         FragmentManager fragmentManager = getParentFragmentManager();
         fragmentManager.popBackStack(null, FragmentManager.POP_BACK_STACK_INCLUSIVE);
-
         ((EventActivity) getActivity()).showHintTextView();
         ((EventActivity) getActivity()).showAddOneTimeEventButton();
     }
-
 }

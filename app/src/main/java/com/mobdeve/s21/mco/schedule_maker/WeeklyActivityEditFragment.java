@@ -1,5 +1,6 @@
 package com.mobdeve.s21.mco.schedule_maker;
 
+import android.app.TimePickerDialog;
 import android.content.Context;
 import android.os.Bundle;
 
@@ -12,8 +13,10 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.EditText;
-import android.widget.LinearLayout;
-import android.widget.TextView;
+
+import com.google.android.material.timepicker.MaterialTimePicker;
+
+import java.util.Calendar;
 
 public class WeeklyActivityEditFragment extends DialogFragment {
     private Button saveButton, cancelButton;
@@ -28,6 +31,8 @@ public class WeeklyActivityEditFragment extends DialogFragment {
     private EditText fridayStartTimeInput, fridayEndTimeInput;
     private EditText saturdayStartTimeInput, saturdayEndTimeInput;
     private EditText sundayStartTimeInput, sundayEndTimeInput;
+
+    private Calendar calendar; // Calendar instance to manage date and time
 
     public void setDismissListener(OnFragmentInteractionListener listener) {
         this.listener = listener;
@@ -80,6 +85,8 @@ public class WeeklyActivityEditFragment extends DialogFragment {
         sundayStartTimeInput = view.findViewById(R.id.sundayStartTimeInput);
         sundayEndTimeInput = view.findViewById(R.id.sundayEndTimeInput);
 
+        calendar = Calendar.getInstance(); // Initialize calendar
+
         // Set initial visibility
         setEditTextVisibility();
 
@@ -91,6 +98,22 @@ public class WeeklyActivityEditFragment extends DialogFragment {
         checkFriday.setOnCheckedChangeListener((buttonView, isChecked) -> toggleEditTextVisibility(fridayStartTimeInput, fridayEndTimeInput, isChecked));
         checkSaturday.setOnCheckedChangeListener((buttonView, isChecked) -> toggleEditTextVisibility(saturdayStartTimeInput, saturdayEndTimeInput, isChecked));
         checkSunday.setOnCheckedChangeListener((buttonView, isChecked) -> toggleEditTextVisibility(sundayStartTimeInput, sundayEndTimeInput, isChecked));
+
+        // Set OnClickListeners for time inputs
+        mondayStartTimeInput.setOnClickListener(v -> showTimePicker(mondayStartTimeInput));
+        mondayEndTimeInput.setOnClickListener(v -> showTimePicker(mondayEndTimeInput));
+        tuesdayStartTimeInput.setOnClickListener(v -> showTimePicker(tuesdayStartTimeInput));
+        tuesdayEndTimeInput.setOnClickListener(v -> showTimePicker(tuesdayEndTimeInput));
+        wednesdayStartTimeInput.setOnClickListener(v -> showTimePicker(wednesdayStartTimeInput));
+        wednesdayEndTimeInput.setOnClickListener(v -> showTimePicker(wednesdayEndTimeInput));
+        thursdayStartTimeInput.setOnClickListener(v -> showTimePicker(thursdayStartTimeInput));
+        thursdayEndTimeInput.setOnClickListener(v -> showTimePicker(thursdayEndTimeInput));
+        fridayStartTimeInput.setOnClickListener(v -> showTimePicker(fridayStartTimeInput));
+        fridayEndTimeInput.setOnClickListener(v -> showTimePicker(fridayEndTimeInput));
+        saturdayStartTimeInput.setOnClickListener(v -> showTimePicker(saturdayStartTimeInput));
+        saturdayEndTimeInput.setOnClickListener(v -> showTimePicker(saturdayEndTimeInput));
+        sundayStartTimeInput.setOnClickListener(v -> showTimePicker(sundayStartTimeInput));
+        sundayEndTimeInput.setOnClickListener(v -> showTimePicker(sundayEndTimeInput));
 
         saveButton.setOnClickListener(v -> {
             listener.onDialogDismissed();
@@ -132,5 +155,21 @@ public class WeeklyActivityEditFragment extends DialogFragment {
         saturdayEndTimeInput.setVisibility(View.GONE);
         sundayStartTimeInput.setVisibility(View.GONE);
         sundayEndTimeInput.setVisibility(View.GONE);
+    }
+
+    private void showTimePicker(EditText timeInput) {
+        MaterialTimePicker timePicker = new MaterialTimePicker.Builder()
+                .setTitleText("Select Time")
+                .setPositiveButtonText("OK")
+                .setNegativeButtonText("CANCEL")
+                .setHour(Calendar.getInstance().get(Calendar.HOUR_OF_DAY))
+                .setMinute(Calendar.getInstance().get(Calendar.MINUTE))
+                .build();
+
+        timePicker.show(getParentFragmentManager(), "TIME_PICKER");
+        timePicker.addOnPositiveButtonClickListener(v -> {
+            String formattedTime = String.format("%02d:%02d", timePicker.getHour(), timePicker.getMinute());
+            timeInput.setText(formattedTime);
+        });
     }
 }

@@ -14,6 +14,8 @@ import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 
+import com.google.android.material.timepicker.MaterialTimePicker;
+
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
@@ -113,20 +115,20 @@ public class WeeklyActivityFragment extends Fragment {
         }
     }
 
-    private void showTimePicker(final EditText timeInput) {
-        // Get current time
-        final Calendar calendar = Calendar.getInstance();
-        int hour = calendar.get(Calendar.HOUR_OF_DAY);
-        int minute = calendar.get(Calendar.MINUTE);
+    private void showTimePicker(EditText timeInput) {
+        MaterialTimePicker timePicker = new MaterialTimePicker.Builder()
+                .setTitleText("Select Time")
+                .setPositiveButtonText("OK")
+                .setNegativeButtonText("CANCEL")
+                .setHour(Calendar.getInstance().get(Calendar.HOUR_OF_DAY))
+                .setMinute(Calendar.getInstance().get(Calendar.MINUTE))
+                .build();
 
-        // Create and show the TimePickerDialog
-        TimePickerDialog timePickerDialog = new TimePickerDialog(getActivity(),
-                (view, selectedHour, selectedMinute) -> {
-                    // Format and set the time in the EditText
-                    String formattedTime = String.format("%02d:%02d", selectedHour, selectedMinute);
-                    timeInput.setText(formattedTime);
-                }, hour, minute, true);
-        timePickerDialog.show();
+        timePicker.show(getParentFragmentManager(), "TIME_PICKER");
+        timePicker.addOnPositiveButtonClickListener(v -> {
+            String formattedTime = String.format("%02d:%02d", timePicker.getHour(), timePicker.getMinute());
+            timeInput.setText(formattedTime);
+        });
     }
 
     private void saveActivity() {

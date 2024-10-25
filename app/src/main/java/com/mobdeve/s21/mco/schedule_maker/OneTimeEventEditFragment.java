@@ -1,6 +1,5 @@
 package com.mobdeve.s21.mco.schedule_maker;
 
-import android.app.DatePickerDialog;
 import android.app.TimePickerDialog;
 import android.content.Context;
 import android.os.Bundle;
@@ -15,6 +14,11 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
 
+import com.google.android.material.datepicker.CalendarConstraints;
+import com.google.android.material.datepicker.MaterialDatePicker;
+import com.google.android.material.timepicker.MaterialTimePicker;
+
+import java.text.SimpleDateFormat;
 import java.util.Calendar;
 
 public class OneTimeEventEditFragment extends DialogFragment {
@@ -54,9 +58,9 @@ public class OneTimeEventEditFragment extends DialogFragment {
 
         calendar = Calendar.getInstance(); // Get the current date and time
 
-        dateInput.setOnClickListener(v -> showDatePickerDialog());
-        timeInput.setOnClickListener(v -> showTimePickerDialog(timeInput));
-        endTimeInput.setOnClickListener(v -> showTimePickerDialog(endTimeInput));
+        dateInput.setOnClickListener(v -> showDatePicker());
+        timeInput.setOnClickListener(v -> showTimePicker(timeInput));
+        endTimeInput.setOnClickListener(v -> showTimePicker(endTimeInput));
 
         saveButton.setOnClickListener(v -> {
             // Add any additional logic for saving the event here
@@ -72,30 +76,41 @@ public class OneTimeEventEditFragment extends DialogFragment {
         return view;
     }
 
-    private void showDatePickerDialog() {
-        DatePickerDialog datePickerDialog = new DatePickerDialog(getContext(),
-                (view, year, month, dayOfMonth) -> {
-                    // Update the calendar and set the selected date in the EditText
-                    calendar.set(year, month, dayOfMonth);
-                    dateInput.setText(String.format("%d/%d/%d", dayOfMonth, month + 1, year));
-                },
-                calendar.get(Calendar.YEAR),
-                calendar.get(Calendar.MONTH),
-                calendar.get(Calendar.DAY_OF_MONTH));
-        datePickerDialog.show();
+    private void showDatePicker() {
+        // Get today's date in milliseconds
+        long todayInMillis = MaterialDatePicker.todayInUtcMilliseconds();
+
+        // Create a MaterialDatePicker with constraints
+        MaterialDatePicker<Long> datePicker = MaterialDatePicker.Builder.datePicker()
+                .setTitleText("Select Event Date")
+                .setSelection(todayInMillis) // Start with today's date selected
+                .setCalendarConstraints(new CalendarConstraints.Builder()
+                        .setEnd(Long.MAX_VALUE) // Optional: No end date limit, allows selection of any future date
+                        .build())
+                .build();
+
+        datePicker.show(getParentFragmentManager(), "DATE_PICKER");
+        datePicker.addOnPositiveButtonClickListener(selection -> {
+            Calendar calendar = Calendar.getInstance();
+            calendar.setTimeInMillis(selection);
+            String formattedDate = new SimpleDateFormat("dd/MM/yyyy").format(calendar.getTime());
+            dateInput.setText(formattedDate);
+        });
     }
 
-    private void showTimePickerDialog(EditText timeEditText) {
-        TimePickerDialog timePickerDialog = new TimePickerDialog(getContext(),
-                (view, hourOfDay, minute) -> {
-                    // Update the calendar and set the selected time in the EditText
-                    calendar.set(Calendar.HOUR_OF_DAY, hourOfDay);
-                    calendar.set(Calendar.MINUTE, minute);
-                    timeEditText.setText(String.format("%02d:%02d", hourOfDay, minute));
-                },
-                calendar.get(Calendar.HOUR_OF_DAY),
-                calendar.get(Calendar.MINUTE),
-                true);
-        timePickerDialog.show();
+    private void showTimePicker(EditText timeInput) {
+        MaterialTimePicker timePicker = new MaterialTimePicker.Builder()
+                .setTitleText("Select Time")
+                .setPositiveButtonText("OK")
+                .setNegativeButtonText("CANCEL")
+                .setHour(Calendar.getInstance().get(Calendar.HOUR_OF_DAY))
+                .setMinute(Calendar.getInstance().get(Calendar.MINUTE))
+                .build();
+
+        timePicker.show(getParentFragmentManager(), "TIME_PICKER");
+        timePicker.addOnPositiveButtonClickListener(v -> {
+            String formattedTime = String.format("%02d:%02d", timePicker.getHour(), timePicker.getMinute());
+            timeInput.setText(formattedTime);
+        });
     }
 }
