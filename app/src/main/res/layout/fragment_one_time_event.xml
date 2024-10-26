@@ -29,7 +29,15 @@
         android:hint="Location"
         android:padding="12dp"
         android:textColor="@color/textColorPrimary" />
-
+    <EditText
+        android:id="@+id/colorPickerInput"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="Choose Color (Optional)"
+        android:padding="12dp"
+        android:textColor="@color/textColorPrimary"
+        android:focusable="false"
+        android:clickable="true" />
     <EditText
         android:id="@+id/eventDateInput"
         android:layout_width="match_parent"

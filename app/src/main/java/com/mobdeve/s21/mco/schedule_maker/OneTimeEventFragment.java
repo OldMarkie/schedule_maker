@@ -1,5 +1,7 @@
 package com.mobdeve.s21.mco.schedule_maker;
 
+import android.content.DialogInterface;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -17,6 +19,12 @@ import com.google.android.material.datepicker.CalendarConstraints;
 import com.google.android.material.datepicker.MaterialDatePicker;
 import com.google.android.material.timepicker.MaterialTimePicker;
 
+import com.flask.colorpicker.ColorPickerView;
+import com.flask.colorpicker.OnColorSelectedListener;
+import com.flask.colorpicker.builder.ColorPickerClickListener;
+import com.flask.colorpicker.builder.ColorPickerDialogBuilder;
+
+
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
@@ -32,6 +40,10 @@ public class OneTimeEventFragment extends Fragment {
     private EditText eventEndTimeInput;
     private Button saveButton;
 
+    private int selectedColor = 0xFFFFFFFF; // Default color is white
+    private EditText colorPickerInput;
+
+
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container,
@@ -45,6 +57,12 @@ public class OneTimeEventFragment extends Fragment {
         eventTimeInput = view.findViewById(R.id.eventTimeInput);
         eventEndTimeInput = view.findViewById(R.id.eventEndTimeInput);
         saveButton = view.findViewById(R.id.saveButton);
+        colorPickerInput = view.findViewById(R.id.colorPickerInput);
+
+// Open the color picker dialog when the color input field is clicked
+        colorPickerInput.setOnClickListener(v -> openColorPicker());
+
+
 
         // Set up Material Date Picker
         eventDateInput.setOnClickListener(v -> showDatePicker());
@@ -57,6 +75,35 @@ public class OneTimeEventFragment extends Fragment {
 
         return view;
     }
+
+    private void openColorPicker() {
+        ColorPickerDialogBuilder
+                .with(getContext())
+                .setTitle("Choose color")
+                .initialColor(selectedColor)
+                .wheelType(ColorPickerView.WHEEL_TYPE.FLOWER)
+                .density(12)
+                .setOnColorSelectedListener(new OnColorSelectedListener() {
+                    @Override
+                    public void onColorSelected(int color) {
+                        Toast.makeText(getContext(), "Color selected: #" + Integer.toHexString(color), Toast.LENGTH_SHORT).show();
+                    }
+                })
+                .setPositiveButton("OK", new ColorPickerClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int color, Integer[] allColors) {
+                        selectedColor = color;
+                        // Update the colorPickerInput with the selected color as a hex string
+                        colorPickerInput.setText(String.format("#%06X", (0xFFFFFF & selectedColor)));
+                    }
+                })
+                .setNegativeButton("Cancel", (dialog, which) -> {
+                    // Do nothing if user cancels
+                })
+                .build()
+                .show();
+    }
+
 
     private void showDatePicker() {
         // Get today's date in milliseconds
@@ -105,6 +152,7 @@ public class OneTimeEventFragment extends Fragment {
         String eventDate = eventDateInput.getText().toString().trim();
         String eventTime = eventTimeInput.getText().toString().trim();
         String eventEndTime = eventEndTimeInput.getText().toString().trim();
+        String color = colorPickerInput.getText().toString().trim();
 
         if (eventName.isEmpty() || eventDescription.isEmpty() || eventLocation.isEmpty() ||
                 eventDate.isEmpty() || eventTime.isEmpty() || eventEndTime.isEmpty()) {
@@ -133,8 +181,22 @@ public class OneTimeEventFragment extends Fragment {
             return;
         }
 
+        // Get the color from colorPickerInput or use a default if it's empty
+        String colorString = colorPickerInput.getText().toString().trim();
+        int eventColor;
+        if (colorString.isEmpty()) {
+            eventColor = Color.WHITE; // Default color
+        } else {
+            try {
+                eventColor = Color.parseColor(colorString); // Parse the color
+            } catch (IllegalArgumentException e) {
+                Toast.makeText(getActivity(), "Invalid color format", Toast.LENGTH_SHORT).show();
+                return;
+            }
+        }
+
         // Create and save new Event
-        Event newEvent = new Event(eventName, eventDescription, eventLocation, eventStartDateTime, eventEndDateTime, false);
+        Event newEvent = new Event(eventName, eventDescription, eventLocation, eventStartDateTime, eventEndDateTime, false, eventColor);
         if (!DummyData.addEvent(newEvent)) {
             Toast.makeText(getActivity(), "Event time conflict!", Toast.LENGTH_SHORT).show();
             return;
