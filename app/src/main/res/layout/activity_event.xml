@@ -1,21 +1,23 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:orientation="vertical"
-    android:padding="16dp">
+    android:padding="16dp"
+    android:background="@color/colorBackground">
 
     <TextView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:text="Add Events"
         android:textSize="34sp"
-        android:textStyle="bold" />
+        android:textStyle="bold"
+        android:textColor="@color/textColorPrimary" />
 
     <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="0dp"
         android:layout_weight="1"
         android:gravity="center"
         android:orientation="vertical">
@@ -23,7 +25,7 @@
         <FrameLayout
             android:id="@+id/fragment_container"
             android:layout_width="match_parent"
-            android:layout_height="0dp"
+            android:layout_height="match_parent"
             android:layout_gravity="center"
             android:layout_weight="1">
 
@@ -32,9 +34,9 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center"
-                android:foregroundGravity="center"
-                android:gravity="center"
-                android:text="Tap on The Buttons To Add Schedules" />
+                android:text="Tap on The Buttons To Add Schedules"
+                android:textColor="@color/textColorSecondary" />
+
         </FrameLayout>
 
         <LinearLayout
@@ -50,17 +52,20 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_margin="8dp"
-                android:text="Add One-Time Event" />
+                android:text="Add One-Time Event"
+                android:backgroundTint="@color/colorPrimary"
+                android:textColor="@color/colorOnPrimary" />
 
             <Button
                 android:id="@+id/weeklyEventButton"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_margin="8dp"
-                android:text="Add Weekly Activity" />
-        </LinearLayout>
+                android:text="Add Weekly Activity"
+                android:backgroundTint="@color/colorPrimary"
+                android:textColor="@color/colorOnPrimary" />
 
-        <!-- Fragment container added here -->
+        </LinearLayout>
 
     </LinearLayout>
 
@@ -68,9 +73,10 @@
         android:id="@+id/bottomNavigationView"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_gravity="bottom"
+        android:layout_gravity="bottom|center"
         app:itemIconTint="@color/bottomNavIconColor"
         app:itemTextColor="@color/bottomNavTextColor"
-        app:menu="@menu/bottom_nav_menu" />
+        app:menu="@menu/bottom_nav_menu"
+        android:background="@color/colorBackground" />
 
 </LinearLayout>

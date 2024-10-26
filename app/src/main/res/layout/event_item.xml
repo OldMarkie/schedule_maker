@@ -1,12 +1,11 @@
-<?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="100dp"
-    android:background="@color/colorPrimary"
     android:clickable="true"
     android:focusable="true"
     android:orientation="vertical"
-    android:padding="10dp">
+    android:padding="10dp"
+    android:background="@color/colorBackground">
 
     <!-- Event Name -->
     <TextView
@@ -14,7 +13,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="Event Name"
-        android:textColor="@android:color/black"
+        android:textColor="@color/textColorPrimary"
         android:textSize="18sp"
         android:textStyle="bold" />
 
@@ -25,7 +24,7 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="4dp"
         android:text="Event Time"
-        android:textColor="@android:color/darker_gray"
+        android:textColor="@color/textColorSecondary"
         android:textSize="16sp" />
 
     <!-- Event Recurrence (Weekly or One-time) -->
@@ -35,7 +34,7 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="4dp"
         android:text="Recurrence Type"
-        android:textColor="@android:color/black"
+        android:textColor="@color/textColorSecondary"
         android:textSize="14sp" />
 
 </LinearLayout>

@@ -1,11 +1,20 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <color name="colorPrimaryDark">#000000</color>
-    <color name="colorAccent">#FF4081</color> <!-- This color can stay the same if you want -->
-    <color name="white">#FFFFFFFF</color>
-    <color name="black">#FF000000</color>
-    <color name="colorPrimary">#BB86FC</color>
-    <color name="colorOnPrimary">#FFFFFF</color>
-    <color name="bottomNavIconColor">#FFFFFF</color>
-    <color name="bottomNavTextColor">#FFFFFF</color>
+        <!-- Dark Mode Colors -->
+        <color name="colorPrimary">#BB86FC</color> <!-- Lighter purple for primary elements -->
+        <color name="colorPrimaryDark">#3700B3</color> <!-- Even darker purple for accents -->
+        <color name="colorSecondary">#03DAC5</color> <!-- Teal for secondary elements -->
+        <color name="colorAccent">#F0D46A</color> <!-- Accent color -->
+        <color name="colorBackground">#121212</color> <!-- Dark grey background for dark mode -->
+        <color name="colorOnPrimary">#FFFFFF</color> <!-- White for text/icons on primary elements -->
+        <color name="colorOnSecondary">#000000</color> <!-- Black for text/icons on secondary elements -->
+        <color name="bottomNavIconColor">#D1C4E9</color> <!-- Light greyish purple for icons -->
+        <color name="bottomNavTextColor">#D1C4E9</color> <!-- Light greyish purple for text -->
+        <color name="textColorPrimary">#E0E0E0</color> <!-- Light grey for primary text -->
+        <color name="textColorSecondary">#B0BEC5</color> <!-- Muted grey for secondary text -->
+        <color name="textColorHint">#B0BEC5</color> <!-- Hint text color -->
+        <color name="black">#000000</color> <!-- Can use a darker variant if needed -->
+        <color name="white">#FFFFFF</color> <!-- Can use a lighter variant if needed -->
+        <color name="colorOnIcon">#424242</color>
+        <color name="colorDelete">#FF6F81</color>
 </resources>

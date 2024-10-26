@@ -2,17 +2,25 @@
     <item
         android:id="@+id/nav_home"
         android:icon="@drawable/home"
-        android:title="Home" />
+        android:title="Home"
+        android:iconTint="@color/bottomNavIconColor"
+        android:titleTextColor="@color/textColorPrimary" />
     <item
         android:id="@+id/nav_add_event"
         android:icon="@drawable/add_event"
-        android:title="Add Event" />
+        android:title="Add Event"
+        android:iconTint="@color/bottomNavIconColor"
+        android:titleTextColor="@color/textColorPrimary" />
     <item
         android:id="@+id/nav_view_events"
         android:icon="@drawable/view_events"
-        android:title="View Events" />
+        android:title="View Events"
+        android:iconTint="@color/bottomNavIconColor"
+        android:titleTextColor="@color/textColorPrimary" />
     <item
         android:id="@+id/nav_settings"
         android:icon="@drawable/settings"
-        android:title="Settings" />
+        android:title="Settings"
+        android:iconTint="@color/bottomNavIconColor"
+        android:titleTextColor="@color/textColorPrimary" />
 </menu>

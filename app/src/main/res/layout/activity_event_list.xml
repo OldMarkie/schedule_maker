@@ -4,16 +4,17 @@
     android:layout_height="match_parent"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:orientation="vertical"
-    android:padding="16dp">
+    android:padding="16dp"
+    android:background="@color/colorBackground">
 
-    <!-- CalendarView to select dates -->
     <TextView
         android:id="@+id/pageTitle"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:text="Home"
         android:textSize="34sp"
-        android:textStyle="bold" />
+        android:textStyle="bold"
+        android:textColor="@color/textColorPrimary" />
 
     <CalendarView
         android:id="@+id/calendarView"
@@ -28,7 +29,8 @@
         android:layout_marginBottom="8dp"
         android:text="Events for Selected Date"
         android:textSize="18sp"
-        android:textStyle="bold" />
+        android:textStyle="bold"
+        android:textColor="@color/textColorPrimary" />
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -43,20 +45,15 @@
             android:layout_weight="1" />
     </LinearLayout>
 
-    <!-- RecyclerView for weekly schedule -->
-
-    <!-- List of events for the week -->
-
-    <!-- List of events for the selected date -->
-
-    <!-- Bottom Navigation Bar -->
     <Button
         android:id="@+id/weeklyEventButton"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="center"
         android:layout_margin="16dp"
-        android:text="See Weekly Schedule" />
+        android:text="See Weekly Schedule"
+        android:textColor="@color/colorOnSecondary"
+        android:backgroundTint="@color/colorSecondary" />
 
     <com.google.android.material.bottomnavigation.BottomNavigationView
         android:id="@+id/bottomNavigationView"
@@ -65,8 +62,7 @@
         android:layout_gravity="bottom|center"
         app:itemIconTint="@color/bottomNavIconColor"
         app:itemTextColor="@color/bottomNavTextColor"
-        app:menu="@menu/bottom_nav_menu" />
+        app:menu="@menu/bottom_nav_menu"
+        android:background="@color/colorBackground" />
 
 </LinearLayout>
-
-
