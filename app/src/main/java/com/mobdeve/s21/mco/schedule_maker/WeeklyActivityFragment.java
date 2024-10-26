@@ -14,6 +14,8 @@ import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 
+import com.flask.colorpicker.ColorPickerView;
+import com.flask.colorpicker.builder.ColorPickerDialogBuilder;
 import com.google.android.material.timepicker.MaterialTimePicker;
 
 import java.text.ParseException;
@@ -35,6 +37,9 @@ public class WeeklyActivityFragment extends Fragment {
     private EditText saturdayStartTimeInput, saturdayEndTimeInput;
     private EditText sundayStartTimeInput, sundayEndTimeInput;
     private Button saveButton;
+    private EditText colorPickerInput;
+    private int selectedColor = 0xFFFFFFFF; // Default color is white
+
 
     @Nullable
     @Override
@@ -67,6 +72,12 @@ public class WeeklyActivityFragment extends Fragment {
         sundayStartTimeInput = view.findViewById(R.id.sundayStartTimeInput);
         sundayEndTimeInput = view.findViewById(R.id.sundayEndTimeInput);
         saveButton = view.findViewById(R.id.saveButton);
+
+        colorPickerInput = view.findViewById(R.id.colorPickerInput);
+
+        // Open the color picker dialog when the color input field is clicked
+        colorPickerInput.setOnClickListener(v -> openColorPicker());
+
 
         // Initially set all time inputs to be gone
         setTimeInputVisibility();
@@ -104,6 +115,29 @@ public class WeeklyActivityFragment extends Fragment {
             toggleTimeInputs(sundayStartTimeInput, sundayEndTimeInput, isChecked);
         });
     }
+
+    private void openColorPicker() {
+        ColorPickerDialogBuilder
+                .with(getContext())
+                .setTitle("Choose color")
+                .initialColor(selectedColor)
+                .wheelType(ColorPickerView.WHEEL_TYPE.FLOWER)
+                .density(12)
+                .setOnColorSelectedListener(color -> {
+                    Toast.makeText(getContext(), "Color selected: #" + Integer.toHexString(color), Toast.LENGTH_SHORT).show();
+                })
+                .setPositiveButton("OK", (dialog, color, allColors) -> {
+                    selectedColor = color;
+                    // Update the colorPickerInput with the selected color as a hex string
+                    colorPickerInput.setText(String.format("#%06X", (0xFFFFFF & selectedColor)));
+                })
+                .setNegativeButton("Cancel", (dialog, which) -> {
+                    // Do nothing if user cancels
+                })
+                .build()
+                .show();
+    }
+
 
     private void toggleTimeInputs(EditText startInput, EditText endInput, boolean isChecked) {
         int visibility = isChecked ? View.VISIBLE : View.GONE;
@@ -212,7 +246,7 @@ public class WeeklyActivityFragment extends Fragment {
             endEventCalendar.set(Calendar.MINUTE, endTime.getMinutes());
 
             // Try to add the event and check for conflict
-            if (!DummyData.addEvent(new Event(name, description, location, startEventCalendar.getTime(), endEventCalendar.getTime(), true))) {
+            if (!DummyData.addEvent(new Event(name, description, location, startEventCalendar.getTime(), endEventCalendar.getTime(), true, selectedColor))) {
                 Toast.makeText(getActivity(), "Event time conflict for " + baseDate.getDisplayName(Calendar.DAY_OF_WEEK, Calendar.LONG, getResources().getConfiguration().locale), Toast.LENGTH_SHORT).show();
             }
         } else {
