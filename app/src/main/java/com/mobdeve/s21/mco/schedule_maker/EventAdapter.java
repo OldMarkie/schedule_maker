@@ -7,6 +7,7 @@ import android.icu.text.SimpleDateFormat;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.fragment.app.FragmentActivity;
@@ -61,6 +62,19 @@ public class EventAdapter extends RecyclerView.Adapter<EventAdapter.EventViewHol
             holder.eventRecurrence.setText("One-time");
         }
 
+        // Determine if dark mode is enabled
+        int currentNightMode = activity.getResources().getConfiguration().uiMode &
+                android.content.res.Configuration.UI_MODE_NIGHT_MASK;
+        boolean isDarkMode = (currentNightMode == android.content.res.Configuration.UI_MODE_NIGHT_YES);
+
+        // Set the background color based on event color
+        int eventColor = event.getColor();
+        if (isDarkMode) {
+            // Get the complementary color
+            eventColor = getComplementaryColor(eventColor);
+        }
+        holder.detailsBackground.setBackgroundColor(eventColor); // Set the background color
+
         // Set click listener to show event details
         holder.itemView.setOnClickListener(v -> {
             EventDetailsDialogFragment dialog = EventDetailsDialogFragment.newInstance(event, listener);
@@ -77,12 +91,25 @@ public class EventAdapter extends RecyclerView.Adapter<EventAdapter.EventViewHol
         public TextView eventName;
         public TextView eventTime; // This was previously named `eventDate`
         public TextView eventRecurrence;
+        public LinearLayout detailsBackground;
 
         public EventViewHolder(View itemView) {
             super(itemView);
             eventName = itemView.findViewById(R.id.eventName);
             eventTime = itemView.findViewById(R.id.eventTime); // Rename `eventDate` to `eventTime`
             eventRecurrence = itemView.findViewById(R.id.eventRecurrence); // Add `eventRecurrence` if it's in your layout
+            detailsBackground = itemView.findViewById(R.id.detailsBackground);
         }
+    }
+
+    // Method to get the complementary color
+    private int getComplementaryColor(int color) {
+        // Extract RGB values
+        int r = (color >> 16) & 0xFF;
+        int g = (color >> 8) & 0xFF;
+        int b = color & 0xFF;
+
+        // Invert the RGB values
+        return 0xFF000000 | ((255 - r) << 16) | ((255 - g) << 8) | (255 - b); // Preserve alpha channel
     }
 }
