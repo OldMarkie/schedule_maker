@@ -2,15 +2,14 @@ package com.mobdeve.s21.mco.schedule_maker
 
 import android.content.Intent
 import android.os.Bundle
-import android.widget.Button
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import com.alamkanak.weekview.WeekView // Import the WeekView class
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import java.util.Calendar
 
-class BasicActivity : AppCompatActivity() {
-    private val viewModel by viewModels<BasicViewModel>()
+class WeeklySchedActivity : AppCompatActivity() {
+    private val viewModel by viewModels<WeeklySchedViewModel>()
     private lateinit var weekView: WeekView // Change this to WeekView
     private lateinit var adapter: MyCustomPagingAdapter
 

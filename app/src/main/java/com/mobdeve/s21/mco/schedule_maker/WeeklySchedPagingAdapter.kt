@@ -1,6 +1,5 @@
 package com.mobdeve.s21.mco.schedule_maker
 
-import android.content.Context
 import com.alamkanak.weekview.WeekView
 import com.alamkanak.weekview.WeekViewEntity
 import java.util.Calendar
