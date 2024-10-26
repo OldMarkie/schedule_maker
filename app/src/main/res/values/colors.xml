@@ -1,12 +1,20 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <color name="colorPrimaryDark">#000000</color>
-    <color name="colorAccent">#FF4081</color>
-    <color name="white">#FFFFFF</color>
+    <!-- Light Mode Colors -->
+    <color name="colorPrimary">#6200EE</color> <!-- Purple for primary elements -->
+    <color name="colorPrimaryDark">#3700B3</color> <!-- Darker shade of purple -->
+    <color name="colorSecondary">#03DAC5</color> <!-- Teal for secondary elements -->
+    <color name="colorAccent">#F0D46A</color>
+    <color name="colorBackground">#FFFFFF</color> <!-- White background for light mode -->
+    <color name="colorOnPrimary">#FFFFFF</color> <!-- Text/icon color on primary elements -->
+    <color name="colorOnSecondary">#FFFFFF</color> <!-- Text/icon color on secondary elements -->
+    <color name="bottomNavIconColor">#6200EE</color> <!-- Purple icons for navigation -->
+    <color name="bottomNavTextColor">#6200EE</color> <!-- Purple text for navigation -->
+    <color name="textColorPrimary">#000000</color> <!-- Primary text color (black) -->
+    <color name="textColorSecondary">#555555</color> <!-- Slightly muted grey text -->
+    <color name="textColorHint">#B0BEC5</color> <!-- Hint text color -->
     <color name="black">#000000</color>
-    <color name="colorPrimary">#6200EE</color>
-    <color name="colorOnPrimary">#FFFFFF</color>
-    <color name="bottomNavIconColor">#000000</color>
-    <color name="bottomNavTextColor">#000000</color>
-
+    <color name="white">#FFFFFF</color>
+    <color name="colorOnIcon">#424242</color>
+    <color name="colorDelete">#C62828</color>
 </resources>

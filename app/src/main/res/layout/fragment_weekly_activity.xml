@@ -9,25 +9,29 @@
         android:id="@+id/activityNameInput"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:hint="Activity Name" />
+        android:hint="Activity Name"
+        android:textColor="@color/textColorPrimary" />
 
     <EditText
         android:id="@+id/activityDescriptionInput"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:hint="Description" />
+        android:hint="Description"
+        android:textColor="@color/textColorPrimary" />
 
     <EditText
         android:id="@+id/activityLocationInput"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:hint="Location" />
+        android:hint="Location"
+        android:textColor="@color/textColorPrimary" />
 
     <TextView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:paddingTop="10dp"
-        android:text="Select Days:" />
+        android:text="Select Days:"
+        android:textColor="@color/textColorPrimary" />
 
     <ScrollView
         android:layout_width="match_parent"
@@ -40,12 +44,12 @@
             android:layout_height="wrap_content"
             android:orientation="vertical">
 
-            <!-- Monday -->
             <CheckBox
                 android:id="@+id/checkMonday"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Monday" />
+                android:text="Monday"
+                android:textColor="@color/textColorPrimary" />
 
             <LinearLayout
                 android:layout_width="match_parent"
@@ -58,7 +62,8 @@
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
                     android:hint="Start Time"
-                    android:inputType="time" />
+                    android:inputType="time"
+                    android:textColor="@color/textColorPrimary" />
 
                 <EditText
                     android:id="@+id/mondayEndTimeInput"
@@ -66,15 +71,16 @@
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
                     android:hint="End Time"
-                    android:inputType="time" />
+                    android:inputType="time"
+                    android:textColor="@color/textColorPrimary" />
             </LinearLayout>
 
-            <!-- Tuesday -->
             <CheckBox
                 android:id="@+id/checkTuesday"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Tuesday" />
+                android:text="Tuesday"
+                android:textColor="@color/textColorPrimary" />
 
             <LinearLayout
                 android:layout_width="match_parent"
@@ -87,7 +93,8 @@
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
                     android:hint="Start Time"
-                    android:inputType="time" />
+                    android:inputType="time"
+                    android:textColor="@color/textColorPrimary" />
 
                 <EditText
                     android:id="@+id/tuesdayEndTimeInput"
@@ -95,15 +102,16 @@
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
                     android:hint="End Time"
-                    android:inputType="time" />
+                    android:inputType="time"
+                    android:textColor="@color/textColorPrimary" />
             </LinearLayout>
 
-            <!-- Wednesday -->
             <CheckBox
                 android:id="@+id/checkWednesday"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Wednesday" />
+                android:text="Wednesday"
+                android:textColor="@color/textColorPrimary" />
 
             <LinearLayout
                 android:layout_width="match_parent"
@@ -116,7 +124,8 @@
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
                     android:hint="Start Time"
-                    android:inputType="time" />
+                    android:inputType="time"
+                    android:textColor="@color/textColorPrimary" />
 
                 <EditText
                     android:id="@+id/wednesdayEndTimeInput"
@@ -124,15 +133,16 @@
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
                     android:hint="End Time"
-                    android:inputType="time" />
+                    android:inputType="time"
+                    android:textColor="@color/textColorPrimary" />
             </LinearLayout>
 
-            <!-- Thursday -->
             <CheckBox
                 android:id="@+id/checkThursday"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Thursday" />
+                android:text="Thursday"
+                android:textColor="@color/textColorPrimary" />
 
             <LinearLayout
                 android:layout_width="match_parent"
@@ -145,7 +155,8 @@
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
                     android:hint="Start Time"
-                    android:inputType="time" />
+                    android:inputType="time"
+                    android:textColor="@color/textColorPrimary" />
 
                 <EditText
                     android:id="@+id/thursdayEndTimeInput"
@@ -153,15 +164,16 @@
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
                     android:hint="End Time"
-                    android:inputType="time" />
+                    android:inputType="time"
+                    android:textColor="@color/textColorPrimary" />
             </LinearLayout>
 
-            <!-- Friday -->
             <CheckBox
                 android:id="@+id/checkFriday"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Friday" />
+                android:text="Friday"
+                android:textColor="@color/textColorPrimary" />
 
             <LinearLayout
                 android:layout_width="match_parent"
@@ -174,7 +186,8 @@
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
                     android:hint="Start Time"
-                    android:inputType="time" />
+                    android:inputType="time"
+                    android:textColor="@color/textColorPrimary" />
 
                 <EditText
                     android:id="@+id/fridayEndTimeInput"
@@ -182,15 +195,16 @@
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
                     android:hint="End Time"
-                    android:inputType="time" />
+                    android:inputType="time"
+                    android:textColor="@color/textColorPrimary" />
             </LinearLayout>
 
-            <!-- Saturday -->
             <CheckBox
                 android:id="@+id/checkSaturday"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Saturday" />
+                android:text="Saturday"
+                android:textColor="@color/textColorPrimary" />
 
             <LinearLayout
                 android:layout_width="match_parent"
@@ -203,7 +217,8 @@
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
                     android:hint="Start Time"
-                    android:inputType="time" />
+                    android:inputType="time"
+                    android:textColor="@color/textColorPrimary" />
 
                 <EditText
                     android:id="@+id/saturdayEndTimeInput"
@@ -211,15 +226,16 @@
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
                     android:hint="End Time"
-                    android:inputType="time" />
+                    android:inputType="time"
+                    android:textColor="@color/textColorPrimary" />
             </LinearLayout>
 
-            <!-- Sunday -->
             <CheckBox
                 android:id="@+id/checkSunday"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Sunday" />
+                android:text="Sunday"
+                android:textColor="@color/textColorPrimary" />
 
             <LinearLayout
                 android:layout_width="match_parent"
@@ -232,7 +248,8 @@
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
                     android:hint="Start Time"
-                    android:inputType="time" />
+                    android:inputType="time"
+                    android:textColor="@color/textColorPrimary" />
 
                 <EditText
                     android:id="@+id/sundayEndTimeInput"
@@ -240,7 +257,8 @@
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
                     android:hint="End Time"
-                    android:inputType="time" />
+                    android:inputType="time"
+                    android:textColor="@color/textColorPrimary" />
             </LinearLayout>
 
         </LinearLayout>
@@ -252,6 +270,7 @@
         android:layout_height="wrap_content"
         android:layout_gravity="center"
         android:gravity="center"
-        android:text="Save" />
-
+        android:text="Save"
+        android:textColor="@color/colorOnPrimary"
+        android:backgroundTint="@color/colorPrimary" />
 </LinearLayout>

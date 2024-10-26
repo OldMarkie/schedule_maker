@@ -12,7 +12,8 @@
         android:layout_marginLeft="8dp"
         android:text="Event Name"
         android:textSize="20sp"
-        android:textStyle="bold" />
+        android:textStyle="bold"
+        android:textColor="@color/textColorPrimary" />
 
     <TextView
         android:id="@+id/eventDescription"
@@ -20,7 +21,8 @@
         android:layout_height="wrap_content"
         android:layout_marginLeft="8dp"
         android:layout_marginTop="8dp"
-        android:text="Event Description" />
+        android:text="Event Description"
+        android:textColor="@color/textColorPrimary" />
 
     <TextView
         android:id="@+id/eventLocation"
@@ -28,7 +30,8 @@
         android:layout_height="wrap_content"
         android:layout_marginLeft="8dp"
         android:layout_marginTop="8dp"
-        android:text="Event Location" />
+        android:text="Event Location"
+        android:textColor="@color/textColorPrimary" />
 
     <TextView
         android:id="@+id/eventTime"
@@ -36,7 +39,8 @@
         android:layout_height="wrap_content"
         android:layout_marginLeft="8dp"
         android:layout_marginTop="8dp"
-        android:text="Event Date and Time" />
+        android:text="Event Date and Time"
+        android:textColor="@color/textColorPrimary" />
 
     <TextView
         android:id="@+id/eventRecurrence"
@@ -44,7 +48,8 @@
         android:layout_height="wrap_content"
         android:layout_marginLeft="8dp"
         android:layout_marginTop="8dp"
-        android:text="Recurrence" />
+        android:text="Recurrence"
+        android:textColor="@color/textColorPrimary" />
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -58,7 +63,9 @@
             android:layout_height="wrap_content"
             android:layout_marginLeft="8dp"
             android:layout_marginTop="8dp"
-            android:text="Edit" />
+            android:text="Edit"
+            android:textColor="@color/colorOnSecondary"
+            android:backgroundTint="@color/colorSecondary" />
 
         <Button
             android:id="@+id/deleteButton"
@@ -66,7 +73,9 @@
             android:layout_height="wrap_content"
             android:layout_margin="8dp"
             android:layout_marginTop="8dp"
-            android:text="Delete" />
+            android:text="Delete"
+            android:textColor="@color/colorOnSecondary"
+            android:backgroundTint="@color/colorDelete" />
     </LinearLayout>
 
 </LinearLayout>

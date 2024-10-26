@@ -4,14 +4,9 @@
     android:layout_height="match_parent"
     android:orientation="vertical"
     android:gravity="center"
-    android:padding="16dp">
+    android:padding="16dp"
+    android:background="@color/colorBackground">
 
-
-    <!-- Title of the page -->
-
-    <!-- Content of the activity -->
-
-    <!-- Digital Clock at the top-center of the screen -->
     <Space
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -25,9 +20,9 @@
         android:gravity="center"
         android:text="00:00"
         android:textSize="96sp"
-        android:textStyle="bold" />
+        android:textStyle="bold"
+        android:textColor="@color/textColorPrimary" />
 
-    <!-- Current day below the clock -->
     <TextView
         android:id="@+id/currentDay"
         android:layout_width="wrap_content"
@@ -36,22 +31,17 @@
         android:text="Friday"
         android:textAllCaps="true"
         android:textSize="34sp"
-        android:textStyle="bold" />
+        android:textStyle="bold"
+        android:textColor="@color/textColorPrimary" />
 
-    <!-- Current date (month, day, year) below the day -->
     <TextView
         android:id="@+id/currentDate"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="4dp"
         android:text="Jan 1, 2025"
-        android:textSize="24sp" />
-
-    <!-- Latest schedule displayed below the clock -->
-
-    <!-- Space to push the bottom navigation down -->
-
-    <!-- Bottom Navigation Bar -->
+        android:textSize="24sp"
+        android:textColor="@color/textColorPrimary" />
 
     <Space
         android:layout_width="match_parent"
@@ -78,5 +68,6 @@
         app:menu="@menu/bottom_nav_menu"
         app:itemIconTint="@color/bottomNavIconColor"
         app:itemTextColor="@color/bottomNavTextColor"
-        android:layout_gravity="bottom" />
+        android:layout_gravity="bottom"
+        android:background="@color/colorBackground" />
 </LinearLayout>

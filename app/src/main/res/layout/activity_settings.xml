@@ -4,83 +4,95 @@
     android:layout_height="match_parent"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:orientation="vertical"
-    android:padding="16dp">
+    android:padding="16dp"
+    android:background="@color/colorBackground">
 
-    <TextView
-        android:id="@+id/pageTitle"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:paddingBottom="16dp"
-        android:text="Settings"
-        android:textAllCaps="false"
-        android:textSize="34sp"
-        android:textStyle="bold" />
-
-    <!-- Theme Switch -->
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="horizontal">
-
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_weight="0.5"
-            android:padding="10dp"
-            android:text="Enable Dark Mode"
-            android:textSize="18sp" />
-
-        <Switch
-            android:id="@+id/themeSwitch"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_weight="1" />
-    </LinearLayout>
-
-    <!-- Time Format Switch -->
-
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="horizontal">
-
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_weight="0.5"
-            android:padding="10dp"
-            android:text="Use 24-hour Time Format"
-            android:textSize="18sp" />
-
-        <Switch
-            android:id="@+id/timeFormatSwitch"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_weight="1" />
-
-    </LinearLayout>
-
-    <!-- Bottom Navigation -->
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_weight="1"
-        android:orientation="horizontal">
+        android:orientation="vertical">
 
         <TextView
+            android:id="@+id/pageTitle"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_weight="0.5"
-            android:padding="10dp"
-            android:text="Enable Notification"
-            android:textSize="18sp" />
+            android:paddingBottom="16dp"
+            android:text="Settings"
+            android:textAllCaps="false"
+            android:textColor="@color/textColorPrimary"
+            android:textSize="34sp"
+            android:textStyle="bold" />
 
-        <Switch
-            android:id="@+id/notifSwitch"
-            android:layout_width="wrap_content"
+        <LinearLayout
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_weight="1" />
+            android:orientation="horizontal">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_weight="0.5"
+                android:padding="10dp"
+                android:text="Enable Dark Mode"
+                android:textColor="@color/textColorPrimary"
+                android:textSize="18sp" />
+
+            <Switch
+                android:id="@+id/themeSwitch"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_weight="1" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_weight="0.5"
+                android:padding="10dp"
+                android:text="Use 24-hour Time Format"
+                android:textColor="@color/textColorPrimary"
+                android:textSize="18sp" />
+
+            <Switch
+                android:id="@+id/timeFormatSwitch"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_weight="1" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_weight="0.5"
+                android:padding="10dp"
+                android:text="Enable Notification"
+                android:textColor="@color/textColorPrimary"
+                android:textSize="18sp" />
+
+            <Switch
+                android:id="@+id/notifSwitch"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_weight="1" />
+        </LinearLayout>
     </LinearLayout>
+
+    <!-- Theme Switch -->
+
+    <!-- Time Format Switch -->
+
+    <!-- Notification Switch -->
 
     <com.google.android.material.bottomnavigation.BottomNavigationView
         android:id="@+id/bottomNavigationView"
@@ -88,6 +100,6 @@
         android:layout_height="wrap_content"
         app:itemIconTint="@color/bottomNavIconColor"
         app:itemTextColor="@color/bottomNavTextColor"
-        app:menu="@menu/bottom_nav_menu" />
-
+        app:menu="@menu/bottom_nav_menu"
+        android:background="@color/colorBackground" />
 </LinearLayout>

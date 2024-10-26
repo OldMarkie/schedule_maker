@@ -12,46 +12,59 @@
         android:layout_marginBottom="8sp"
         android:text="Edit One-Time Event"
         android:textSize="37sp"
-        android:textStyle="bold" />
+        android:textStyle="bold"
+        android:textColor="@color/textColorPrimary" />
 
     <EditText
         android:id="@+id/eventNameInput"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:hint="Event Name" />
+        android:hint="Event Name"
+        android:textColor="@color/textColorPrimary"
+        android:backgroundTint="@color/colorPrimary" />
 
     <EditText
         android:id="@+id/eventDescriptionInput"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:hint="Description" />
+        android:hint="Description"
+        android:textColor="@color/textColorPrimary"
+        android:backgroundTint="@color/colorPrimary" />
 
     <EditText
         android:id="@+id/eventLocationInput"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:hint="Location" />
+        android:hint="Location"
+        android:textColor="@color/textColorPrimary"
+        android:backgroundTint="@color/colorPrimary" />
 
     <EditText
         android:id="@+id/eventDateInput"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:hint="Select Date"
-        android:focusable="false" />
+        android:focusable="false"
+        android:textColor="@color/textColorPrimary"
+        android:backgroundTint="@color/colorPrimary" />
 
     <EditText
         android:id="@+id/eventTimeInput"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:hint="Select Start Time"
-        android:focusable="false" />
+        android:focusable="false"
+        android:textColor="@color/textColorPrimary"
+        android:backgroundTint="@color/colorPrimary" />
 
     <EditText
         android:id="@+id/eventEndTimeInput"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:hint="Select End Time"
-        android:focusable="false" />
+        android:focusable="false"
+        android:textColor="@color/textColorPrimary"
+        android:backgroundTint="@color/colorPrimary" />
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -64,14 +77,18 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_margin="8dp"
-            android:text="Save" />
+            android:text="Save"
+            android:textColor="@color/colorOnPrimary"
+            android:backgroundTint="@color/colorPrimary" />
 
         <Button
             android:id="@+id/editCancelButton"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_margin="8dp"
-            android:text="Cancel" />
+            android:text="Cancel"
+            android:textColor="@color/colorOnSecondary"
+            android:backgroundTint="@color/colorSecondary" />
     </LinearLayout>
 
 </LinearLayout>
