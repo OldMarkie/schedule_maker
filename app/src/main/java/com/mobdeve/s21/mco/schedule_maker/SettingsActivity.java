@@ -2,6 +2,7 @@ package com.mobdeve.s21.mco.schedule_maker;
 
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.res.ColorStateList;
 import android.os.Bundle;
 import android.widget.CompoundButton;
 import android.widget.Switch;
@@ -53,8 +54,17 @@ public class SettingsActivity extends AppCompatActivity {
                 AppCompatDelegate.setDefaultNightMode(isChecked ? AppCompatDelegate.MODE_NIGHT_YES : AppCompatDelegate.MODE_NIGHT_NO);
                 editor.putBoolean("isDarkMode", isChecked);
                 editor.apply();
+
+                // Refresh the BottomNavigationView to apply theme changes
+                BottomNavigationView bottomNavigationView = findViewById(R.id.bottomNavigationView);
+                int iconColor = getResources().getColor(isChecked ? R.color.bottomNavIconColor : R.color.bottomNavIconColor, getTheme());
+                int textColor = getResources().getColor(isChecked ? R.color.bottomNavTextColor : R.color.bottomNavTextColor, getTheme());
+
+                bottomNavigationView.setItemIconTintList(ColorStateList.valueOf(iconColor));
+                bottomNavigationView.setItemTextColor(ColorStateList.valueOf(textColor));
             }
         });
+
 
         // Set listener for time format switch
         timeFormatSwitch.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {

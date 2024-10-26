@@ -30,7 +30,7 @@ public class EventListActivity extends AppCompatActivity implements OneTimeEvent
     private TextView pageTitle, eventsForDateTitle;
     private CalendarView calendarView;
     private Date currentSelectedDate;
-    private Button weeklyEventButton; // Declare the button
+    private Button weeklyEventButton;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {

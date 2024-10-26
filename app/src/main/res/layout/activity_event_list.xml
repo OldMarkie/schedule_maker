@@ -63,8 +63,8 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_gravity="bottom|center"
-        app:itemIconTint="@color/black"
-        app:itemTextColor="@color/black"
+        app:itemIconTint="@color/bottomNavIconColor"
+        app:itemTextColor="@color/bottomNavTextColor"
         app:menu="@menu/bottom_nav_menu" />
 
 </LinearLayout>
