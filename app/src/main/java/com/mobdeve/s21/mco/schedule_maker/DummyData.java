@@ -28,6 +28,8 @@ public class DummyData {
             }
         }
 
+        // Sort by start time
+        Collections.sort(filteredEvents, Comparator.comparing(Event::getStartTime));
         return filteredEvents;
     }
 
@@ -52,6 +54,8 @@ public class DummyData {
             }
         }
 
+        // Sort by start time
+        Collections.sort(filteredEvents, Comparator.comparing(Event::getStartTime));
         return filteredEvents;
     }
 
@@ -87,12 +91,7 @@ public class DummyData {
 
     // Return all events sorted by start time
     public static List<Event> getEvents() {
-        Collections.sort(eventList, new Comparator<Event>() {
-            @Override
-            public int compare(Event e1, Event e2) {
-                return e1.getStartTime().compareTo(e2.getStartTime());
-            }
-        });
+        Collections.sort(eventList, Comparator.comparing(Event::getStartTime));
         return eventList;
     }
 

@@ -30,7 +30,7 @@ public class EventListActivity extends AppCompatActivity implements OneTimeEvent
     private TextView pageTitle, eventsForDateTitle;
     private CalendarView calendarView;
     private Date currentSelectedDate;
-    private Button weeklyEventButton; // Declare the button
+    private Button weeklyEventButton;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -92,7 +92,7 @@ public class EventListActivity extends AppCompatActivity implements OneTimeEvent
         // Handle click for weekly event button
         weeklyEventButton.setOnClickListener(v -> {
             // Start the WeeklyEventActivity or Fragment
-            Intent intent = new Intent(EventListActivity.this, BasicActivity.class);
+            Intent intent = new Intent(EventListActivity.this, WeeklySchedActivity.class);
             startActivity(intent);
         });
 
