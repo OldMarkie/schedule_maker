@@ -36,7 +36,14 @@
         android:layout_height="wrap_content"
         android:hint="Location"
         android:textColorHint="@color/textColorHint" />
-
+    <EditText
+        android:id="@+id/colorPickerInput"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="Choose Color (Optional)"
+        android:textColor="@color/textColorPrimary"
+        android:focusable="false"
+        android:clickable="true" />
     <TextView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"

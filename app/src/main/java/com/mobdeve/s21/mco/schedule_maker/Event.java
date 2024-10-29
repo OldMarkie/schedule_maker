@@ -9,9 +9,11 @@ public class Event implements Serializable {
     private String name;
     private String description;
     private String location;
-    private Date startTime;      // Start time of the event
-    private Date endTime;        // End time of the event
-    private boolean isWeekly;     // Indicates if the event is recurring weekly
+    private Date startTime;
+    private Date endTime;
+    private boolean isWeekly;
+    private int color; // Add this in Event.java
+
 
     // Constructor to initialize an event with a generated ID
     public Event(String name, String description, String location, Date startTime, Date endTime, boolean isWeekly) {
@@ -33,6 +35,17 @@ public class Event implements Serializable {
         this.startTime = startTime;
         this.endTime = endTime;
         this.isWeekly = isWeekly;
+    }
+
+    public Event(String name, String description, String location, Date startTime, Date endTime, boolean isWeekly, int color) {
+        this.id = UUID.randomUUID().toString(); // Generate a unique ID
+        this.name = name;
+        this.description = description;
+        this.location = location;
+        this.startTime = startTime;
+        this.endTime = endTime;
+        this.isWeekly = isWeekly;
+        this.color = color;
     }
 
     public String getId() {
@@ -61,5 +74,9 @@ public class Event implements Serializable {
 
     public boolean isWeekly() {
         return isWeekly;
+    }
+
+    public int getColor() {
+        return color;
     }
 }

@@ -17,4 +17,7 @@
         <color name="white">#FFFFFF</color> <!-- Can use a lighter variant if needed -->
         <color name="colorOnIcon">#424242</color>
         <color name="colorDelete">#FF6F81</color>
+        <color name="buttonColor">#000000</color>
+        <color name="buttonOutlineColor">#FFFFFF</color>
+
 </resources>

@@ -1,5 +1,11 @@
 package com.mobdeve.s21.mco.schedule_maker;
 
+import static android.content.Context.MODE_PRIVATE;
+
+import android.content.DialogInterface;
+import android.content.SharedPreferences;
+import android.content.res.ColorStateList;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -17,6 +23,14 @@ import com.google.android.material.datepicker.CalendarConstraints;
 import com.google.android.material.datepicker.MaterialDatePicker;
 import com.google.android.material.timepicker.MaterialTimePicker;
 
+import com.flask.colorpicker.ColorPickerView;
+import com.flask.colorpicker.OnColorSelectedListener;
+import com.flask.colorpicker.builder.ColorPickerClickListener;
+import com.flask.colorpicker.builder.ColorPickerDialogBuilder;
+
+
+import java.io.IOException;
+import java.io.InputStream;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
@@ -32,6 +46,12 @@ public class OneTimeEventFragment extends Fragment {
     private EditText eventEndTimeInput;
     private Button saveButton;
 
+    private int selectedColor = 0xFFFFFFFF; // Default color is white
+    private Button colorPickerInput;
+
+    private ColorUtils colorUtils;
+
+
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container,
@@ -45,6 +65,26 @@ public class OneTimeEventFragment extends Fragment {
         eventTimeInput = view.findViewById(R.id.eventTimeInput);
         eventEndTimeInput = view.findViewById(R.id.eventEndTimeInput);
         saveButton = view.findViewById(R.id.saveButton);
+        colorPickerInput = view.findViewById(R.id.colorPickerInput);
+
+        colorPickerInput.setBackgroundTintList(ColorStateList.valueOf(0xff6200EE));
+        colorPickerInput.setHint("Electric Violet By Default");
+        colorPickerInput.setHintTextColor(Color.WHITE);
+
+        // Load color names
+        try {
+            InputStream inputStream = requireContext().getAssets().open("colornames.json");
+            colorUtils = new ColorUtils(inputStream);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+// Open the color picker dialog when the color input field is clicked
+        colorPickerInput.setOnClickListener(v -> openColorPicker());
+
+        // Retrieve dark mode preference
+        SharedPreferences sharedPreferences = requireActivity().getSharedPreferences("ThemePref", MODE_PRIVATE);
+        boolean isDarkMode = sharedPreferences.getBoolean("isDarkMode", false);
 
         // Set up Material Date Picker
         eventDateInput.setOnClickListener(v -> showDatePicker());
@@ -57,6 +97,55 @@ public class OneTimeEventFragment extends Fragment {
 
         return view;
     }
+
+
+
+    private void setTextColorBasedOnContrast(int selectedColor) {
+        // Calculate the luminance
+        double luminance = (0.299 * Color.red(selectedColor) + 0.587 * Color.green(selectedColor) + 0.114 * Color.blue(selectedColor)) / 255;
+        if (luminance < 0.5) {
+            colorPickerInput.setTextColor(Color.WHITE); // Light text on dark background
+        } else {
+            colorPickerInput.setTextColor(Color.BLACK); // Dark text on light background
+        }
+    }
+
+
+    private void openColorPicker() {
+        ColorPickerDialogBuilder
+                .with(getContext())
+                .setTitle("Choose color")
+                .initialColor(selectedColor)
+                .wheelType(ColorPickerView.WHEEL_TYPE.FLOWER)
+                .density(12)
+                .setOnColorSelectedListener(new OnColorSelectedListener() {
+                    @Override
+                    public void onColorSelected(int color) {
+                        // Get nearest color name
+                        String nearestColorName = colorUtils.getNearestColorName(color);
+                        Toast.makeText(getContext(), "Color selected: #" + Integer.toHexString(color) + " (" + nearestColorName + ")", Toast.LENGTH_SHORT).show();
+                    }
+                })
+                .setPositiveButton("OK", new ColorPickerClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int color, Integer[] allColors) {
+                        selectedColor = color;
+                        // Update colorPickerInput
+                        String nearsteColorName = colorUtils.getNearestColorName(selectedColor);
+                        colorPickerInput.setText(nearsteColorName);
+                        colorPickerInput.setBackgroundTintList(ColorStateList.valueOf(selectedColor));
+
+                        // Set text color based on contrast
+                        setTextColorBasedOnContrast(selectedColor);
+                    }
+                })
+                .setNegativeButton("Cancel", (dialog, which) -> {
+                    // Do nothing if user cancels
+                })
+                .build()
+                .show();
+    }
+
 
     private void showDatePicker() {
         // Get today's date in milliseconds
@@ -105,6 +194,7 @@ public class OneTimeEventFragment extends Fragment {
         String eventDate = eventDateInput.getText().toString().trim();
         String eventTime = eventTimeInput.getText().toString().trim();
         String eventEndTime = eventEndTimeInput.getText().toString().trim();
+        String color = colorPickerInput.getText().toString().trim();
 
         if (eventName.isEmpty() || eventDescription.isEmpty() || eventLocation.isEmpty() ||
                 eventDate.isEmpty() || eventTime.isEmpty() || eventEndTime.isEmpty()) {
@@ -133,8 +223,35 @@ public class OneTimeEventFragment extends Fragment {
             return;
         }
 
+        // Get the color from colorPickerInput or use a default if it's empty
+        // Get the ColorStateList from the colorPickerInput
+        ColorStateList colorStateList = colorPickerInput.getBackgroundTintList();
+        int eventColor;
+
+        // Check if the ColorStateList is null
+        if (colorStateList == null) {
+            colorPickerInput.setBackgroundTintList(ColorStateList.valueOf(0xff6200EE));
+            colorStateList = colorPickerInput.getBackgroundTintList();
+            eventColor = colorStateList.getDefaultColor();
+        } else {
+            // Get the default color from the ColorStateList
+            eventColor = colorStateList.getDefaultColor();
+
+            // Optionally, if you want to show the color as a string format
+            String colorString = String.format("#%06X", (0xFFFFFF & eventColor));
+
+            // If you need to validate the format (not necessary in this context)
+            try {
+                // This block may not be needed if you trust the colorStateList to be valid
+                eventColor = Color.parseColor(colorString);
+            } catch (IllegalArgumentException e) {
+                Toast.makeText(getActivity(), "Invalid color format", Toast.LENGTH_SHORT).show();
+                return;
+            }
+        }
+
         // Create and save new Event
-        Event newEvent = new Event(eventName, eventDescription, eventLocation, eventStartDateTime, eventEndDateTime, false);
+        Event newEvent = new Event(eventName, eventDescription, eventLocation, eventStartDateTime, eventEndDateTime, false, eventColor);
         if (!DummyData.addEvent(newEvent)) {
             Toast.makeText(getActivity(), "Event time conflict!", Toast.LENGTH_SHORT).show();
             return;

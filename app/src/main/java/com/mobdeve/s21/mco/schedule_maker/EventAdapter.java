@@ -7,6 +7,7 @@ import android.icu.text.SimpleDateFormat;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.fragment.app.FragmentActivity;
@@ -61,6 +62,16 @@ public class EventAdapter extends RecyclerView.Adapter<EventAdapter.EventViewHol
             holder.eventRecurrence.setText("One-time");
         }
 
+        // Set the background color based on event color
+        int eventColor = event.getColor();
+        holder.detailsBackground.setBackgroundColor(eventColor); // Set the background color
+
+        // Set text color for contrast against the background
+        int textColor = (isDarkMode(eventColor)) ? 0xFFFFFFFF : 0xFF000000; // White for dark bg, black for light bg
+        holder.eventName.setTextColor(textColor);
+        holder.eventTime.setTextColor(textColor);
+        holder.eventRecurrence.setTextColor(textColor);
+
         // Set click listener to show event details
         holder.itemView.setOnClickListener(v -> {
             EventDetailsDialogFragment dialog = EventDetailsDialogFragment.newInstance(event, listener);
@@ -77,12 +88,23 @@ public class EventAdapter extends RecyclerView.Adapter<EventAdapter.EventViewHol
         public TextView eventName;
         public TextView eventTime; // This was previously named `eventDate`
         public TextView eventRecurrence;
+        public LinearLayout detailsBackground;
 
         public EventViewHolder(View itemView) {
             super(itemView);
             eventName = itemView.findViewById(R.id.eventName);
             eventTime = itemView.findViewById(R.id.eventTime); // Rename `eventDate` to `eventTime`
             eventRecurrence = itemView.findViewById(R.id.eventRecurrence); // Add `eventRecurrence` if it's in your layout
+            detailsBackground = itemView.findViewById(R.id.detailsBackground);
         }
+    }
+    // Method to determine if a color is dark
+    private boolean isDarkMode(int color) {
+        int r = (color >> 16) & 0xFF;
+        int g = (color >> 8) & 0xFF;
+        int b = color & 0xFF;
+        // Calculate the brightness using the luminance formula
+        double brightness = (0.299 * r + 0.587 * g + 0.114 * b);
+        return brightness < 128; // Returns true if dark
     }
 }

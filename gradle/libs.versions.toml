@@ -10,6 +10,7 @@ constraintlayout = "2.1.4"
 core = "5.2.4"
 kotlin = "2.0.21"
 materialVersion = "1.13.0-alpha07"
+colorpicker = "0.0.15"
 
 [libraries]
 junit = { group = "junit", name = "junit", version.ref = "junit" }
@@ -21,6 +22,7 @@ activity = { group = "androidx.activity", name = "activity", version.ref = "acti
 constraintlayout = { group = "androidx.constraintlayout", name = "constraintlayout", version.ref = "constraintlayout" }
 core = { group = "com.github.thellmund.Android-Week-View", name = "core", version.ref = "core" }
 google-material = { group = "com.google.android.material", name = "material", version.ref = "materialVersion" }
+colorpicker = { group = "com.github.QuadFlask", name = "colorpicker", version.ref = "colorpicker" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }
