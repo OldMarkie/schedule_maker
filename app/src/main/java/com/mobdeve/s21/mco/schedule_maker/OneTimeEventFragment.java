@@ -1,6 +1,10 @@
 package com.mobdeve.s21.mco.schedule_maker;
 
+import static android.content.Context.MODE_PRIVATE;
+
 import android.content.DialogInterface;
+import android.content.SharedPreferences;
+import android.content.res.ColorStateList;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.view.LayoutInflater;
@@ -41,7 +45,7 @@ public class OneTimeEventFragment extends Fragment {
     private Button saveButton;
 
     private int selectedColor = 0xFFFFFFFF; // Default color is white
-    private EditText colorPickerInput;
+    private Button colorPickerInput;
 
 
     @Nullable
@@ -62,6 +66,12 @@ public class OneTimeEventFragment extends Fragment {
 // Open the color picker dialog when the color input field is clicked
         colorPickerInput.setOnClickListener(v -> openColorPicker());
 
+        // Retrieve dark mode preference
+        SharedPreferences sharedPreferences = requireActivity().getSharedPreferences("ThemePref", MODE_PRIVATE);
+        boolean isDarkMode = sharedPreferences.getBoolean("isDarkMode", false);
+
+        // Set text on colorPickerInput based on dark mode
+        updateColorPickerText(isDarkMode);
 
 
         // Set up Material Date Picker
@@ -74,6 +84,10 @@ public class OneTimeEventFragment extends Fragment {
         saveButton.setOnClickListener(v -> saveEvent());
 
         return view;
+    }
+
+    private void updateColorPickerText(boolean isDarkMode) {
+        colorPickerInput.setText(isDarkMode ? "Black by Default " : "White by Default");
     }
 
     private void openColorPicker() {
@@ -95,6 +109,7 @@ public class OneTimeEventFragment extends Fragment {
                         selectedColor = color;
                         // Update the colorPickerInput with the selected color as a hex string
                         colorPickerInput.setText(String.format("#%06X", (0xFFFFFF & selectedColor)));
+                        colorPickerInput.setBackgroundTintList(ColorStateList.valueOf(selectedColor));
                     }
                 })
                 .setNegativeButton("Cancel", (dialog, which) -> {

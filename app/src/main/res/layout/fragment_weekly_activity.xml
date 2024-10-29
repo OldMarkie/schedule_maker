@@ -276,8 +276,8 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_gravity="center"
+        android:backgroundTint="@color/colorSecondary"
         android:gravity="center"
         android:text="Save"
-        android:textColor="@color/colorOnPrimary"
-        android:backgroundTint="@color/colorPrimary" />
+        android:textColor="@color/colorOnPrimary" />
 </LinearLayout>
