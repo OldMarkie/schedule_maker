@@ -67,6 +67,10 @@ public class OneTimeEventFragment extends Fragment {
         saveButton = view.findViewById(R.id.saveButton);
         colorPickerInput = view.findViewById(R.id.colorPickerInput);
 
+        colorPickerInput.setBackgroundTintList(ColorStateList.valueOf(0xff6200EE));
+        colorPickerInput.setHint("Electric Violet By Default");
+        colorPickerInput.setHintTextColor(Color.WHITE);
+
         // Load color names
         try {
             InputStream inputStream = requireContext().getAssets().open("colornames.json");
@@ -82,8 +86,7 @@ public class OneTimeEventFragment extends Fragment {
         SharedPreferences sharedPreferences = requireActivity().getSharedPreferences("ThemePref", MODE_PRIVATE);
         boolean isDarkMode = sharedPreferences.getBoolean("isDarkMode", false);
 
-        // Set text on colorPickerInput based on dark mode
-        updateColorPickerText(isDarkMode);
+
 
 
         // Set up Material Date Picker
@@ -98,9 +101,7 @@ public class OneTimeEventFragment extends Fragment {
         return view;
     }
 
-    private void updateColorPickerText(boolean isDarkMode) {
-        colorPickerInput.setText(isDarkMode ? "Black by Default " : "White by Default");
-    }
+
 
     private void setTextColorBasedOnContrast(int selectedColor) {
         // Calculate the luminance
@@ -232,7 +233,9 @@ public class OneTimeEventFragment extends Fragment {
 
         // Check if the ColorStateList is null
         if (colorStateList == null) {
-            eventColor = Color.WHITE; // Default color
+            colorPickerInput.setBackgroundTintList(ColorStateList.valueOf(0xff6200EE));
+            colorStateList = colorPickerInput.getBackgroundTintList();
+            eventColor = colorStateList.getDefaultColor();
         } else {
             // Get the default color from the ColorStateList
             eventColor = colorStateList.getDefaultColor();

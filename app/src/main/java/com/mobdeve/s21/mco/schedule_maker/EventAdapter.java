@@ -62,18 +62,15 @@ public class EventAdapter extends RecyclerView.Adapter<EventAdapter.EventViewHol
             holder.eventRecurrence.setText("One-time");
         }
 
-        // Determine if dark mode is enabled
-        int currentNightMode = activity.getResources().getConfiguration().uiMode &
-                android.content.res.Configuration.UI_MODE_NIGHT_MASK;
-        boolean isDarkMode = (currentNightMode == android.content.res.Configuration.UI_MODE_NIGHT_YES);
-
         // Set the background color based on event color
         int eventColor = event.getColor();
-        if (isDarkMode) {
-            // Get the complementary color
-            eventColor = getComplementaryColor(eventColor);
-        }
         holder.detailsBackground.setBackgroundColor(eventColor); // Set the background color
+
+        // Set text color for contrast against the background
+        int textColor = (isDarkMode(eventColor)) ? 0xFFFFFFFF : 0xFF000000; // White for dark bg, black for light bg
+        holder.eventName.setTextColor(textColor);
+        holder.eventTime.setTextColor(textColor);
+        holder.eventRecurrence.setTextColor(textColor);
 
         // Set click listener to show event details
         holder.itemView.setOnClickListener(v -> {
@@ -101,15 +98,13 @@ public class EventAdapter extends RecyclerView.Adapter<EventAdapter.EventViewHol
             detailsBackground = itemView.findViewById(R.id.detailsBackground);
         }
     }
-
-    // Method to get the complementary color
-    private int getComplementaryColor(int color) {
-        // Extract RGB values
+    // Method to determine if a color is dark
+    private boolean isDarkMode(int color) {
         int r = (color >> 16) & 0xFF;
         int g = (color >> 8) & 0xFF;
         int b = color & 0xFF;
-
-        // Invert the RGB values
-        return 0xFF000000 | ((255 - r) << 16) | ((255 - g) << 8) | (255 - b); // Preserve alpha channel
+        // Calculate the brightness using the luminance formula
+        double brightness = (0.299 * r + 0.587 * g + 0.114 * b);
+        return brightness < 128; // Returns true if dark
     }
 }
