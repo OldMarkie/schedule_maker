@@ -29,6 +29,8 @@ import com.flask.colorpicker.builder.ColorPickerClickListener;
 import com.flask.colorpicker.builder.ColorPickerDialogBuilder;
 
 
+import java.io.IOException;
+import java.io.InputStream;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
@@ -47,6 +49,8 @@ public class OneTimeEventFragment extends Fragment {
     private int selectedColor = 0xFFFFFFFF; // Default color is white
     private Button colorPickerInput;
 
+    private ColorUtils colorUtils;
+
 
     @Nullable
     @Override
@@ -62,6 +66,14 @@ public class OneTimeEventFragment extends Fragment {
         eventEndTimeInput = view.findViewById(R.id.eventEndTimeInput);
         saveButton = view.findViewById(R.id.saveButton);
         colorPickerInput = view.findViewById(R.id.colorPickerInput);
+
+        // Load color names
+        try {
+            InputStream inputStream = requireContext().getAssets().open("colornames.json");
+            colorUtils = new ColorUtils(inputStream);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
 
 // Open the color picker dialog when the color input field is clicked
         colorPickerInput.setOnClickListener(v -> openColorPicker());
@@ -90,6 +102,17 @@ public class OneTimeEventFragment extends Fragment {
         colorPickerInput.setText(isDarkMode ? "Black by Default " : "White by Default");
     }
 
+    private void setTextColorBasedOnContrast(int selectedColor) {
+        // Calculate the luminance
+        double luminance = (0.299 * Color.red(selectedColor) + 0.587 * Color.green(selectedColor) + 0.114 * Color.blue(selectedColor)) / 255;
+        if (luminance < 0.5) {
+            colorPickerInput.setTextColor(Color.WHITE); // Light text on dark background
+        } else {
+            colorPickerInput.setTextColor(Color.BLACK); // Dark text on light background
+        }
+    }
+
+
     private void openColorPicker() {
         ColorPickerDialogBuilder
                 .with(getContext())
@@ -100,16 +123,22 @@ public class OneTimeEventFragment extends Fragment {
                 .setOnColorSelectedListener(new OnColorSelectedListener() {
                     @Override
                     public void onColorSelected(int color) {
-                        Toast.makeText(getContext(), "Color selected: #" + Integer.toHexString(color), Toast.LENGTH_SHORT).show();
+                        // Get nearest color name
+                        String nearestColorName = colorUtils.getNearestColorName(color);
+                        Toast.makeText(getContext(), "Color selected: #" + Integer.toHexString(color) + " (" + nearestColorName + ")", Toast.LENGTH_SHORT).show();
                     }
                 })
                 .setPositiveButton("OK", new ColorPickerClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int color, Integer[] allColors) {
                         selectedColor = color;
-                        // Update the colorPickerInput with the selected color as a hex string
-                        colorPickerInput.setText(String.format("#%06X", (0xFFFFFF & selectedColor)));
+                        // Update colorPickerInput
+                        String nearsteColorName = colorUtils.getNearestColorName(selectedColor);
+                        colorPickerInput.setText(nearsteColorName);
                         colorPickerInput.setBackgroundTintList(ColorStateList.valueOf(selectedColor));
+
+                        // Set text color based on contrast
+                        setTextColorBasedOnContrast(selectedColor);
                     }
                 })
                 .setNegativeButton("Cancel", (dialog, which) -> {
@@ -197,13 +226,24 @@ public class OneTimeEventFragment extends Fragment {
         }
 
         // Get the color from colorPickerInput or use a default if it's empty
-        String colorString = colorPickerInput.getText().toString().trim();
+        // Get the ColorStateList from the colorPickerInput
+        ColorStateList colorStateList = colorPickerInput.getBackgroundTintList();
         int eventColor;
-        if (colorString.isEmpty()) {
+
+        // Check if the ColorStateList is null
+        if (colorStateList == null) {
             eventColor = Color.WHITE; // Default color
         } else {
+            // Get the default color from the ColorStateList
+            eventColor = colorStateList.getDefaultColor();
+
+            // Optionally, if you want to show the color as a string format
+            String colorString = String.format("#%06X", (0xFFFFFF & eventColor));
+
+            // If you need to validate the format (not necessary in this context)
             try {
-                eventColor = Color.parseColor(colorString); // Parse the color
+                // This block may not be needed if you trust the colorStateList to be valid
+                eventColor = Color.parseColor(colorString);
             } catch (IllegalArgumentException e) {
                 Toast.makeText(getActivity(), "Invalid color format", Toast.LENGTH_SHORT).show();
                 return;
