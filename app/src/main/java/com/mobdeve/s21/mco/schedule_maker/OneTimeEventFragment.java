@@ -86,9 +86,6 @@ public class OneTimeEventFragment extends Fragment {
         SharedPreferences sharedPreferences = requireActivity().getSharedPreferences("ThemePref", MODE_PRIVATE);
         boolean isDarkMode = sharedPreferences.getBoolean("isDarkMode", false);
 
-
-
-
         // Set up Material Date Picker
         eventDateInput.setOnClickListener(v -> showDatePicker());
 
