@@ -188,6 +188,7 @@ public class OneTimeEventFragment extends Fragment {
     }
 
     private void saveEvent() {
+        DatabaseHelper dbHelper = new DatabaseHelper(getContext());
         String eventName = eventNameInput.getText().toString().trim();
         String eventDescription = eventDescriptionInput.getText().toString().trim();
         String eventLocation = eventLocationInput.getText().toString().trim();
@@ -200,6 +201,11 @@ public class OneTimeEventFragment extends Fragment {
                 eventDate.isEmpty() || eventTime.isEmpty() || eventEndTime.isEmpty()) {
             Toast.makeText(getActivity(), "Please fill in all fields", Toast.LENGTH_SHORT).show();
             return;
+        }
+
+        if (dbHelper.eventExists(eventName)) {
+            Toast.makeText(getContext(), "An event with the same name already exists!", Toast.LENGTH_SHORT).show();
+            return; // Exit the method if an event with the same name exists
         }
 
         // Combine date and time into Date objects
@@ -251,16 +257,30 @@ public class OneTimeEventFragment extends Fragment {
         }
 
         // Create and save new Event
-        Event newEvent = new Event(eventName, eventDescription, eventLocation, eventStartDateTime, eventEndDateTime, false, eventColor);
-        if (!DummyData.addEvent(newEvent)) {
-            Toast.makeText(getActivity(), "Event time conflict!", Toast.LENGTH_SHORT).show();
-            return;
+        try {
+            Date startDate = dateFormat.parse(startDateTimeString);
+            Date endDate = dateFormat.parse(endDateTimeString);
+
+            // Check for conflicts
+            if (dbHelper.isTimeConflict(startDate, endDate)) {
+                Toast.makeText(getActivity(), "Event time conflict!", Toast.LENGTH_SHORT).show();
+                return;
+            }
+
+            // Create and save the event
+            Event newEvent = new Event(eventName, eventDescription, eventLocation, startDate, endDate, false, eventColor);
+            dbHelper.addEvent(newEvent);
+
+            Toast.makeText(getActivity(), "One-Time Event Saved!", Toast.LENGTH_SHORT).show();
+            FragmentManager fragmentManager = getParentFragmentManager();
+            fragmentManager.popBackStack(null, FragmentManager.POP_BACK_STACK_INCLUSIVE);
+            ((EventActivity) getActivity()).showHintTextView();
+            ((EventActivity) getActivity()).showAddOneTimeEventButton();
+
+        } catch (ParseException e) {
+            e.printStackTrace();
+            Toast.makeText(getActivity(), "Invalid date format", Toast.LENGTH_SHORT).show();
         }
 
-        Toast.makeText(getActivity(), "One-Time Event Saved!", Toast.LENGTH_SHORT).show();
-        FragmentManager fragmentManager = getParentFragmentManager();
-        fragmentManager.popBackStack(null, FragmentManager.POP_BACK_STACK_INCLUSIVE);
-        ((EventActivity) getActivity()).showHintTextView();
-        ((EventActivity) getActivity()).showAddOneTimeEventButton();
     }
 }

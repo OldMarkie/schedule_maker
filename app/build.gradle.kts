@@ -50,6 +50,7 @@ dependencies {
     implementation(libs.core)
     implementation(libs.google.material)
     implementation(libs.colorpicker)
+    implementation(libs.sqlite)
     testImplementation(libs.junit)
     androidTestImplementation(libs.ext.junit)
     androidTestImplementation(libs.espresso.core)

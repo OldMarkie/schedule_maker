@@ -1,9 +1,10 @@
 package com.mobdeve.s21.mco.schedule_maker;
 
-import android.app.TimePickerDialog;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.res.ColorStateList;
 import android.graphics.Color;
+import android.icu.text.SimpleDateFormat;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -12,6 +13,7 @@ import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.Toast;
+
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
@@ -26,15 +28,17 @@ import com.google.android.material.timepicker.MaterialTimePicker;
 import java.io.IOException;
 import java.io.InputStream;
 import java.text.ParseException;
-import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
 
+
 public class WeeklyActivityFragment extends Fragment {
 
-    private EditText activityNameInput;
-    private EditText activityDescriptionInput;
-    private EditText activityLocationInput;
+    // DatabaseHelper instance
+    private DatabaseHelper dbHelper;
+
+    // Other fields...
+    private EditText activityNameInput, activityDescriptionInput, activityLocationInput;
     private CheckBox checkMonday, checkTuesday, checkWednesday, checkThursday, checkFriday, checkSaturday, checkSunday;
     private EditText mondayStartTimeInput, mondayEndTimeInput;
     private EditText tuesdayStartTimeInput, tuesdayEndTimeInput;
@@ -43,10 +47,16 @@ public class WeeklyActivityFragment extends Fragment {
     private EditText fridayStartTimeInput, fridayEndTimeInput;
     private EditText saturdayStartTimeInput, saturdayEndTimeInput;
     private EditText sundayStartTimeInput, sundayEndTimeInput;
-    private Button saveButton;
-    private Button colorPickerInput;
+    private Button saveButton, colorPickerInput;
     private int selectedColor = 0xFFFFFFFF; // Default color is white
     private ColorUtils colorUtils;
+
+
+    @Override
+    public void onAttach(@NonNull Context context) {
+        super.onAttach(context);
+        dbHelper = new DatabaseHelper(context); // Initialize DatabaseHelper
+    }
 
     @Nullable
     @Override
@@ -54,6 +64,7 @@ public class WeeklyActivityFragment extends Fragment {
                              @Nullable Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_weekly_activity, container, false);
 
+        // Initialize views...
         activityNameInput = view.findViewById(R.id.activityNameInput);
         activityDescriptionInput = view.findViewById(R.id.activityDescriptionInput);
         activityLocationInput = view.findViewById(R.id.activityLocationInput);
@@ -79,8 +90,9 @@ public class WeeklyActivityFragment extends Fragment {
         sundayStartTimeInput = view.findViewById(R.id.sundayStartTimeInput);
         sundayEndTimeInput = view.findViewById(R.id.sundayEndTimeInput);
         saveButton = view.findViewById(R.id.saveButton);
-
         colorPickerInput = view.findViewById(R.id.colorPickerInput);
+
+        saveButton.setOnClickListener(v -> saveActivity());
 
         // Open the color picker dialog when the color input field is clicked
         colorPickerInput.setOnClickListener(v -> openColorPicker());
@@ -110,6 +122,7 @@ public class WeeklyActivityFragment extends Fragment {
 
         return view;
     }
+
 
     private void setupCheckBoxListeners() {
         checkMonday.setOnCheckedChangeListener((buttonView, isChecked) -> {
@@ -207,107 +220,6 @@ public class WeeklyActivityFragment extends Fragment {
         });
     }
 
-    private void saveActivity() {
-        String activityName = activityNameInput.getText().toString().trim();
-        String activityDescription = activityDescriptionInput.getText().toString().trim();
-        String activityLocation = activityLocationInput.getText().toString().trim();
-
-        boolean isWeekly = checkMonday.isChecked() || checkTuesday.isChecked() || checkWednesday.isChecked() ||
-                checkThursday.isChecked() || checkFriday.isChecked() || checkSaturday.isChecked() || checkSunday.isChecked();
-
-        if (isWeekly) {
-            // Create a Calendar instance to set the base date
-            Calendar baseDate = Calendar.getInstance();
-            int currentWeekday = baseDate.get(Calendar.DAY_OF_WEEK); // Get today's weekday
-
-            // Iterate through each day of the week and save events accordingly
-            if (checkMonday.isChecked()) {
-                baseDate.set(Calendar.DAY_OF_WEEK, Calendar.MONDAY);
-                createWeeklyEvent(activityName, activityDescription, activityLocation, baseDate, mondayStartTimeInput, mondayEndTimeInput, colorPickerInput);
-            }
-            if (checkTuesday.isChecked()) {
-                baseDate.set(Calendar.DAY_OF_WEEK, Calendar.TUESDAY);
-                createWeeklyEvent(activityName, activityDescription, activityLocation, baseDate, tuesdayStartTimeInput, tuesdayEndTimeInput, colorPickerInput);
-            }
-            if (checkWednesday.isChecked()) {
-                baseDate.set(Calendar.DAY_OF_WEEK, Calendar.WEDNESDAY);
-                createWeeklyEvent(activityName, activityDescription, activityLocation, baseDate, wednesdayStartTimeInput, wednesdayEndTimeInput, colorPickerInput);
-            }
-            if (checkThursday.isChecked()) {
-                baseDate.set(Calendar.DAY_OF_WEEK, Calendar.THURSDAY);
-                createWeeklyEvent(activityName, activityDescription, activityLocation, baseDate, thursdayStartTimeInput, thursdayEndTimeInput, colorPickerInput);
-            }
-            if (checkFriday.isChecked()) {
-                baseDate.set(Calendar.DAY_OF_WEEK, Calendar.FRIDAY);
-                createWeeklyEvent(activityName, activityDescription, activityLocation, baseDate, fridayStartTimeInput, fridayEndTimeInput, colorPickerInput);
-            }
-            if (checkSaturday.isChecked()) {
-                baseDate.set(Calendar.DAY_OF_WEEK, Calendar.SATURDAY);
-                createWeeklyEvent(activityName, activityDescription, activityLocation, baseDate, saturdayStartTimeInput, saturdayEndTimeInput, colorPickerInput);
-            }
-            if (checkSunday.isChecked()) {
-                baseDate.set(Calendar.DAY_OF_WEEK, Calendar.SUNDAY);
-                createWeeklyEvent(activityName, activityDescription, activityLocation, baseDate, sundayStartTimeInput, sundayEndTimeInput, colorPickerInput);
-            }
-
-            // Show a message to the user
-            Toast.makeText(getActivity(), "Events saved successfully!", Toast.LENGTH_SHORT).show();
-
-            // Clear the back stack to return to EventActivity
-            FragmentManager fragmentManager = getParentFragmentManager();
-            fragmentManager.popBackStack(null, FragmentManager.POP_BACK_STACK_INCLUSIVE);
-
-            // After saving, show the hint text view again
-            ((EventActivity) getActivity()).showHintTextView();
-            ((EventActivity) getActivity()).showAddWeeklyActivityButton();
-
-        } else {
-            // Handle one-time event case if needed
-            Toast.makeText(getActivity(), "Please select at least one day for the weekly event.", Toast.LENGTH_SHORT).show();
-        }
-    }
-
-    private void createWeeklyEvent(String name, String description, String location, Calendar baseDate, EditText startTimeInput, EditText endTimeInput, Button colorPickerInput) {
-        Date startTime = parseTime(startTimeInput.getText().toString());
-        Date endTime = parseTime(endTimeInput.getText().toString());
-        ColorStateList colorStateList = colorPickerInput.getBackgroundTintList();
-        int eventColor = colorStateList.getDefaultColor();
-        if (startTime != null && endTime != null) {
-            // Combine the base date with the event time (hour and minute)
-            Calendar startEventCalendar = Calendar.getInstance();
-            startEventCalendar.set(Calendar.YEAR, baseDate.get(Calendar.YEAR));
-            startEventCalendar.set(Calendar.MONTH, baseDate.get(Calendar.MONTH));
-            startEventCalendar.set(Calendar.DAY_OF_MONTH, baseDate.get(Calendar.DAY_OF_MONTH));
-            startEventCalendar.set(Calendar.HOUR_OF_DAY, startTime.getHours());
-            startEventCalendar.set(Calendar.MINUTE, startTime.getMinutes());
-
-            Calendar endEventCalendar = Calendar.getInstance();
-            endEventCalendar.set(Calendar.YEAR, baseDate.get(Calendar.YEAR));
-            endEventCalendar.set(Calendar.MONTH, baseDate.get(Calendar.MONTH));
-            endEventCalendar.set(Calendar.DAY_OF_MONTH, baseDate.get(Calendar.DAY_OF_MONTH));
-            endEventCalendar.set(Calendar.HOUR_OF_DAY, endTime.getHours());
-            endEventCalendar.set(Calendar.MINUTE, endTime.getMinutes());
-
-            // Try to add the event and check for conflict
-            if (!DummyData.addEvent(new Event(name, description, location, startEventCalendar.getTime(), endEventCalendar.getTime(), true, eventColor))) {
-                Toast.makeText(getActivity(), "Event time conflict for " + baseDate.getDisplayName(Calendar.DAY_OF_WEEK, Calendar.LONG, getResources().getConfiguration().locale), Toast.LENGTH_SHORT).show();
-            }
-        } else {
-            Toast.makeText(getActivity(), "Invalid time for " + baseDate.getDisplayName(Calendar.DAY_OF_WEEK, Calendar.LONG, getResources().getConfiguration().locale), Toast.LENGTH_SHORT).show();
-        }
-    }
-
-
-    private Date parseTime(String time) {
-        SimpleDateFormat sdf = new SimpleDateFormat("HH:mm");
-        try {
-            return sdf.parse(time);
-        } catch (ParseException e) {
-            e.printStackTrace();
-            return null;
-        }
-    }
-
     private void setTimeInputVisibility() {
         mondayStartTimeInput.setVisibility(View.GONE);
         mondayEndTimeInput.setVisibility(View.GONE);
@@ -323,5 +235,137 @@ public class WeeklyActivityFragment extends Fragment {
         saturdayEndTimeInput.setVisibility(View.GONE);
         sundayStartTimeInput.setVisibility(View.GONE);
         sundayEndTimeInput.setVisibility(View.GONE);
+    }
+
+
+    private void saveActivity() {
+        String activityName = activityNameInput.getText().toString().trim();
+        String activityDescription = activityDescriptionInput.getText().toString().trim();
+        String activityLocation = activityLocationInput.getText().toString().trim();
+
+        boolean isWeekly = checkMonday.isChecked() || checkTuesday.isChecked() || checkWednesday.isChecked() ||
+                checkThursday.isChecked() || checkFriday.isChecked() || checkSaturday.isChecked() || checkSunday.isChecked();
+
+        if (isWeekly) {
+            Calendar baseDate = Calendar.getInstance();
+
+            if (checkMonday.isChecked()) {
+                baseDate.set(Calendar.DAY_OF_WEEK, Calendar.MONDAY);
+                saveWeeklyEventToDatabase(activityName, activityDescription, activityLocation, baseDate,
+                        mondayStartTimeInput, mondayEndTimeInput);
+            }
+            if (checkTuesday.isChecked()) {
+                baseDate.set(Calendar.DAY_OF_WEEK, Calendar.TUESDAY);
+                saveWeeklyEventToDatabase(activityName, activityDescription, activityLocation, baseDate,
+                        tuesdayStartTimeInput, tuesdayEndTimeInput);
+            }
+            if (checkWednesday.isChecked()) {
+                baseDate.set(Calendar.DAY_OF_WEEK, Calendar.WEDNESDAY);
+                saveWeeklyEventToDatabase(activityName, activityDescription, activityLocation, baseDate,
+                        wednesdayStartTimeInput, wednesdayEndTimeInput);
+            }
+            if (checkThursday.isChecked()) {
+                baseDate.set(Calendar.DAY_OF_WEEK, Calendar.THURSDAY);
+                saveWeeklyEventToDatabase(activityName, activityDescription, activityLocation, baseDate,
+                        thursdayStartTimeInput, thursdayEndTimeInput);
+            }
+            if (checkFriday.isChecked()) {
+                baseDate.set(Calendar.DAY_OF_WEEK, Calendar.FRIDAY);
+                saveWeeklyEventToDatabase(activityName, activityDescription, activityLocation, baseDate,
+                        fridayStartTimeInput, fridayEndTimeInput);
+            }
+            if (checkSaturday.isChecked()) {
+                baseDate.set(Calendar.DAY_OF_WEEK, Calendar.SATURDAY);
+                saveWeeklyEventToDatabase(activityName, activityDescription, activityLocation, baseDate,
+                        saturdayStartTimeInput, saturdayEndTimeInput);
+            }
+            if (checkSunday.isChecked()) {
+                baseDate.set(Calendar.DAY_OF_WEEK, Calendar.SUNDAY);
+                saveWeeklyEventToDatabase(activityName, activityDescription, activityLocation, baseDate,
+                        sundayStartTimeInput, sundayEndTimeInput);
+            }
+
+            Toast.makeText(getActivity(), "Events saved successfully!", Toast.LENGTH_SHORT).show();
+
+            FragmentManager fragmentManager = getParentFragmentManager();
+            fragmentManager.popBackStack(null, FragmentManager.POP_BACK_STACK_INCLUSIVE);
+
+            // After saving, show the hint text view again
+            ((EventActivity) getActivity()).showHintTextView();
+            ((EventActivity) getActivity()).showAddWeeklyActivityButton();
+
+        } else {
+            Toast.makeText(getActivity(), "Please select at least one day for the weekly event.", Toast.LENGTH_SHORT).show();
+        }
+    }
+
+    private void saveWeeklyEventToDatabase(String name, String description, String location, Calendar baseDate,
+                                           EditText startTimeInput, EditText endTimeInput) {
+        Date startTime = parseTime(startTimeInput.getText().toString());
+        Date endTime = parseTime(endTimeInput.getText().toString());
+        ColorStateList colorStateList = colorPickerInput.getBackgroundTintList();
+        int eventColor = colorStateList != null ? colorStateList.getDefaultColor() : Color.BLACK; // Default color if null
+
+        if (startTime != null && endTime != null) {
+            // Check if an event with the same name already exists
+            if (dbHelper.eventExists(name)) {
+                Toast.makeText(getContext(), "An event with the same name already exists!", Toast.LENGTH_SHORT).show();
+                return; // Exit the method if an event with the same name exists
+            }
+
+            // Iterate through each week for the next year (52 weeks)
+            for (int i = 0; i < 52; i++) {
+                // Create the start and end Date for the event instance
+                Calendar eventDate = (Calendar) baseDate.clone();
+                eventDate.add(Calendar.WEEK_OF_YEAR, i); // Move to the correct week
+
+                Date eventStartDate = combineDateAndTime(eventDate, startTime);
+                Date eventEndDate = combineDateAndTime(eventDate, endTime);
+
+                // Check for conflicts
+                if (dbHelper.isTimeConflict(eventStartDate, eventEndDate)) {
+                    Toast.makeText(getActivity(), "Event time conflict for week " + (i + 1) + "!", Toast.LENGTH_SHORT).show();
+                    continue; // Optionally continue to check the next week
+                }
+
+                // Create the Event object
+                Event event = new Event(name, description, location, eventStartDate, eventEndDate, true, eventColor);
+
+                // Save the Event object to the database
+                boolean success = dbHelper.addEvent(event);
+                if (!success) {
+                    Toast.makeText(getContext(), "Failed to save event for week " + (i + 1), Toast.LENGTH_SHORT).show();
+                }
+            }
+            Toast.makeText(getContext(), "Weekly Event saved for a year!", Toast.LENGTH_SHORT).show();
+        }
+    }
+
+
+    // Helper method to combine a date with a specific time
+    private Date combineDateAndTime(Calendar date, Date time) {
+        Calendar dateTime = (Calendar) date.clone();
+        Calendar timeCal = Calendar.getInstance();
+        timeCal.setTime(time);
+
+        // Set the hour, minute, second, and millisecond from the time to the dateTime
+        dateTime.set(Calendar.HOUR_OF_DAY, timeCal.get(Calendar.HOUR_OF_DAY));
+        dateTime.set(Calendar.MINUTE, timeCal.get(Calendar.MINUTE));
+        dateTime.set(Calendar.SECOND, timeCal.get(Calendar.SECOND));
+        dateTime.set(Calendar.MILLISECOND, timeCal.get(Calendar.MILLISECOND));
+
+        return dateTime.getTime();
+    }
+
+
+
+    private Date parseTime(String timeString) {
+        try {
+            SimpleDateFormat sdf = new SimpleDateFormat("HH:mm");
+            return sdf.parse(timeString);
+        } catch (ParseException e) {
+            e.printStackTrace();
+            return null;
+        }
     }
 }
