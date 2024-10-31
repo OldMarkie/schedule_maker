@@ -127,7 +127,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         boolean isWeekly = cursor.getInt(cursor.getColumnIndexOrThrow(COLUMN_IS_WEEKLY)) == 1;
         int color = cursor.getInt(cursor.getColumnIndexOrThrow(COLUMN_COLOR));
 
-        return new Event(name, description, location, startTime, endTime, isWeekly, color);
+        return new Event(id, name, description, location, startTime, endTime, isWeekly, color);
     }
 
     public void deleteEvent(String eventName) {
@@ -173,7 +173,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         values.put(COLUMN_IS_WEEKLY, event.isWeekly() ? 1 : 0);
         values.put(COLUMN_COLOR, event.getColor());
 
-        db.update(TABLE_EVENTS, values, COLUMN_NAME + "=?", new String[]{event.getName()});
+        db.update(TABLE_EVENTS, values, COLUMN_ID + "=?", new String[]{event.getId()});
         db.close();
     }
 
@@ -209,19 +209,20 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     }
 
     @SuppressLint("Range")
-    public Event getEventByName(String eventName) {
+    public Event getEventById(String eventId) {
         SQLiteDatabase db = this.getReadableDatabase();
         Event event = null;
 
-        String query = "SELECT * FROM events WHERE name = ?";
-        Cursor cursor = db.rawQuery(query, new String[]{eventName});
+        String query = "SELECT * FROM events WHERE id = ?";
+        Cursor cursor = db.rawQuery(query, new String[]{eventId});
 
         // Check if cursor is not null and has results
         if (cursor != null) {
-            Log.d("DatabaseHelper", "Query executed: " + query + " with name: " + eventName);
+            Log.d("DatabaseHelper", "Query executed: " + query + " with ID: " + eventId);
 
             if (cursor.moveToFirst()) {
                 // Retrieve each field using the correct column names
+                String id = cursor.getString(cursor.getColumnIndexOrThrow("id")); // Get the ID
                 String name = cursor.getString(cursor.getColumnIndexOrThrow("name"));
                 String description = cursor.getString(cursor.getColumnIndexOrThrow("description"));
                 String location = cursor.getString(cursor.getColumnIndexOrThrow("location"));
@@ -233,12 +234,12 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                 Date startDate = new Date(startTimeMillis);
                 Date endDate = new Date(endTimeMillis);
 
-                // Create the Event object
-                event = new Event(name, description, location, startDate, endDate, false, color);
+                // Create the Event object with the ID
+                event = new Event(id, name, description, location, startDate, endDate, false, color); // Include ID
 
                 Log.d("DatabaseHelper", "Event found: " + event.toString());
             } else {
-                Log.e("DatabaseHelper", "No event found for Event: " + eventName);
+                Log.e("DatabaseHelper", "No event found for ID: " + eventId);
             }
 
             cursor.close();
@@ -249,6 +250,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         db.close();
         return event;
     }
+
 
 
 

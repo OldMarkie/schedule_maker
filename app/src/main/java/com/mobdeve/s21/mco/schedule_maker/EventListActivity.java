@@ -197,4 +197,9 @@ public class EventListActivity extends AppCompatActivity {
                 .show();
     }
 
+    public void refreshEventsForCurrentDate() {
+        loadEventsForDate(currentSelectedDate);
+    }
+
+
 }

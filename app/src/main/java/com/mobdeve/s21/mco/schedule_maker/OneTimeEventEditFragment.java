@@ -71,41 +71,14 @@ public class OneTimeEventEditFragment extends Fragment {
         Bundle args = getArguments();
         if (args != null) {
             String eventId = args.getString("eventId");
-            String eventName = args.getString("eventName");
-            String eventDescription = args.getString("eventDescription");
-            String eventLocation = args.getString("eventLocation");
-            long startTimeMillis = args.getLong("startTime");
-            long endTimeMillis = args.getLong("endTime");
-            int eventColor = args.getInt("eventColor");
-
             Log.d("OneTimeEventEditFragment", "Received Event ID: " + eventId);
-            Log.d("OneTimeEventEditFragment", "Received Event Name: " + eventName);
-            Log.d("OneTimeEventEditFragment", "Received Event Description: " + eventDescription);
-            Log.d("OneTimeEventEditFragment", "Received Event Location: " + eventLocation);
-            Log.d("OneTimeEventEditFragment", "Received Start Time: " + startTimeMillis);
-            Log.d("OneTimeEventEditFragment", "Received End Time: " + endTimeMillis);
-            Log.d("OneTimeEventEditFragment", "Received Event Color: " + eventColor);
-
-            // Populate fields in the fragment using the retrieved data
-            eventNameInput.setText(eventName);
-            eventDescriptionInput.setText(eventDescription);
-            eventLocationInput.setText(eventLocation);
-            eventDateInput.setText(new SimpleDateFormat("dd/MM/yyyy", Locale.getDefault()).format(new Date(startTimeMillis)));
-            eventTimeInput.setText(new SimpleDateFormat("HH:mm", Locale.getDefault()).format(new Date(startTimeMillis)));
-            eventEndTimeInput.setText(new SimpleDateFormat("HH:mm", Locale.getDefault()).format(new Date(endTimeMillis)));
-            colorPickerInput.setBackgroundTintList(ColorStateList.valueOf(eventColor));
-            ColorStateList textColor = ColorStateList.valueOf(eventColor);
-            colorPickerInput.setTextColor(textColor);
-            selectedColor = eventColor;
-            String nearestColorName = colorUtils.getNearestColorName(selectedColor);
-            colorPickerInput.setHint(nearestColorName);
+            // Load event data if editing
+            if (getArguments() != null) {
+                loadEventData(eventId);
+            }
         }
 
-        // Load event data if editing
-        if (getArguments() != null) {
-            String eventId = getArguments().getString("eventName");
-            loadEventData(eventId);
-        }
+
 
         return view;
     }
@@ -135,11 +108,11 @@ public class OneTimeEventEditFragment extends Fragment {
         cancelButton.setOnClickListener(v -> backToEventList());
     }
 
-    private void loadEventData(String eventName) {
-        Log.d("OneTimeEventEditFragment", "Loading event data for Event Name: " + eventName);
+    private void loadEventData(String eventId) {
+        Log.d("OneTimeEventEditFragment", "Loading event data for Event Name: " + eventId);
 
         dbHelper = new DatabaseHelper(getContext());
-        currentEvent = dbHelper.getEventByName(eventName);
+        currentEvent = dbHelper.getEventById(eventId);
 
         if (currentEvent != null) {
             Log.d("OneTimeEventEditFragment", "Event found: " + currentEvent.toString()); // Log the event details
@@ -156,11 +129,12 @@ public class OneTimeEventEditFragment extends Fragment {
 
             selectedColor = currentEvent.getColor();
             colorPickerInput.setBackgroundTintList(ColorStateList.valueOf(selectedColor));
+            colorPickerInput.setHint(colorUtils.getNearestColorName(selectedColor));
             setTextColorBasedOnContrast(selectedColor);
 
             Log.d("OneTimeEventEditFragment", "Event details populated in UI.");
         } else {
-            Log.e("OneTimeEventEditFragment", "No event found for ID: " + eventName);
+            Log.e("OneTimeEventEditFragment", "No event found for ID: " + eventId);
         }
     }
 
@@ -179,6 +153,7 @@ public class OneTimeEventEditFragment extends Fragment {
                 .setPositiveButton("OK", (dialog, color, allColors) -> {
                     selectedColor = color;
                     colorPickerInput.setBackgroundTintList(ColorStateList.valueOf(selectedColor));
+                    colorPickerInput.setHint(colorUtils.getNearestColorName(selectedColor));
                     setTextColorBasedOnContrast(selectedColor);
                 })
                 .setNegativeButton("Cancel", (dialog, which) -> { })
@@ -267,15 +242,26 @@ public class OneTimeEventEditFragment extends Fragment {
 
     private void setTextColorBasedOnContrast(int selectedColor) {
         double luminance = (0.299 * Color.red(selectedColor) + 0.587 * Color.green(selectedColor) + 0.114 * Color.blue(selectedColor)) / 255;
-        colorPickerInput.setTextColor(luminance < 0.5 ? Color.WHITE : Color.BLACK);
+        colorPickerInput.setHintTextColor(luminance < 0.5 ? Color.WHITE : Color.BLACK);
     }
 
     private void backToEventList() {
+        // Show the main event list view
         View view = getActivity().findViewById(R.id.mainAEL);
         view.setVisibility(View.VISIBLE);
+
+        // Hide the edit event view
         View editView = getActivity().findViewById(R.id.editOneTImeEvent);
         editView.setVisibility(View.GONE);
+
+        // Refresh the event list
+        EventListActivity activity = (EventListActivity) getActivity();
+        if (activity != null) {
+            activity.refreshEventsForCurrentDate(); // Call the new public method
+        }
     }
+
+
 
 
 
