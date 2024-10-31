@@ -63,11 +63,7 @@ public class OneTimeEventEditFragment extends Fragment {
             e.printStackTrace();
         }
 
-        // Load event data if editing
-        if (getArguments() != null) {
-            String eventId = getArguments().getString("EVENT_ID");
-            loadEventData(eventId);
-        }
+
 
         // Set button click listeners
         setListeners(view);
@@ -105,6 +101,11 @@ public class OneTimeEventEditFragment extends Fragment {
             colorPickerInput.setHint(nearestColorName);
         }
 
+        // Load event data if editing
+        if (getArguments() != null) {
+            String eventId = getArguments().getString("eventName");
+            loadEventData(eventId);
+        }
 
         return view;
     }
@@ -134,11 +135,14 @@ public class OneTimeEventEditFragment extends Fragment {
         cancelButton.setOnClickListener(v -> backToEventList());
     }
 
-    private void loadEventData(String eventId) {
+    private void loadEventData(String eventName) {
+        Log.d("OneTimeEventEditFragment", "Loading event data for Event Name: " + eventName);
+
         dbHelper = new DatabaseHelper(getContext());
-        currentEvent = dbHelper.getEventById(eventId);
+        currentEvent = dbHelper.getEventByName(eventName);
 
         if (currentEvent != null) {
+            Log.d("OneTimeEventEditFragment", "Event found: " + currentEvent.toString()); // Log the event details
             eventNameInput.setText(currentEvent.getName());
             eventDescriptionInput.setText(currentEvent.getDescription());
             eventLocationInput.setText(currentEvent.getLocation());
@@ -153,8 +157,13 @@ public class OneTimeEventEditFragment extends Fragment {
             selectedColor = currentEvent.getColor();
             colorPickerInput.setBackgroundTintList(ColorStateList.valueOf(selectedColor));
             setTextColorBasedOnContrast(selectedColor);
+
+            Log.d("OneTimeEventEditFragment", "Event details populated in UI.");
+        } else {
+            Log.e("OneTimeEventEditFragment", "No event found for ID: " + eventName);
         }
     }
+
 
     private void openColorPicker() {
         ColorPickerDialogBuilder
@@ -216,6 +225,9 @@ public class OneTimeEventEditFragment extends Fragment {
         String eventDate = eventDateInput.getText().toString().trim();
         String eventTime = eventTimeInput.getText().toString().trim();
         String eventEndTime = eventEndTimeInput.getText().toString().trim();
+        ColorStateList textColor = colorPickerInput.getBackgroundTintList();
+        int selectedColor = textColor.getDefaultColor();
+
 
         if (eventName.isEmpty() || eventDescription.isEmpty() || eventLocation.isEmpty() ||
                 eventDate.isEmpty() || eventTime.isEmpty() || eventEndTime.isEmpty()) {

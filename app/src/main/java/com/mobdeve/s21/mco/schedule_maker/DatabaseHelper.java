@@ -7,6 +7,7 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.icu.text.SimpleDateFormat;
+import android.util.Log;
 
 import java.util.ArrayList;
 import java.util.Date;
@@ -172,7 +173,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         values.put(COLUMN_IS_WEEKLY, event.isWeekly() ? 1 : 0);
         values.put(COLUMN_COLOR, event.getColor());
 
-        db.update(TABLE_EVENTS, values, COLUMN_ID + "=?", new String[]{event.getId()});
+        db.update(TABLE_EVENTS, values, COLUMN_NAME + "=?", new String[]{event.getName()});
         db.close();
     }
 
@@ -207,36 +208,48 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         return exists;
     }
 
-    public Event getEventById(String eventId) {
+    @SuppressLint("Range")
+    public Event getEventByName(String eventName) {
         SQLiteDatabase db = this.getReadableDatabase();
         Event event = null;
 
-        String query = "SELECT * FROM events WHERE id = ?";
-        Cursor cursor = db.rawQuery(query, new String[]{String.valueOf(eventId)});
+        String query = "SELECT * FROM events WHERE name = ?";
+        Cursor cursor = db.rawQuery(query, new String[]{eventName});
 
+        // Check if cursor is not null and has results
         if (cursor != null) {
+            Log.d("DatabaseHelper", "Query executed: " + query + " with name: " + eventName);
+
             if (cursor.moveToFirst()) {
-                // Assuming column indices or names are known (e.g., COL_NAME, COL_DESCRIPTION, etc.)
-                @SuppressLint("Range") String eventName = cursor.getString(cursor.getColumnIndex("name"));
-                @SuppressLint("Range") String eventDescription = cursor.getString(cursor.getColumnIndex("description"));
-                @SuppressLint("Range") String eventLocation = cursor.getString(cursor.getColumnIndex("location"));
-                @SuppressLint("Range") long startTimeMillis = cursor.getLong(cursor.getColumnIndex("start_date"));
-                @SuppressLint("Range") long endTimeMillis = cursor.getLong(cursor.getColumnIndex("end_date"));
-                @SuppressLint("Range") int color = cursor.getInt(cursor.getColumnIndex("color"));
+                // Retrieve each field using the correct column names
+                String name = cursor.getString(cursor.getColumnIndexOrThrow("name"));
+                String description = cursor.getString(cursor.getColumnIndexOrThrow("description"));
+                String location = cursor.getString(cursor.getColumnIndexOrThrow("location"));
+                long startTimeMillis = cursor.getLong(cursor.getColumnIndexOrThrow("start_time"));
+                long endTimeMillis = cursor.getLong(cursor.getColumnIndexOrThrow("end_time"));
+                int color = cursor.getInt(cursor.getColumnIndexOrThrow("color"));
 
                 // Convert start and end times from milliseconds to Date objects
                 Date startDate = new Date(startTimeMillis);
                 Date endDate = new Date(endTimeMillis);
 
                 // Create the Event object
-                event = new Event(eventName, eventDescription, eventLocation, startDate, endDate, false, color);
-                event.setId(eventId);  // Set the ID of the event
+                event = new Event(name, description, location, startDate, endDate, false, color);
+
+                Log.d("DatabaseHelper", "Event found: " + event.toString());
+            } else {
+                Log.e("DatabaseHelper", "No event found for Event: " + eventName);
             }
+
             cursor.close();
+        } else {
+            Log.e("DatabaseHelper", "Cursor is null.");
         }
 
         db.close();
         return event;
     }
+
+
 
 }
