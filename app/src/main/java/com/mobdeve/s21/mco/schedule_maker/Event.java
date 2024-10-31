@@ -57,4 +57,37 @@ public class Event implements Serializable {
     public int getColor() {
         return color;
     }
+
+    public void setColor(int color) {
+        this.color = color;
+    }
+
+    public void setWeekly(boolean weekly) {
+        isWeekly = weekly;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
+    }
+
+    public void setEndTime(Date endTime) {
+        this.endTime = endTime;
+    }
+
+    public void setId(String id) {
+        this.id = id;
+    }
+
+    public void setLocation(String location) {
+        this.location = location;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public void setStartTime(Date startTime) {
+        this.startTime = startTime;
+    }
+
 }

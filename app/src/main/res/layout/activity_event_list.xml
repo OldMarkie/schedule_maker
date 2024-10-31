@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     xmlns:app="http://schemas.android.com/apk/res-auto"
@@ -7,53 +8,69 @@
     android:padding="16dp"
     android:background="@color/colorBackground">
 
-    <TextView
-        android:id="@+id/pageTitle"
+    <androidx.fragment.app.FragmentContainerView
+        android:id="@+id/editOneTImeEvent"
+        android:name="com.mobdeve.s21.mco.schedule_maker.OneTimeEventEditFragment"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="Home"
-        android:textSize="34sp"
-        android:textStyle="bold"
-        android:textColor="@color/textColorPrimary" />
-
-    <CalendarView
-        android:id="@+id/calendarView"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content" />
-
-    <TextView
-        android:id="@+id/eventsForDateTitle"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="8dp"
-        android:layout_marginBottom="8dp"
-        android:text="Events for Selected Date"
-        android:textSize="18sp"
-        android:textStyle="bold"
-        android:textColor="@color/textColorPrimary" />
+        android:layout_height="match_parent"
+        android:layout_weight="1"
+        android:visibility="gone" />
 
     <LinearLayout
+        android:id="@+id/mainAEL"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="match_parent"
         android:layout_weight="1"
         android:orientation="vertical">
 
-        <androidx.recyclerview.widget.RecyclerView
-            android:id="@+id/recyclerView"
+        <TextView
+            android:id="@+id/pageTitle"
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:layout_weight="1" />
-    </LinearLayout>
+            android:layout_height="wrap_content"
+            android:text="Home"
+            android:textColor="@color/textColorPrimary"
+            android:textSize="34sp"
+            android:textStyle="bold" />
 
-    <Button
-        android:id="@+id/weeklyEventButton"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_gravity="center"
-        android:layout_margin="16dp"
-        android:text="See Weekly Schedule"
-        android:textColor="@color/colorOnSecondary"
-        android:backgroundTint="@color/colorSecondary" />
+        <CalendarView
+            android:id="@+id/calendarView"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content" />
+
+        <TextView
+            android:id="@+id/eventsForDateTitle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:layout_marginBottom="8dp"
+            android:text="Events for Selected Date"
+            android:textColor="@color/textColorPrimary"
+            android:textSize="18sp"
+            android:textStyle="bold" />
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:orientation="vertical">
+
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/recyclerView"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_weight="1" />
+        </LinearLayout>
+
+        <Button
+            android:id="@+id/weeklyEventButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:layout_margin="16dp"
+            android:backgroundTint="@color/colorSecondary"
+            android:text="See Weekly Schedule"
+            android:textColor="@color/colorOnSecondary" />
+    </LinearLayout>
 
     <com.google.android.material.bottomnavigation.BottomNavigationView
         android:id="@+id/bottomNavigationView"

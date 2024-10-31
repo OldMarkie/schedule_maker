@@ -5,6 +5,8 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.util.Log;
+import android.view.View;
 import android.widget.Button;
 import android.widget.CalendarView;
 import android.widget.TextView;
@@ -22,7 +24,7 @@ import java.util.Date;
 import java.util.List;
 import java.util.Locale;
 
-public class EventListActivity extends AppCompatActivity implements OneTimeEventEditFragment.OnFragmentInteractionListener, WeeklyActivityEditFragment.OnFragmentInteractionListener {
+public class EventListActivity extends AppCompatActivity {
 
     private RecyclerView recyclerView;
     private EventAdapter eventAdapter;
@@ -64,16 +66,52 @@ public class EventListActivity extends AppCompatActivity implements OneTimeEvent
 
             @Override
             public void onEventEdit(Event event) {
+                Log.d("EventListActivity", "Editing Event: " + event.getName());
                 if (event.isWeekly()) {
-                    WeeklyActivityEditFragment weeklyEditDialog = new WeeklyActivityEditFragment();
-                    weeklyEditDialog.setDismissListener(EventListActivity.this);
-                    weeklyEditDialog.show(getSupportFragmentManager(), "WeeklyEditDialog");
+                   return;
                 } else {
+                    // Create a new instance of the fragment
                     OneTimeEventEditFragment oneTimeEditDialog = new OneTimeEventEditFragment();
-                    oneTimeEditDialog.setDismissListener(EventListActivity.this);
-                    oneTimeEditDialog.show(getSupportFragmentManager(), "OneTimeEditDialog");
+
+                    // Create a bundle with event details
+                    Bundle args = new Bundle();
+                    // Create a bundle with event details
+                    args.putString("eventId", event.getId());  // Pass the event ID to the fragment
+                    Log.d("EventListActivity", "Event ID: " + event.getId());
+
+                    args.putString("eventName", event.getName());
+                    Log.d("EventListActivity", "Event Name: " + event.getName());
+
+                    args.putString("eventDescription", event.getDescription());
+                    Log.d("EventListActivity", "Event Description: " + event.getDescription());
+
+                    args.putString("eventLocation", event.getLocation());
+                    Log.d("EventListActivity", "Event Location: " + event.getLocation());
+
+                    args.putLong("startTime", event.getStartTime().getTime());
+                    Log.d("EventListActivity", "Start Time: " + event.getStartTime().getTime());
+
+                    args.putLong("endTime", event.getEndTime().getTime());
+                    Log.d("EventListActivity", "End Time: " + event.getEndTime().getTime());
+
+                    args.putInt("eventColor", event.getColor());
+                    Log.d("EventListActivity", "Event Color: " + event.getColor());
+
+                    Log.d("EventListActivity", "Creating fragment with arguments: " + args.toString());
+
+                    // Set the arguments to the fragment
+                    oneTimeEditDialog.setArguments(args);
+
+                    // Create and set up the fragment
+                    getSupportFragmentManager().beginTransaction()
+                            .replace(R.id.editOneTImeEvent, oneTimeEditDialog)
+                            .addToBackStack(null) // Add to back stack to allow navigation back
+                            .commit();
+                    findViewById(R.id.mainAEL).setVisibility(View.GONE);
+                    findViewById(R.id.editOneTImeEvent).setVisibility(View.VISIBLE);
                 }
             }
+
 
 
         });
@@ -157,12 +195,6 @@ public class EventListActivity extends AppCompatActivity implements OneTimeEvent
                 })
                 .setNegativeButton("Cancel", null)
                 .show();
-    }
-
-
-    @Override
-    public void onDialogDismissed() {
-        loadEventsForDate(currentSelectedDate); // Reload events when dialog is dismissed
     }
 
 }

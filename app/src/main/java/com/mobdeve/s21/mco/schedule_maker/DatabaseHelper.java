@@ -1,5 +1,6 @@
 package com.mobdeve.s21.mco.schedule_maker;
 
+import android.annotation.SuppressLint;
 import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
@@ -204,6 +205,38 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         cursor.close();
         db.close();
         return exists;
+    }
+
+    public Event getEventById(String eventId) {
+        SQLiteDatabase db = this.getReadableDatabase();
+        Event event = null;
+
+        String query = "SELECT * FROM events WHERE id = ?";
+        Cursor cursor = db.rawQuery(query, new String[]{String.valueOf(eventId)});
+
+        if (cursor != null) {
+            if (cursor.moveToFirst()) {
+                // Assuming column indices or names are known (e.g., COL_NAME, COL_DESCRIPTION, etc.)
+                @SuppressLint("Range") String eventName = cursor.getString(cursor.getColumnIndex("name"));
+                @SuppressLint("Range") String eventDescription = cursor.getString(cursor.getColumnIndex("description"));
+                @SuppressLint("Range") String eventLocation = cursor.getString(cursor.getColumnIndex("location"));
+                @SuppressLint("Range") long startTimeMillis = cursor.getLong(cursor.getColumnIndex("start_date"));
+                @SuppressLint("Range") long endTimeMillis = cursor.getLong(cursor.getColumnIndex("end_date"));
+                @SuppressLint("Range") int color = cursor.getInt(cursor.getColumnIndex("color"));
+
+                // Convert start and end times from milliseconds to Date objects
+                Date startDate = new Date(startTimeMillis);
+                Date endDate = new Date(endTimeMillis);
+
+                // Create the Event object
+                event = new Event(eventName, eventDescription, eventLocation, startDate, endDate, false, color);
+                event.setId(eventId);  // Set the ID of the event
+            }
+            cursor.close();
+        }
+
+        db.close();
+        return event;
     }
 
 }
