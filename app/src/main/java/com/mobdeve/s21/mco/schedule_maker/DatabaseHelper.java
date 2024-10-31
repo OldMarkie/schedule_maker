@@ -128,11 +128,37 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         return new Event(name, description, location, startTime, endTime, isWeekly, color);
     }
 
-    public void deleteEvent(String eventId) {
+    public void deleteEvent(String eventName) {
         SQLiteDatabase db = this.getWritableDatabase();
-        db.delete(TABLE_EVENTS, COLUMN_ID + "=?", new String[]{eventId});
+
+        // First, retrieve the event by its name to check if it's weekly
+        Cursor cursor = db.query(TABLE_EVENTS, null, COLUMN_NAME + "=?", new String[]{eventName}, null, null, null);
+
+        if (cursor != null && cursor.moveToFirst()) {
+            // Loop through all instances with the same name
+            do {
+                Event event = createEventFromCursor(cursor);
+
+                // Check if the event is weekly
+                if (event.isWeekly()) {
+                    // If it's a weekly event, delete all instances by its name
+                    db.delete(TABLE_EVENTS, COLUMN_NAME + "=?", new String[]{event.getName()});
+                    break; // Exit the loop after deletion
+                } else {
+                    // If it's not a weekly event, delete it by its name
+                    db.delete(TABLE_EVENTS, COLUMN_NAME + "=?", new String[]{event.getName()});
+                }
+            } while (cursor.moveToNext());
+        }
+
+        // Close the cursor and database
+        if (cursor != null) {
+            cursor.close();
+        }
         db.close();
     }
+
+
 
     public void updateEvent(Event event) {
         SQLiteDatabase db = this.getWritableDatabase();

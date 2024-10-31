@@ -151,12 +151,14 @@ public class EventListActivity extends AppCompatActivity implements OneTimeEvent
         builder.setTitle("Delete Event")
                 .setMessage("Are you sure you want to delete this event?")
                 .setPositiveButton("Delete", (dialog, which) -> {
-                    DummyData.deleteEvent(event);
+                    // Use DatabaseHelper to delete the event
+                    dbHelper.deleteEvent(event.getName()); // Call the delete method with event ID
                     loadEventsForDate(currentSelectedDate);  // Refresh events for the current date
                 })
                 .setNegativeButton("Cancel", null)
                 .show();
     }
+
 
     @Override
     public void onDialogDismissed() {
