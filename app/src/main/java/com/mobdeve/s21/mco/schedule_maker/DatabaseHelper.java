@@ -5,9 +5,14 @@ import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
+import android.icu.text.SimpleDateFormat;
+
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Locale;
+import java.util.Set;
 
 public class DatabaseHelper extends SQLiteOpenHelper {
 
@@ -68,18 +73,47 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
     public List<Event> getEventsForDate(Date date) {
         List<Event> events = new ArrayList<>();
+        Set<String> uniqueWeeklyEventIds = new HashSet<>(); // To track unique weekly events
         SQLiteDatabase db = this.getReadableDatabase();
+
+        // Format date to match with your stored event dates
+        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault());
+        String dateString = dateFormat.format(date);
+
+        // Query to retrieve all events, could also add WHERE clause to filter by date if necessary
         Cursor cursor = db.query(TABLE_EVENTS, null, null, null, null, null, COLUMN_START_TIME);
 
         while (cursor.moveToNext()) {
             Event event = createEventFromCursor(cursor);
-            // Filter events by date or recurrence as needed
-            events.add(event);
+
+            // Check if the event is for the specified date
+            if (isEventOnDate(event, dateString)) {
+                if (event.isWeekly()) {
+                    // Use a unique identifier for weekly events
+                    String uniqueId = event.getName(); // Adjust this based on your identifier logic
+                    if (!uniqueWeeklyEventIds.contains(uniqueId)) {
+                        uniqueWeeklyEventIds.add(uniqueId);
+                        events.add(event); // Add only unique weekly events
+                    }
+                } else {
+                    // Add one-time events directly
+                    events.add(event);
+                }
+            }
         }
         cursor.close();
         db.close();
         return events;
     }
+
+    // Helper method to determine if an event is on the specified date
+    private boolean isEventOnDate(Event event, String dateString) {
+        // Format the event's start time to compare with the given date
+        SimpleDateFormat eventDateFormat = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault());
+        String eventDateString = eventDateFormat.format(event.getStartTime()); // Assuming getStartTime returns a Date object
+        return eventDateString.equals(dateString);
+    }
+
 
     private Event createEventFromCursor(Cursor cursor) {
         String id = cursor.getString(cursor.getColumnIndexOrThrow(COLUMN_ID));

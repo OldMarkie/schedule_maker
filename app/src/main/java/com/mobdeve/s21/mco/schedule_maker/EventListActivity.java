@@ -31,6 +31,7 @@ public class EventListActivity extends AppCompatActivity implements OneTimeEvent
     private CalendarView calendarView;
     private Date currentSelectedDate;
     private Button weeklyEventButton;
+    private DatabaseHelper dbHelper;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -46,6 +47,7 @@ public class EventListActivity extends AppCompatActivity implements OneTimeEvent
         recyclerView = findViewById(R.id.recyclerView);
         eventsForDateTitle = findViewById(R.id.eventsForDateTitle);
         weeklyEventButton = findViewById(R.id.weeklyEventButton); // Initialize the button
+        dbHelper= new DatabaseHelper(this);
 
         // Disable past dates in the CalendarView
         calendarView.setMinDate(System.currentTimeMillis() - 1000);  // Disable past dates
@@ -132,7 +134,7 @@ public class EventListActivity extends AppCompatActivity implements OneTimeEvent
         eventsForDateTitle.setText("Events for " + selectedDateString);
 
         eventList.clear();  // Clear current event list
-        List<Event> eventsForDate = DummyData.getEventsForDate(date);  // Fetch events for the selected date
+        List<Event> eventsForDate = dbHelper.getEventsForDate(date);  // Fetch events from DatabaseHelper
 
         if (eventsForDate.isEmpty()) {
             eventsForDateTitle.setText("No Scheduled Events For " + selectedDateString);
