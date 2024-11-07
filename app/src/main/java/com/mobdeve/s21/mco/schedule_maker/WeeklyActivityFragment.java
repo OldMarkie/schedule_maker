@@ -30,6 +30,7 @@ import java.io.InputStream;
 import java.text.ParseException;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.Random;
 
 
 public class WeeklyActivityFragment extends Fragment {
@@ -307,11 +308,10 @@ public class WeeklyActivityFragment extends Fragment {
         int eventColor = colorStateList != null ? colorStateList.getDefaultColor() : Color.BLACK; // Default color if null
 
         if (startTime != null && endTime != null) {
-            // Check if an event with the same name already exists
-            if (dbHelper.eventExists(name)) {
-                Toast.makeText(getContext(), "An event with the same name already exists!", Toast.LENGTH_SHORT).show();
-                return; // Exit the method if an event with the same name exists
-            }
+
+            Random random = new Random();
+            int rand = random.nextInt(10000);
+            rand = rand + random.nextInt(10000);
 
             // Iterate through each week for the next year (52 weeks)
             for (int i = 0; i < 52; i++) {
@@ -328,8 +328,10 @@ public class WeeklyActivityFragment extends Fragment {
                     continue; // Optionally continue to check the next week
                 }
 
+
+                String counter = String.valueOf(rand + i);
                 // Create the Event object
-                Event event = new Event(name, description, location, eventStartDate, eventEndDate, true, eventColor);
+                Event event = new Event(counter, name, description, location, eventStartDate, eventEndDate, true, eventColor);
 
                 // Save the Event object to the database
                 boolean success = dbHelper.addEvent(event);
