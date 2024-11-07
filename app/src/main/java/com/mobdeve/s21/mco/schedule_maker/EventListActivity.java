@@ -11,6 +11,7 @@ import android.widget.Button;
 import android.widget.CalendarView;
 import android.widget.TextView;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.fragment.app.FragmentManager;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
@@ -68,7 +69,17 @@ public class EventListActivity extends AppCompatActivity {
             public void onEventEdit(Event event) {
                 Log.d("EventListActivity", "Editing Event: " + event.getName());
                 if (event.isWeekly()) {
-                   return;
+                    Bundle args = new Bundle();
+                    args.putString("EVENT_ID", event.getId()); // Pass the event ID
+                    WeeklyActivityEditFragment editFragment = new WeeklyActivityEditFragment();
+                    editFragment.setArguments(args);
+
+                    // Replace the fragment or add to back stack
+                    FragmentManager fragmentManager = getSupportFragmentManager();
+                    fragmentManager.beginTransaction()
+                            .replace(R.id.fragment_container, editFragment)
+                            .addToBackStack(null)
+                            .commit();;
                 } else {
                     // Create a new instance of the fragment
                     OneTimeEventEditFragment oneTimeEditDialog = new OneTimeEventEditFragment();

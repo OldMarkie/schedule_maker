@@ -53,7 +53,7 @@ public class EventAdapter extends RecyclerView.Adapter<EventAdapter.EventViewHol
         }
 
         // Format and set only the time in the eventTime TextView
-        holder.eventTime.setText(timeFormat.format(event.getStartTime()));
+        holder.eventTime.setText(timeFormat.format(event.getStartTime()) + " - " + timeFormat.format(event.getEndTime()));
 
         // Set the recurrence text (e.g., Weekly or One-time)
         if (event.isWeekly()) {

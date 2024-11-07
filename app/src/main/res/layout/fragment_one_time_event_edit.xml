@@ -12,6 +12,7 @@
         android:layout_height="wrap_content"
         android:paddingBottom="8dp"
         android:text="Edit [One Time Event]"
+        android:textColor="@color/textColorPrimary"
         android:textSize="30sp"
         android:textStyle="bold" />
 
