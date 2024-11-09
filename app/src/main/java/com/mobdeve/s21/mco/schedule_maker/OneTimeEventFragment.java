@@ -7,6 +7,7 @@ import android.content.SharedPreferences;
 import android.content.res.ColorStateList;
 import android.graphics.Color;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -35,6 +36,7 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.UUID;
 
 public class OneTimeEventFragment extends Fragment {
 
@@ -267,8 +269,10 @@ public class OneTimeEventFragment extends Fragment {
                 return;
             }
 
+            String eventId = UUID.randomUUID().toString();
             // Create and save the event
-            Event newEvent = new Event(eventName, eventDescription, eventLocation, startDate, endDate, false, eventColor);
+            Event newEvent = new Event(eventId,eventName, eventDescription, eventLocation, startDate, endDate, false, eventColor, -1);
+            Log.d("OneTimeEventFragment", "Saving event: " + newEvent.toString());
             dbHelper.addEvent(newEvent);
 
             Toast.makeText(getActivity(), "One-Time Event Saved!", Toast.LENGTH_SHORT).show();

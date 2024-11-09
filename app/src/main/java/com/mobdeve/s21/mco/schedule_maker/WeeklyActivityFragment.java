@@ -6,6 +6,7 @@ import android.content.res.ColorStateList;
 import android.graphics.Color;
 import android.icu.text.SimpleDateFormat;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -31,6 +32,7 @@ import java.text.ParseException;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.Random;
+import java.util.UUID;
 
 
 public class WeeklyActivityFragment extends Fragment {
@@ -253,37 +255,37 @@ public class WeeklyActivityFragment extends Fragment {
             if (checkMonday.isChecked()) {
                 baseDate.set(Calendar.DAY_OF_WEEK, Calendar.MONDAY);
                 saveWeeklyEventToDatabase(activityName, activityDescription, activityLocation, baseDate,
-                        mondayStartTimeInput, mondayEndTimeInput);
+                        mondayStartTimeInput, mondayEndTimeInput, 1);
             }
             if (checkTuesday.isChecked()) {
                 baseDate.set(Calendar.DAY_OF_WEEK, Calendar.TUESDAY);
                 saveWeeklyEventToDatabase(activityName, activityDescription, activityLocation, baseDate,
-                        tuesdayStartTimeInput, tuesdayEndTimeInput);
+                        tuesdayStartTimeInput, tuesdayEndTimeInput, 2);
             }
             if (checkWednesday.isChecked()) {
                 baseDate.set(Calendar.DAY_OF_WEEK, Calendar.WEDNESDAY);
                 saveWeeklyEventToDatabase(activityName, activityDescription, activityLocation, baseDate,
-                        wednesdayStartTimeInput, wednesdayEndTimeInput);
+                        wednesdayStartTimeInput, wednesdayEndTimeInput, 3);
             }
             if (checkThursday.isChecked()) {
                 baseDate.set(Calendar.DAY_OF_WEEK, Calendar.THURSDAY);
                 saveWeeklyEventToDatabase(activityName, activityDescription, activityLocation, baseDate,
-                        thursdayStartTimeInput, thursdayEndTimeInput);
+                        thursdayStartTimeInput, thursdayEndTimeInput, 4);
             }
             if (checkFriday.isChecked()) {
                 baseDate.set(Calendar.DAY_OF_WEEK, Calendar.FRIDAY);
                 saveWeeklyEventToDatabase(activityName, activityDescription, activityLocation, baseDate,
-                        fridayStartTimeInput, fridayEndTimeInput);
+                        fridayStartTimeInput, fridayEndTimeInput, 5);
             }
             if (checkSaturday.isChecked()) {
                 baseDate.set(Calendar.DAY_OF_WEEK, Calendar.SATURDAY);
                 saveWeeklyEventToDatabase(activityName, activityDescription, activityLocation, baseDate,
-                        saturdayStartTimeInput, saturdayEndTimeInput);
+                        saturdayStartTimeInput, saturdayEndTimeInput, 6);
             }
             if (checkSunday.isChecked()) {
                 baseDate.set(Calendar.DAY_OF_WEEK, Calendar.SUNDAY);
                 saveWeeklyEventToDatabase(activityName, activityDescription, activityLocation, baseDate,
-                        sundayStartTimeInput, sundayEndTimeInput);
+                        sundayStartTimeInput, sundayEndTimeInput, 7);
             }
 
             Toast.makeText(getActivity(), "Events saved successfully!", Toast.LENGTH_SHORT).show();
@@ -301,17 +303,22 @@ public class WeeklyActivityFragment extends Fragment {
     }
 
     private void saveWeeklyEventToDatabase(String name, String description, String location, Calendar baseDate,
-                                           EditText startTimeInput, EditText endTimeInput) {
+                                           EditText startTimeInput, EditText endTimeInput, int dayWeek) {
         Date startTime = parseTime(startTimeInput.getText().toString());
         Date endTime = parseTime(endTimeInput.getText().toString());
         ColorStateList colorStateList = colorPickerInput.getBackgroundTintList();
-        int eventColor = colorStateList != null ? colorStateList.getDefaultColor() : Color.BLACK; // Default color if null
+        int eventColor = colorStateList.getDefaultColor();
+
+        // Debugging the dayWeek value
+        Log.d("Event", "dayWeek value: " + dayWeek);
+
+        // Ensure dayWeek is not null or invalid (set a default value if necessary)
+        if (dayWeek < 1 || dayWeek > 7) {
+            Log.w("Event", "Invalid dayWeek value. Setting to default (0 - Monday).");
+            dayWeek = 1;  // Default to Sunday (or handle this appropriately)
+        }
 
         if (startTime != null && endTime != null) {
-
-            Random random = new Random();
-            int rand = random.nextInt(10000);
-            rand = rand + random.nextInt(10000);
 
             // Iterate through each week for the next year (52 weeks)
             for (int i = 0; i < 52; i++) {
@@ -322,26 +329,33 @@ public class WeeklyActivityFragment extends Fragment {
                 Date eventStartDate = combineDateAndTime(eventDate, startTime);
                 Date eventEndDate = combineDateAndTime(eventDate, endTime);
 
+                Log.d("Event", "Event " + (i + 1) + " - Start: " + eventStartDate + ", End: " + eventEndDate);
+
                 // Check for conflicts
                 if (dbHelper.isTimeConflict(eventStartDate, eventEndDate)) {
                     Toast.makeText(getActivity(), "Event time conflict for week " + (i + 1) + "!", Toast.LENGTH_SHORT).show();
                     continue; // Optionally continue to check the next week
                 }
 
-
-                String counter = String.valueOf(rand + i);
+                String counter = UUID.randomUUID().toString();
                 // Create the Event object
-                Event event = new Event(counter, name, description, location, eventStartDate, eventEndDate, true, eventColor);
+                Event event = new Event(counter, name, description, location, eventStartDate, eventEndDate, true, eventColor, dayWeek);
 
                 // Save the Event object to the database
                 boolean success = dbHelper.addEvent(event);
                 if (!success) {
                     Toast.makeText(getContext(), "Failed to save event for week " + (i + 1), Toast.LENGTH_SHORT).show();
+                    Log.e("Event", "Failed to save event for week " + (i + 1));
+                } else {
+                    Log.d("Event", "Event saved for week " + (i + 1));
                 }
             }
             Toast.makeText(getContext(), "Weekly Event saved for a year!", Toast.LENGTH_SHORT).show();
+        } else {
+            Toast.makeText(getContext(), "Invalid start or end time!", Toast.LENGTH_SHORT).show();
         }
     }
+
 
 
     // Helper method to combine a date with a specific time

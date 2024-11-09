@@ -31,6 +31,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     private static final String COLUMN_END_TIME = "end_time";
     private static final String COLUMN_IS_WEEKLY = "is_weekly";
     private static final String COLUMN_COLOR = "color";
+    private static final String COLUMN_DAY_OF_WEEK = "day_of_week";
 
     public DatabaseHelper(Context context) {
         super(context, DATABASE_NAME, null, DATABASE_VERSION);
@@ -46,7 +47,8 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                 + COLUMN_START_TIME + " INTEGER, "
                 + COLUMN_END_TIME + " INTEGER, "
                 + COLUMN_IS_WEEKLY + " INTEGER, "
-                + COLUMN_COLOR + " INTEGER)";
+                + COLUMN_COLOR + " INTEGER,"
+                + COLUMN_DAY_OF_WEEK + " INTEGER)";
         db.execSQL(createTable);
     }
 
@@ -66,6 +68,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         values.put(COLUMN_START_TIME, event.getStartTime().getTime());
         values.put(COLUMN_END_TIME, event.getEndTime().getTime());
         values.put(COLUMN_IS_WEEKLY, event.isWeekly() ? 1 : 0);
+        values.put(COLUMN_DAY_OF_WEEK, event.getDayWeek());
         values.put(COLUMN_COLOR, event.getColor());
 
         long result = db.insert(TABLE_EVENTS, null, values);
@@ -117,6 +120,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     }
 
 
+    // Helper method to create an Event object from the cursor
     private Event createEventFromCursor(Cursor cursor) {
         String id = cursor.getString(cursor.getColumnIndexOrThrow(COLUMN_ID));
         String name = cursor.getString(cursor.getColumnIndexOrThrow(COLUMN_NAME));
@@ -126,8 +130,9 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         Date endTime = new Date(cursor.getLong(cursor.getColumnIndexOrThrow(COLUMN_END_TIME)));
         boolean isWeekly = cursor.getInt(cursor.getColumnIndexOrThrow(COLUMN_IS_WEEKLY)) == 1;
         int color = cursor.getInt(cursor.getColumnIndexOrThrow(COLUMN_COLOR));
+        int dayOfWeek = cursor.getInt(cursor.getColumnIndexOrThrow(COLUMN_DAY_OF_WEEK));
 
-        return new Event(id, name, description, location, startTime, endTime, isWeekly, color);
+        return new Event(id, name, description, location, startTime, endTime, isWeekly, color, dayOfWeek);
     }
 
     public void deleteEvent(String eventName) {
@@ -229,13 +234,14 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                 long startTimeMillis = cursor.getLong(cursor.getColumnIndexOrThrow("start_time"));
                 long endTimeMillis = cursor.getLong(cursor.getColumnIndexOrThrow("end_time"));
                 int color = cursor.getInt(cursor.getColumnIndexOrThrow("color"));
+                int dayOfWeek = cursor.getInt(cursor.getColumnIndexOrThrow("day_of_week"));
 
                 // Convert start and end times from milliseconds to Date objects
                 Date startDate = new Date(startTimeMillis);
                 Date endDate = new Date(endTimeMillis);
 
                 // Create the Event object with the ID
-                event = new Event(id, name, description, location, startDate, endDate, false, color); // Include ID
+                event = new Event(id, name, description, location, startDate, endDate, false, color, dayOfWeek); // Include ID
 
                 Log.d("DatabaseHelper", "Event found: " + event.toString());
             } else {
@@ -251,6 +257,23 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         return event;
     }
 
+    // Update a specific instance of a weekly activity for a specific day of the week
+    public boolean updateWeeklyActivityForDay(String eventId, int dayOfWeek, long newStartTime, long newEndTime, String newLocation, String newDescription, int newColor) {
+        SQLiteDatabase db = this.getWritableDatabase();
+        ContentValues values = new ContentValues();
+        values.put(COLUMN_START_TIME, newStartTime);
+        values.put(COLUMN_END_TIME, newEndTime);
+        values.put(COLUMN_LOCATION, newLocation);
+        values.put(COLUMN_DESCRIPTION, newDescription);
+        values.put(COLUMN_COLOR, newColor);
+
+        // Update the specific instance of the weekly activity
+        int rowsAffected = db.update(TABLE_EVENTS, values, COLUMN_ID + "=? AND " + COLUMN_DAY_OF_WEEK + "=?",
+                new String[]{eventId, String.valueOf(dayOfWeek)});
+        db.close();
+
+        return rowsAffected > 0;
+    }
 
 
 

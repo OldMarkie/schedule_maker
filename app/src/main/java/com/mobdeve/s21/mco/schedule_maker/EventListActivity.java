@@ -48,9 +48,13 @@ public class EventListActivity extends AppCompatActivity {
         pageTitle = findViewById(R.id.pageTitle);
         calendarView = findViewById(R.id.calendarView);
         recyclerView = findViewById(R.id.recyclerView);
+        recyclerView.setLayoutManager(new LinearLayoutManager(this));
         eventsForDateTitle = findViewById(R.id.eventsForDateTitle);
         weeklyEventButton = findViewById(R.id.weeklyEventButton); // Initialize the button
         dbHelper= new DatabaseHelper(this);
+
+        boolean is24HourFormat = sharedPreferences.getBoolean("is24HourFormat", false);
+
 
         // Disable past dates in the CalendarView
         calendarView.setMinDate(System.currentTimeMillis() - 1000);  // Disable past dates
@@ -59,7 +63,7 @@ public class EventListActivity extends AppCompatActivity {
         // Set up RecyclerView for events of a selected date
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
         eventList = new ArrayList<>();
-        eventAdapter = new EventAdapter(eventList, this, new EventDetailsDialogFragment.OnEventActionListener() {
+        eventAdapter = new EventAdapter(eventList, this, new EventDetailsDialogFragment.OnEventActionListener(){
             @Override
             public void onEventDelete(Event event) {
                 confirmDeleteEvent(event);
@@ -68,64 +72,53 @@ public class EventListActivity extends AppCompatActivity {
             @Override
             public void onEventEdit(Event event) {
                 Log.d("EventListActivity", "Editing Event: " + event.getName());
+
                 if (event.isWeekly()) {
+                    // Handle weekly event edit
                     Bundle args = new Bundle();
-                    args.putString("EVENT_ID", event.getId()); // Pass the event ID
+                    args.putString("eventId", event.getId()); // Pass the event ID
                     WeeklyActivityEditFragment editFragment = new WeeklyActivityEditFragment();
                     editFragment.setArguments(args);
 
-                    // Replace the fragment or add to back stack
+                    // Replace the fragment or add to back stack using getSupportFragmentManager
                     FragmentManager fragmentManager = getSupportFragmentManager();
                     fragmentManager.beginTransaction()
-                            .replace(R.id.fragment_container, editFragment)
+                            .replace(R.id.editOneTImeEvent, editFragment)
                             .addToBackStack(null)
-                            .commit();;
+                            .commit();
+
+                    findViewById(R.id.mainAEL).setVisibility(View.GONE);
+                    findViewById(R.id.editOneTImeEvent).setVisibility(View.VISIBLE); // Ensure container is correct
                 } else {
-                    // Create a new instance of the fragment
+                    // Handle one-time event edit
                     OneTimeEventEditFragment oneTimeEditDialog = new OneTimeEventEditFragment();
-
-                    // Create a bundle with event details
                     Bundle args = new Bundle();
-                    // Create a bundle with event details
-                    args.putString("eventId", event.getId());  // Pass the event ID to the fragment
-                    Log.d("EventListActivity", "Event ID: " + event.getId());
 
+                    // Add event data to the bundle
+                    args.putString("eventId", event.getId());
                     args.putString("eventName", event.getName());
-                    Log.d("EventListActivity", "Event Name: " + event.getName());
-
                     args.putString("eventDescription", event.getDescription());
-                    Log.d("EventListActivity", "Event Description: " + event.getDescription());
-
                     args.putString("eventLocation", event.getLocation());
-                    Log.d("EventListActivity", "Event Location: " + event.getLocation());
-
                     args.putLong("startTime", event.getStartTime().getTime());
-                    Log.d("EventListActivity", "Start Time: " + event.getStartTime().getTime());
-
                     args.putLong("endTime", event.getEndTime().getTime());
-                    Log.d("EventListActivity", "End Time: " + event.getEndTime().getTime());
-
                     args.putInt("eventColor", event.getColor());
-                    Log.d("EventListActivity", "Event Color: " + event.getColor());
-
-                    Log.d("EventListActivity", "Creating fragment with arguments: " + args.toString());
 
                     // Set the arguments to the fragment
                     oneTimeEditDialog.setArguments(args);
 
-                    // Create and set up the fragment
+                    // Begin transaction to replace the fragment using getSupportFragmentManager
                     getSupportFragmentManager().beginTransaction()
                             .replace(R.id.editOneTImeEvent, oneTimeEditDialog)
-                            .addToBackStack(null) // Add to back stack to allow navigation back
+                            .addToBackStack(null) // Add to back stack for navigation
                             .commit();
+
+                    // Manage the visibility of views
                     findViewById(R.id.mainAEL).setVisibility(View.GONE);
-                    findViewById(R.id.editOneTImeEvent).setVisibility(View.VISIBLE);
+                    findViewById(R.id.editOneTImeEvent).setVisibility(View.VISIBLE); // Ensure container is correct
                 }
             }
+        }, is24HourFormat);
 
-
-
-        });
         recyclerView.setAdapter(eventAdapter);
 
         // Load events for today
@@ -184,6 +177,8 @@ public class EventListActivity extends AppCompatActivity {
 
         eventList.clear();  // Clear current event list
         List<Event> eventsForDate = dbHelper.getEventsForDate(date);  // Fetch events from DatabaseHelper
+        Log.d("EventAdapter", "Loaded " + eventsForDate.size() + " events for " + selectedDateString);
+
 
         if (eventsForDate.isEmpty()) {
             eventsForDateTitle.setText("No Scheduled Events For " + selectedDateString);
@@ -191,7 +186,8 @@ public class EventListActivity extends AppCompatActivity {
             eventList.addAll(eventsForDate);  // Add events if available
         }
 
-        eventAdapter.notifyDataSetChanged();  // Notify the adapter to refresh the RecyclerView
+        Log.d("EventAdapter", "Item count: " + eventList.size());
+        runOnUiThread(() -> eventAdapter.notifyDataSetChanged());
     }
 
     // Method to confirm event deletion
