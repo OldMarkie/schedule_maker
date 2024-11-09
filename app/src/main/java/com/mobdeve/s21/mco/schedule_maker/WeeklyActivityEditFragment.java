@@ -35,6 +35,7 @@ import java.text.ParseException;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
+import java.util.UUID;
 
 public class WeeklyActivityEditFragment extends Fragment {
 
@@ -54,6 +55,7 @@ public class WeeklyActivityEditFragment extends Fragment {
     private Button updateButton, colorPickerInput, cancelButton;
     private int selectedColor = 0xFFFFFFFF; // Default color is white
     private ColorUtils colorUtils;
+    private  String oldNameHolder;
 
     @Nullable
     @Override
@@ -122,6 +124,8 @@ public class WeeklyActivityEditFragment extends Fragment {
         setupAlreadyChecked(eventName);
         fillUpDetails(eventName);
         setupTimeInputExisting(eventName);
+
+
 
 
         updateButton.setOnClickListener(v -> updateActivity());
@@ -211,6 +215,8 @@ public class WeeklyActivityEditFragment extends Fragment {
         String description = weeklyDetails.get(1);  // Description of the activity
         String location = weeklyDetails.get(2);     // Location of the activity
         int colorInt = Integer.parseInt(weeklyDetails.get(3)); // Color (Hex string, e.g. #FF5733)
+
+        oldNameHolder = activityName;
 
         activityNameInput.setText(activityName);
         activityDescriptionInput.setText(description);
@@ -317,52 +323,84 @@ public class WeeklyActivityEditFragment extends Fragment {
 
             Toast.makeText(getActivity(), "Events saved successfully!", Toast.LENGTH_SHORT).show();
 
-            FragmentManager fragmentManager = getParentFragmentManager();
-            fragmentManager.popBackStack(null, FragmentManager.POP_BACK_STACK_INCLUSIVE);
-
-            // After saving, show the hint text view again
-            ((EventActivity) getActivity()).showHintTextView();
-            ((EventActivity) getActivity()).showAddWeeklyActivityButton();
+            backToEventList();
 
         } else {
             Toast.makeText(getActivity(), "Please select at least one day for the weekly event.", Toast.LENGTH_SHORT).show();
         }
     }
 
-    private void updateWeeklyEventToDatabase(String activityName, String activityDescription, String activityLocation, Calendar baseDate, EditText startTimeInput, EditText endTimeInput, int dayWeek) {
+    private void updateWeeklyEventToDatabase(String activityName, String activityDescription, String activityLocation, Calendar baseDate,
+                                             EditText startTimeInput, EditText endTimeInput, int dayWeek) {
         String startTimeText = startTimeInput.getText().toString().trim();
         String endTimeText = endTimeInput.getText().toString().trim();
 
+        // Check if start and end times are filled
         if (startTimeText.isEmpty() || endTimeText.isEmpty()) {
             Toast.makeText(getActivity(), "Start and end times must be filled.", Toast.LENGTH_SHORT).show();
             return;
         }
 
-        // Parse start and end times
-        Date startTime = parseTime(startTimeText);
-        Date endTime = parseTime(endTimeText);
+        // Parse the start and end times
+        Date newStartTime = parseTime(startTimeText);
+        Date newEndTime = parseTime(endTimeText);
 
-        if (startTime == null || endTime == null) {
+        if (newStartTime == null || newEndTime == null) {
             Toast.makeText(getActivity(), "Invalid time format. Use HH:mm.", Toast.LENGTH_SHORT).show();
             return;
         }
 
-        // Combine the date with the start and end times
-        Date combinedStartTime = combineDateAndTime(baseDate, startTime);
-        Date combinedEndTime = combineDateAndTime(baseDate, endTime);
+        // Step 1: Delete all existing instances of the event for the specific day
+        boolean deleted = dbHelper.deleteEventInstancesForDay(oldNameHolder, dayWeek);
 
-        // Save to database (implement DatabaseHelper's update or insert method as needed)
-        boolean success = dbHelper.updateWeeklyActivityForDay(
-                activityName, dayWeek,
-                combinedStartTime.getTime(), combinedEndTime.getTime(),activityLocation, activityDescription, selectedColor
-        );
 
-        if (success) {
-            Toast.makeText(getActivity(), "Activity updated successfully.", Toast.LENGTH_SHORT).show();
-        } else {
-            Toast.makeText(getActivity(), "Failed to update activity.", Toast.LENGTH_SHORT).show();
+        // Step 2: Reinsert the event with the new start and end times
+        Log.d("UpdateDebug", "Reinserting event with new times.");
+
+        // Get the starting date for the first instance
+        Calendar eventDate = (Calendar) baseDate.clone();
+        eventDate.set(Calendar.DAY_OF_WEEK, dayWeek); // Set the correct day of the week
+
+        // Iterate over the 52 weeks to insert the event instances again
+        for (int i = 0; i < 52; i++) {
+            // Adjust to the correct week
+            eventDate.add(Calendar.WEEK_OF_YEAR, i);
+
+            // Combine the date and new time
+            Date eventStartDate = combineDateAndTime(eventDate, newStartTime);
+            Date eventEndDate = combineDateAndTime(eventDate, newEndTime);
+
+            // Log the event details
+            Log.d("UpdateDebug", "Event " + (i + 1) + " - Start: " + eventStartDate + ", End: " + eventEndDate);
+
+            // Check for time conflicts before inserting
+            if (dbHelper.isTimeConflict(eventStartDate, eventEndDate)) {
+                Toast.makeText(getActivity(), "Event time conflict for week " + (i + 1) + "!", Toast.LENGTH_SHORT).show();
+                continue;
+            }
+
+            selectedColor = colorPickerInput.getBackgroundTintList().getDefaultColor();
+
+            // Create a new event object with the updated times
+            Event event = new Event(UUID.randomUUID().toString(), activityName, activityDescription, activityLocation, eventStartDate, eventEndDate, true, selectedColor, dayWeek);
+
+            // Insert the event into the database
+            boolean success = dbHelper.addEvent(event);
+            if (!success) {
+                Toast.makeText(getContext(), "Failed to save event for week " + (i + 1), Toast.LENGTH_SHORT).show();
+                Log.e("Event", "Failed to save event for week " + (i + 1));
+            } else {
+                Log.d("Event", "Event saved for week " + (i + 1));
+            }
         }
+
+        // Show success message
+        Toast.makeText(getActivity(), "Weekly Event updated for a year!", Toast.LENGTH_SHORT).show();
     }
+
+
+
+
 
 
 
@@ -509,7 +547,6 @@ public class WeeklyActivityEditFragment extends Fragment {
     }
 
 
-    // Helper method to combine a date with a specific time
     private Date combineDateAndTime(Calendar date, Date time) {
         Calendar dateTime = (Calendar) date.clone();
         Calendar timeCal = Calendar.getInstance();
@@ -523,6 +560,7 @@ public class WeeklyActivityEditFragment extends Fragment {
 
         return dateTime.getTime();
     }
+
 
 
 

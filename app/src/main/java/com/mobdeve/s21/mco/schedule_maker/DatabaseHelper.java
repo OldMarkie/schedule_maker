@@ -394,7 +394,80 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         return timeDetails;
     }
 
+    public boolean updateWeeklyActivityForWeek(String name, int dayOfWeek, long startTime, long endTime, String location, String description, int color) {
+        SQLiteDatabase db = this.getWritableDatabase();
+        ContentValues contentValues = new ContentValues();
+        contentValues.put(COLUMN_NAME, name);
+        contentValues.put(COLUMN_START_TIME, startTime);
+        contentValues.put(COLUMN_END_TIME, endTime);
+        contentValues.put(COLUMN_LOCATION, location);
+        contentValues.put(COLUMN_DESCRIPTION, description);
+        contentValues.put(COLUMN_COLOR, color);
 
+        // Debugging logs
+        Log.d("UpdateDebug", "Updating activity - Name: " + name + ", Day: " + dayOfWeek +
+                ", Start: " + startTime + ", End: " + endTime + ", Location: " + location +
+                ", Description: " + description + ", Color: " + color);
+
+        // Perform the update
+        int rowsAffected = db.update(TABLE_EVENTS, contentValues, COLUMN_NAME + " = ? AND " + COLUMN_DAY_OF_WEEK + " = ?",
+                new String[]{name, String.valueOf(dayOfWeek)});
+
+        // Log the result
+        Log.d("UpdateDebug", "Rows affected: " + rowsAffected);
+
+        db.close();
+        return rowsAffected > 0;
+    }
+
+    @SuppressLint("Range")
+    public long getEventStartTime(String name, int dayOfWeek) {
+        SQLiteDatabase db = this.getReadableDatabase();
+        Cursor cursor = db.query(TABLE_EVENTS, new String[]{COLUMN_START_TIME},
+                COLUMN_NAME + " = ? AND " + COLUMN_DAY_OF_WEEK + " = ?",
+                new String[]{name, String.valueOf(dayOfWeek)}, null, null, null);
+
+        long startTime = -1;
+        if (cursor.moveToFirst()) {
+            startTime = cursor.getLong(cursor.getColumnIndex(COLUMN_START_TIME));
+        }
+        cursor.close();
+        return startTime;
+    }
+
+    @SuppressLint("Range")
+    public long getEventEndTime(String name, int dayOfWeek) {
+        SQLiteDatabase db = this.getReadableDatabase();
+        Cursor cursor = db.query(TABLE_EVENTS, new String[]{COLUMN_END_TIME},
+                COLUMN_NAME + " = ? AND " + COLUMN_DAY_OF_WEEK + " = ?",
+                new String[]{name, String.valueOf(dayOfWeek)}, null, null, null);
+
+        long endTime = -1;
+        if (cursor.moveToFirst()) {
+            endTime = cursor.getLong(cursor.getColumnIndex(COLUMN_END_TIME));
+        }
+        cursor.close();
+        return endTime;
+    }
+
+    public boolean deleteEventInstancesForDay(String name, int dayOfWeek) {
+        SQLiteDatabase db = this.getWritableDatabase();
+
+        // Log the incoming parameters
+        Log.d("DeleteDebug", "Deleting instances for activity: " + name + ", Day: " + dayOfWeek);
+
+        // Perform the delete operation
+        int rowsDeleted = db.delete(TABLE_EVENTS,
+                COLUMN_NAME + " = ? AND " + COLUMN_DAY_OF_WEEK + " = ?",
+                new String[]{name, String.valueOf(dayOfWeek)});
+
+        // Log the number of rows deleted
+        Log.d("DeleteDebug", "Rows deleted: " + rowsDeleted);
+
+        db.close();
+
+        return rowsDeleted > 0;
+    }
 
 
 
