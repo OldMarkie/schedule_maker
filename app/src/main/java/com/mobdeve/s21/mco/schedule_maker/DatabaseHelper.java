@@ -275,6 +275,127 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         return rowsAffected > 0;
     }
 
+    @SuppressLint("Range")
+    public List<Integer> getDaysOfWeekForEvent(String eventName) {
+        List<Integer> daysOfWeek = new ArrayList<>();
+        SQLiteDatabase db = this.getReadableDatabase();
+        Cursor cursor = db.rawQuery("SELECT " + COLUMN_DAY_OF_WEEK + " FROM events WHERE name = ?", new String[]{eventName});
+
+        if (cursor.moveToFirst()) {
+            do {
+                daysOfWeek.add(cursor.getInt(cursor.getColumnIndex(COLUMN_DAY_OF_WEEK)));
+            } while (cursor.moveToNext());
+        }
+
+        cursor.close();
+        db.close();
+
+        return daysOfWeek;
+    }
+
+    public List<String> getWeeklyDetails(String eventName) {
+        List<String> weeklyDetails = new ArrayList<>();
+        SQLiteDatabase db = null;
+        Cursor cursor = null;
+
+        // Define your database query (use the correct column names from your database)
+        String query = "SELECT " + COLUMN_NAME + ", "
+                + COLUMN_DESCRIPTION + ", "
+                + COLUMN_LOCATION + ", "
+                + COLUMN_COLOR
+                + " FROM " + TABLE_EVENTS
+                + " WHERE " + COLUMN_NAME + " = ?";
+
+        try {
+            // Open the database in read mode
+            db = this.getReadableDatabase();
+
+            // Execute the query and get a cursor to iterate over the result set
+            cursor = db.rawQuery(query, new String[]{eventName});
+
+            // Check if there are results and move the cursor to the first result
+            if (cursor.moveToFirst()) {
+                // Retrieve each detail and add it to the list
+                String activityName = cursor.getString(cursor.getColumnIndexOrThrow(COLUMN_NAME));
+                String description = cursor.getString(cursor.getColumnIndexOrThrow(COLUMN_DESCRIPTION));
+                String location = cursor.getString(cursor.getColumnIndexOrThrow(COLUMN_LOCATION));
+                int colorInt = cursor.getInt(cursor.getColumnIndexOrThrow(COLUMN_COLOR));
+
+
+                // Add details to the list
+                weeklyDetails.add(activityName);
+                weeklyDetails.add(description);
+                weeklyDetails.add(location);
+                weeklyDetails.add(String.valueOf(colorInt));
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        } finally {
+            // Close the cursor and database to avoid memory leaks
+            if (cursor != null) {
+                cursor.close();
+            }
+            if (db != null) {
+                db.close();
+            }
+        }
+
+        // Return the list containing the event details
+        return weeklyDetails;
+    }
+
+    public List<Date> getWeeklyTime(String eventName) {
+        List<Date> timeDetails = new ArrayList<>();  // List to store startTime and endTime as Date objects
+        SQLiteDatabase db = null;
+        Cursor cursor = null;
+
+        // Define your database query to fetch start and end time for a specific event
+        String query = "SELECT " + COLUMN_START_TIME + ", " + COLUMN_END_TIME
+                + " FROM " + TABLE_EVENTS
+                + " WHERE " + COLUMN_NAME + " = ?";  // Using event name as the filter
+
+        try {
+            // Open the database in read mode
+            db = this.getReadableDatabase();
+
+            // Execute the query and get a cursor to iterate over the result set
+            cursor = db.rawQuery(query, new String[]{eventName});
+
+            // Check if there are results and move the cursor to the first result
+            if (cursor != null && cursor.moveToFirst()) {
+                // Loop through all rows in the cursor
+                do {
+                    // Retrieve the start and end time as Date objects
+                    long startTimeMillis = cursor.getLong(cursor.getColumnIndexOrThrow(COLUMN_START_TIME));
+                    long endTimeMillis = cursor.getLong(cursor.getColumnIndexOrThrow(COLUMN_END_TIME));
+
+                    // Convert the long values (milliseconds) into Date objects
+                    Date startTime = new Date(startTimeMillis);
+                    Date endTime = new Date(endTimeMillis);
+
+                    // Add the start and end time to the list
+                    timeDetails.add(startTime);
+                    timeDetails.add(endTime);
+                } while (cursor.moveToNext());  // Continue to the next row if available
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        } finally {
+            // Close the cursor and database to avoid memory leaks
+            if (cursor != null) {
+                cursor.close();
+            }
+            if (db != null) {
+                db.close();
+            }
+        }
+
+        // Return the list containing the start and end times as Date objects
+        return timeDetails;
+    }
+
+
+
 
 
 }

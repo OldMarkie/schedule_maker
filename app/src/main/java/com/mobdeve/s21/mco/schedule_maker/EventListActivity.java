@@ -76,7 +76,7 @@ public class EventListActivity extends AppCompatActivity {
                 if (event.isWeekly()) {
                     // Handle weekly event edit
                     Bundle args = new Bundle();
-                    args.putString("eventId", event.getId()); // Pass the event ID
+                    args.putString("eventName", event.getName()); // Pass the event ID
                     WeeklyActivityEditFragment editFragment = new WeeklyActivityEditFragment();
                     editFragment.setArguments(args);
 

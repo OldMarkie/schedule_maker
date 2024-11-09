@@ -34,6 +34,7 @@ import java.io.InputStream;
 import java.text.ParseException;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.List;
 
 public class WeeklyActivityEditFragment extends Fragment {
 
@@ -96,12 +97,12 @@ public class WeeklyActivityEditFragment extends Fragment {
         colorPickerInput.setBackgroundTintList(ColorStateList.valueOf(0xff6200EE));
         colorPickerInput.setHint("Electric Violet By Default");
         colorPickerInput.setHintTextColor(Color.WHITE);
-
+        dbHelper = new DatabaseHelper(getContext());
 
         Bundle args = getArguments();
 
-        String eventId = args.getString("eventId");
-        Log.d("OneTimeEventEditFragment", "Received Event ID: " + eventId);
+        String eventName = args.getString("eventName");
+        Log.d("OneTimeEventEditFragment", "Received Event Name: " + eventName);
 
 
         // Load color names
@@ -118,10 +119,137 @@ public class WeeklyActivityEditFragment extends Fragment {
         // Set up listeners to show/hide time input fields based on checkbox state
         setupCheckBoxListeners();
 
+        setupAlreadyChecked(eventName);
+        fillUpDetails(eventName);
+        setupTimeInputExisting(eventName);
+
+
         updateButton.setOnClickListener(v -> updateActivity());
         cancelButton.setOnClickListener(v -> backToEventList());
 
         return view;
+    }
+
+    private void setupTimeInputExisting(String eventName) {
+        // Fetch the list of start and end times (as Date objects)
+        List<Date> timeDetails = dbHelper.getWeeklyTime(eventName);
+
+        // Define SimpleDateFormat to format time
+        SimpleDateFormat timeFormat = new SimpleDateFormat("HH:mm");
+
+        // Iterate over the time details to set them into respective EditTexts for each day
+        for (int i = 0; i < timeDetails.size(); i += 2) {
+            Date startTime = timeDetails.get(i);   // Start time as Date object
+            Date endTime = timeDetails.get(i + 1); // End time as Date object
+
+            // Get the day of the week from the start time
+            String dayOfWeek = getDayOfWeekFromDate(startTime);
+
+            // Format the start and end times into a readable format
+            String formattedStartTime = timeFormat.format(startTime);
+            String formattedEndTime = timeFormat.format(endTime);
+
+            // Set the formatted time into the respective EditTexts for the corresponding day
+            switch (dayOfWeek) {
+                case "Sunday":
+                    sundayStartTimeInput.setText(formattedStartTime);
+                    sundayEndTimeInput.setText(formattedEndTime);
+                    break;
+                case "Monday":
+                    mondayStartTimeInput.setText(formattedStartTime);
+                    mondayEndTimeInput.setText(formattedEndTime);
+                    break;
+                case "Tuesday":
+                    tuesdayStartTimeInput.setText(formattedStartTime);
+                    tuesdayEndTimeInput.setText(formattedEndTime);
+                    break;
+                case "Wednesday":
+                    wednesdayStartTimeInput.setText(formattedStartTime);
+                    wednesdayEndTimeInput.setText(formattedEndTime);
+                    break;
+                case "Thursday":
+                    thursdayStartTimeInput.setText(formattedStartTime);
+                    thursdayEndTimeInput.setText(formattedEndTime);
+                    break;
+                case "Friday":
+                    fridayStartTimeInput.setText(formattedStartTime);
+                    fridayEndTimeInput.setText(formattedEndTime);
+                    break;
+                case "Saturday":
+                    saturdayStartTimeInput.setText(formattedStartTime);
+                    saturdayEndTimeInput.setText(formattedEndTime);
+                    break;
+                default:
+                    // If no matching day is found
+                    break;
+            }
+        }
+    }
+
+    private String getDayName(int dayIndex) {
+        // Map day index to day name
+        String[] daysOfWeek = {"Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"};
+        return daysOfWeek[dayIndex - 1];
+    }
+
+    private String getDayOfWeekFromDate(Date date) {
+        // Use Calendar to get the day of the week from Date
+        Calendar calendar = Calendar.getInstance();
+        calendar.setTime(date);  // Set the Date object
+
+        // Get the day of the week index (1 = Sunday, 2 = Monday, ..., 7 = Saturday)
+        int dayIndex = calendar.get(Calendar.DAY_OF_WEEK);
+        return getDayName(dayIndex);
+    }
+
+
+
+    private void fillUpDetails(String eventName) {
+        List<String> weeklyDetails = dbHelper.getWeeklyDetails(eventName);
+
+        String activityName = weeklyDetails.get(0); // Name of the activity
+        String description = weeklyDetails.get(1);  // Description of the activity
+        String location = weeklyDetails.get(2);     // Location of the activity
+        int colorInt = Integer.parseInt(weeklyDetails.get(3)); // Color (Hex string, e.g. #FF5733)
+
+        activityNameInput.setText(activityName);
+        activityDescriptionInput.setText(description);
+        activityLocationInput.setText(location);
+        colorPickerInput.setBackgroundTintList(ColorStateList.valueOf(colorInt));
+        colorPickerInput.setText(colorUtils.getNearestColorName(colorInt));
+        setTextColorBasedOnContrast(colorInt);
+    }
+
+    private void setupAlreadyChecked(String eventName) {
+        List<Integer> daysOfWeek = dbHelper.getDaysOfWeekForEvent(eventName);
+        for (Integer day : daysOfWeek) {
+            switch (day) {
+                case 1:
+                    checkMonday.setChecked(true);
+                    break;
+                case 2:
+                    checkTuesday.setChecked(true);
+                    break;
+                case 3:
+                    checkWednesday.setChecked(true);
+                    break;
+                case 4:
+                    checkThursday.setChecked(true);
+                    break;
+                case 5:
+                    checkFriday.setChecked(true);
+                    break;
+                case 6:
+                    checkSaturday.setChecked(true);
+                    break;
+                case 7:
+                    checkSunday.setChecked(true);
+                    break;
+                default:
+                    // Handle unexpected day values if necessary
+                    break;
+            }
+        }
     }
 
     private void backToEventList() {

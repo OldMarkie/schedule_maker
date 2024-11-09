@@ -4,6 +4,7 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.res.ColorStateList;
 import android.graphics.Color;
+import android.icu.text.CaseMap;
 import android.icu.text.SimpleDateFormat;
 import android.os.Bundle;
 import android.util.Log;
@@ -29,8 +30,10 @@ import com.google.android.material.timepicker.MaterialTimePicker;
 import java.io.IOException;
 import java.io.InputStream;
 import java.text.ParseException;
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.List;
 import java.util.Random;
 import java.util.UUID;
 
@@ -119,13 +122,17 @@ public class WeeklyActivityFragment extends Fragment {
         // Set up listeners to show/hide time input fields based on checkbox state
         setupCheckBoxListeners();
 
+        List<Event> eventList = new ArrayList<>();
+
+
         saveButton.setOnClickListener(v -> {
             saveActivity();
         });
 
+
+
         return view;
     }
-
 
     private void setupCheckBoxListeners() {
         checkMonday.setOnCheckedChangeListener((buttonView, isChecked) -> {

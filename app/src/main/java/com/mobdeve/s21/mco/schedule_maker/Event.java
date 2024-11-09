@@ -31,17 +31,6 @@ public class Event implements Serializable {
     }
 
 
-//    public Event(String name, String description, String location, Date startTime, Date endTime, boolean isWeekly, int dayWeek, color) {
-//        this.id = UUID.randomUUID().toString(); // Generate a unique ID
-//        this.name = name;
-//        this.description = description;
-//        this.location = location;
-//        this.startTime = startTime;
-//        this.endTime = endTime;
-//        this.isWeekly = isWeekly;
-//        this.color = color;
-//        this.dayWeek = -1;
-//    }
 
     public String getId() {
         return id; // Getter for ID
