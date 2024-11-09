@@ -187,7 +187,7 @@ public class EventListActivity extends AppCompatActivity {
         }
 
         Log.d("EventAdapter", "Item count: " + eventList.size());
-        runOnUiThread(() -> eventAdapter.notifyDataSetChanged());
+        eventAdapter.notifyDataSetChanged();
     }
 
     // Method to confirm event deletion
@@ -206,7 +206,10 @@ public class EventListActivity extends AppCompatActivity {
 
     public void refreshEventsForCurrentDate() {
         loadEventsForDate(currentSelectedDate);
+        eventAdapter.notifyDataSetChanged();
     }
+
+
 
 
 }

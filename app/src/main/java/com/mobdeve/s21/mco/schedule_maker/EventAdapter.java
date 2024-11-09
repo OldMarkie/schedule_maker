@@ -131,4 +131,12 @@ public class EventAdapter extends RecyclerView.Adapter<EventAdapter.EventViewHol
         double brightness = (0.299 * r + 0.587 * g + 0.114 * b);
         return brightness < 128; // Returns true if dark
     }
+
+    // Method to update event list and refresh RecyclerView
+    public void updateEventList(List<Event> updatedEvents) {
+        this.eventList.clear();
+        this.eventList.addAll(updatedEvents); // Adding the updated events to the list
+        notifyDataSetChanged(); // Refresh the RecyclerView
+    }
+
 }
