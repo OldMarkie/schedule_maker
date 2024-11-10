@@ -1,7 +1,10 @@
 package com.mobdeve.s21.mco.schedule_maker;
 
+import static android.app.Activity.RESULT_OK;
+
 import android.content.Context;
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.content.res.ColorStateList;
 import android.graphics.Color;
 import android.icu.text.CaseMap;
@@ -25,6 +28,7 @@ import com.flask.colorpicker.ColorPickerView;
 import com.flask.colorpicker.OnColorSelectedListener;
 import com.flask.colorpicker.builder.ColorPickerClickListener;
 import com.flask.colorpicker.builder.ColorPickerDialogBuilder;
+import com.google.android.gms.maps.model.LatLng;
 import com.google.android.material.timepicker.MaterialTimePicker;
 
 import java.io.IOException;
@@ -56,6 +60,7 @@ public class WeeklyActivityFragment extends Fragment {
     private Button saveButton, colorPickerInput;
     private int selectedColor = 0xFFFFFFFF; // Default color is white
     private ColorUtils colorUtils;
+    private static final int MAP_REQUEST_CODE = 2;
 
 
     @Override
@@ -129,9 +134,30 @@ public class WeeklyActivityFragment extends Fragment {
             saveActivity();
         });
 
-
+        activityLocationInput.setOnClickListener(v -> openMapForLocation());
 
         return view;
+    }
+
+    private void openMapForLocation() {
+        Intent intent = new Intent(getContext(), MapLocationPickerActivity.class);
+        startActivityForResult(intent, MAP_REQUEST_CODE);
+    }
+
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+
+        if (requestCode == MAP_REQUEST_CODE && resultCode == RESULT_OK && data != null) {
+            LatLng selectedLocation = data.getParcelableExtra("selected_location");
+            String selectedAddress = data.getStringExtra("selected_address");
+            if (selectedAddress != null) {
+                activityLocationInput.setText(selectedAddress);
+            } else if (selectedLocation != null) {
+                String locationString = selectedLocation.latitude + ", " + selectedLocation.longitude;
+                activityLocationInput.setText(locationString);
+            }
+        }
     }
 
     private void setupCheckBoxListeners() {

@@ -1,8 +1,11 @@
 package com.mobdeve.s21.mco.schedule_maker;
 
+import static android.app.Activity.RESULT_OK;
+
 import android.app.TimePickerDialog;
 import android.content.Context;
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.content.res.ColorStateList;
 import android.graphics.Color;
 import android.icu.text.SimpleDateFormat;
@@ -27,6 +30,7 @@ import com.flask.colorpicker.ColorPickerView;
 import com.flask.colorpicker.OnColorSelectedListener;
 import com.flask.colorpicker.builder.ColorPickerClickListener;
 import com.flask.colorpicker.builder.ColorPickerDialogBuilder;
+import com.google.android.gms.maps.model.LatLng;
 import com.google.android.material.timepicker.MaterialTimePicker;
 
 import java.io.IOException;
@@ -56,6 +60,7 @@ public class WeeklyActivityEditFragment extends Fragment {
     private int selectedColor = 0xFFFFFFFF; // Default color is white
     private ColorUtils colorUtils;
     private  String oldNameHolder;
+    private static final int MAP_REQUEST_CODE = 2;
 
     @Nullable
     @Override
@@ -126,13 +131,35 @@ public class WeeklyActivityEditFragment extends Fragment {
         setupTimeInputExisting(eventName);
 
 
-
+        activityLocationInput.setOnClickListener(v -> openMapForLocation());
 
         updateButton.setOnClickListener(v -> updateActivity());
         cancelButton.setOnClickListener(v -> backToEventList());
 
         return view;
     }
+
+    private void openMapForLocation() {
+        Intent intent = new Intent(getContext(), MapLocationPickerActivity.class);
+        startActivityForResult(intent, MAP_REQUEST_CODE);
+    }
+
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+
+        if (requestCode == MAP_REQUEST_CODE && resultCode == RESULT_OK && data != null) {
+            LatLng selectedLocation = data.getParcelableExtra("selected_location");
+            String selectedAddress = data.getStringExtra("selected_address");
+            if (selectedAddress != null) {
+                activityLocationInput.setText(selectedAddress);
+            } else if (selectedLocation != null) {
+                String locationString = selectedLocation.latitude + ", " + selectedLocation.longitude;
+                activityLocationInput.setText(locationString);
+            }
+        }
+    }
+
 
     private void setupTimeInputExisting(String eventName) {
         // Fetch the list of start and end times (as Date objects)

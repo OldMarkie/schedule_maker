@@ -134,12 +134,16 @@ public class OneTimeEventFragment extends Fragment {
 
         if (requestCode == MAP_REQUEST_CODE && resultCode == RESULT_OK && data != null) {
             LatLng selectedLocation = data.getParcelableExtra("selected_location");
-            if (selectedLocation != null) {
+            String selectedAddress = data.getStringExtra("selected_address");
+            if (selectedAddress != null) {
+                eventLocationInput.setText(selectedAddress);
+            } else if (selectedLocation != null) {
                 String locationString = selectedLocation.latitude + ", " + selectedLocation.longitude;
                 eventLocationInput.setText(locationString);
             }
         }
     }
+
 
 
 
