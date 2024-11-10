@@ -52,6 +52,7 @@ dependencies {
     implementation(libs.colorpicker)
     implementation(libs.sqlite)
     implementation(libs.places)
+    implementation(libs.play.services.maps)
     testImplementation(libs.junit)
     androidTestImplementation(libs.ext.junit)
     androidTestImplementation(libs.espresso.core)

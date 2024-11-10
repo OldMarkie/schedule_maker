@@ -21,6 +21,7 @@ import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 
+import com.google.android.gms.maps.model.LatLng;
 import com.google.android.libraries.places.api.Places;
 import com.google.android.material.datepicker.CalendarConstraints;
 import com.google.android.material.datepicker.MaterialDatePicker;
@@ -67,6 +68,8 @@ public class OneTimeEventFragment extends Fragment {
     private ColorUtils colorUtils;
 
     private static final int AUTOCOMPLETE_REQUEST_CODE = 1;
+    private static final int MAP_REQUEST_CODE = 2;
+
 
 
     @Nullable
@@ -89,8 +92,9 @@ public class OneTimeEventFragment extends Fragment {
         colorPickerInput.setHintTextColor(Color.WHITE);
 
         PlacesClient placesClient = Places.createClient(requireContext());
-        eventLocationInput.setOnClickListener(v -> openPlaceAutocomplete());
-        
+        eventLocationInput.setOnClickListener(v -> openMapForLocation());
+
+
         // Load color names
         try {
             InputStream inputStream = requireContext().getAssets().open("colornames.json");
@@ -118,34 +122,25 @@ public class OneTimeEventFragment extends Fragment {
         return view;
     }
 
-    private void openPlaceAutocomplete() {
-        // Specify fields to retrieve from the Places API
-        List<Place.Field> fields = Arrays.asList(Place.Field.ID, Place.Field.NAME, Place.Field.ADDRESS, Place.Field.LAT_LNG);
 
-        // Start the Autocomplete intent
-        Intent intent = new Autocomplete.IntentBuilder(AutocompleteActivityMode.OVERLAY, fields)
-                .build(requireContext());
-        startActivityForResult(intent, AUTOCOMPLETE_REQUEST_CODE);
+    private void openMapForLocation() {
+        Intent intent = new Intent(getContext(), MapLocationPickerActivity.class);
+        startActivityForResult(intent, MAP_REQUEST_CODE);
     }
 
     @Override
     public void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
 
-        if (requestCode == AUTOCOMPLETE_REQUEST_CODE) {
-            if (resultCode == RESULT_OK && data != null) {
-                Place place = Autocomplete.getPlaceFromIntent(data);
-
-                // Set the selected address in the EditText
-                eventLocationInput.setText(place.getAddress());
-
-                Log.d("OneTimeEventFragment", "Place selected: " + place.getName() + ", " + place.getAddress());
-            } else if (resultCode == AutocompleteActivity.RESULT_ERROR) {
-                Status status = Autocomplete.getStatusFromIntent(data);
-                Log.e("OneTimeEventFragment", "Autocomplete error: " + status.getStatusMessage());
+        if (requestCode == MAP_REQUEST_CODE && resultCode == RESULT_OK && data != null) {
+            LatLng selectedLocation = data.getParcelableExtra("selected_location");
+            if (selectedLocation != null) {
+                String locationString = selectedLocation.latitude + ", " + selectedLocation.longitude;
+                eventLocationInput.setText(locationString);
             }
         }
     }
+
 
 
     private void setTextColorBasedOnContrast(int selectedColor) {
