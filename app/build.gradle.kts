@@ -51,6 +51,7 @@ dependencies {
     implementation(libs.google.material)
     implementation(libs.colorpicker)
     implementation(libs.sqlite)
+    implementation(libs.places)
     testImplementation(libs.junit)
     androidTestImplementation(libs.ext.junit)
     androidTestImplementation(libs.espresso.core)

@@ -1,5 +1,6 @@
 package com.mobdeve.s21.mco.schedule_maker;
 
+import static android.app.Activity.RESULT_OK;
 import static android.content.Context.MODE_PRIVATE;
 
 import android.content.DialogInterface;
@@ -20,6 +21,7 @@ import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 
+import com.google.android.libraries.places.api.Places;
 import com.google.android.material.datepicker.CalendarConstraints;
 import com.google.android.material.datepicker.MaterialDatePicker;
 import com.google.android.material.timepicker.MaterialTimePicker;
@@ -29,13 +31,24 @@ import com.flask.colorpicker.OnColorSelectedListener;
 import com.flask.colorpicker.builder.ColorPickerClickListener;
 import com.flask.colorpicker.builder.ColorPickerDialogBuilder;
 
+import com.google.android.gms.common.api.Status;
+import com.google.android.libraries.places.api.model.Place;
+import com.google.android.libraries.places.api.net.PlacesClient;
+import com.google.android.libraries.places.widget.Autocomplete;
+import com.google.android.libraries.places.widget.AutocompleteActivity;
+import com.google.android.libraries.places.widget.model.AutocompleteActivityMode;
+
+import android.content.Intent;
+import androidx.annotation.Nullable;
 
 import java.io.IOException;
 import java.io.InputStream;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.List;
 import java.util.UUID;
 
 public class OneTimeEventFragment extends Fragment {
@@ -52,6 +65,8 @@ public class OneTimeEventFragment extends Fragment {
     private Button colorPickerInput;
 
     private ColorUtils colorUtils;
+
+    private static final int AUTOCOMPLETE_REQUEST_CODE = 1;
 
 
     @Nullable
@@ -73,6 +88,9 @@ public class OneTimeEventFragment extends Fragment {
         colorPickerInput.setHint("Electric Violet By Default");
         colorPickerInput.setHintTextColor(Color.WHITE);
 
+        PlacesClient placesClient = Places.createClient(requireContext());
+        eventLocationInput.setOnClickListener(v -> openPlaceAutocomplete());
+        
         // Load color names
         try {
             InputStream inputStream = requireContext().getAssets().open("colornames.json");
@@ -100,6 +118,34 @@ public class OneTimeEventFragment extends Fragment {
         return view;
     }
 
+    private void openPlaceAutocomplete() {
+        // Specify fields to retrieve from the Places API
+        List<Place.Field> fields = Arrays.asList(Place.Field.ID, Place.Field.NAME, Place.Field.ADDRESS, Place.Field.LAT_LNG);
+
+        // Start the Autocomplete intent
+        Intent intent = new Autocomplete.IntentBuilder(AutocompleteActivityMode.OVERLAY, fields)
+                .build(requireContext());
+        startActivityForResult(intent, AUTOCOMPLETE_REQUEST_CODE);
+    }
+
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+
+        if (requestCode == AUTOCOMPLETE_REQUEST_CODE) {
+            if (resultCode == RESULT_OK && data != null) {
+                Place place = Autocomplete.getPlaceFromIntent(data);
+
+                // Set the selected address in the EditText
+                eventLocationInput.setText(place.getAddress());
+
+                Log.d("OneTimeEventFragment", "Place selected: " + place.getName() + ", " + place.getAddress());
+            } else if (resultCode == AutocompleteActivity.RESULT_ERROR) {
+                Status status = Autocomplete.getStatusFromIntent(data);
+                Log.e("OneTimeEventFragment", "Autocomplete error: " + status.getStatusMessage());
+            }
+        }
+    }
 
 
     private void setTextColorBasedOnContrast(int selectedColor) {
