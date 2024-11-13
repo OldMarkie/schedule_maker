@@ -24,6 +24,8 @@ public class MainActivity extends AppCompatActivity {
     private TextView digitalClock;
     private TextView currentDay;
     private TextView currentDate;
+    private Handler deletionHandler;
+    private Runnable deletionRunnable;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -54,6 +56,17 @@ public class MainActivity extends AppCompatActivity {
         // Set up the BottomNavigationView
         BottomNavigationView bottomNavigationView = findViewById(R.id.bottomNavigationView);
         bottomNavigationView.setSelectedItemId(R.id.nav_home);  // Highlight Home as the selected tab
+
+        // Schedule the deletion of past events
+        deletionHandler = new Handler();
+        deletionRunnable = new Runnable() {
+            @Override
+            public void run() {
+                deletePastEvents();
+                deletionHandler.postDelayed(this, 86400000); // Repeat every 24 hours
+            }
+        };
+        deletionHandler.post(deletionRunnable);
 
         bottomNavigationView.setOnNavigationItemSelectedListener(item -> {
             int id = item.getItemId();
@@ -131,9 +144,15 @@ public class MainActivity extends AppCompatActivity {
         currentDate.setText(date);
     }
 
+    private void deletePastEvents() {
+        DatabaseHelper dbHelper = new DatabaseHelper(this);
+        dbHelper.deletePastEvents();
+    }
+
     @Override
     protected void onDestroy() {
         super.onDestroy();
         handler.removeCallbacks(runnable);  // Stop the clock updates when the activity is destroyed
+        deletionHandler.removeCallbacks(deletionRunnable);
     }
 }

@@ -469,6 +469,12 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         return rowsDeleted > 0;
     }
 
+    public void deletePastEvents() {
+        SQLiteDatabase db = this.getWritableDatabase();
+        long currentTime = System.currentTimeMillis();
+        db.delete(TABLE_EVENTS, COLUMN_END_TIME + " < ?", new String[]{String.valueOf(currentTime)});
+        db.close();
+    }
 
 
 }
