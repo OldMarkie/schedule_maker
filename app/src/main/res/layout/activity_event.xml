@@ -16,33 +16,40 @@
         android:textSize="34sp"
         android:textStyle="bold" />
 
-    <androidx.fragment.app.FragmentContainerView
-        android:id="@+id/holder"
-        android:name="com.mobdeve.s21.mco.schedule_maker.OneTimeEventEditFragment"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:layout_weight="1"
-        android:visibility="gone" />
-
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/linearLayout"
         android:layout_width="match_parent"
-        android:layout_height="0dp"
+        android:layout_height="wrap_content"
         android:layout_weight="1"
         android:gravity="center">
 
 
-        <androidx.constraintlayout.widget.ConstraintLayout
-            android:id="@+id/linearLayout2"
+        <androidx.fragment.app.FragmentContainerView
+            android:id="@+id/holder"
+            android:name="com.mobdeve.s21.mco.schedule_maker.OneTimeEventEditFragment"
             android:layout_width="0dp"
-            android:layout_height="574dp"
-            android:layout_marginTop="200dp"
+            android:layout_height="0dp"
+            android:layout_weight="1"
+            android:padding="16dp"
+            android:visibility="gone"
+            app:layout_constraintBottom_toBottomOf="@id/ButtonHolder"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:id="@+id/ButtonHolder"
+            android:layout_width="0dp"
+            android:layout_height="590dp"
+            android:layout_marginTop="220dp"
             android:background="@drawable/circular_background"
             android:backgroundTint="#EB87A8"
             android:gravity="center|left"
+            app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent">
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintVertical_bias="1.0">
 
             <TextView
                 android:id="@+id/hintTV"
@@ -56,7 +63,7 @@
                 tools:layout_editor_absoluteY="16dp" />
 
             <androidx.constraintlayout.widget.ConstraintLayout
-                android:id="@+id/constraintLayout2"
+                android:id="@+id/AddOneTime"
                 android:layout_width="347dp"
                 android:layout_height="77dp"
                 android:layout_marginTop="43dp"
@@ -96,6 +103,7 @@
             </androidx.constraintlayout.widget.ConstraintLayout>
 
             <androidx.constraintlayout.widget.ConstraintLayout
+                android:id="@+id/AddWeekly"
                 android:layout_width="347dp"
                 android:layout_height="77dp"
                 android:layout_marginTop="43dp"
@@ -103,7 +111,7 @@
                 android:foregroundGravity="center"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/constraintLayout2">
+                app:layout_constraintTop_toBottomOf="@+id/AddOneTime">
 
                 <LinearLayout
                     android:layout_width="match_parent"

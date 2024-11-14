@@ -329,6 +329,7 @@ public class WeeklyActivityFragment extends Fragment {
             // After saving, show the hint text view again
             ((EventActivity) getActivity()).showHintTextView();
             ((EventActivity) getActivity()).showAddWeeklyActivityButton();
+            ((EventActivity) getActivity()).hideHolder();
 
         } else {
             Toast.makeText(getActivity(), "Please select at least one day for the weekly event.", Toast.LENGTH_SHORT).show();
