@@ -5,7 +5,7 @@
     android:orientation="vertical"
     android:gravity="center"
     android:padding="16dp"
-    android:background="@color/colorBackground">
+    android:background="@drawable/wallpaper">
 
     <Space
         android:layout_width="match_parent"
@@ -19,29 +19,18 @@
         android:layout_gravity="center"
         android:gravity="center"
         android:text="00:00"
+        android:textColor="@color/white"
         android:textSize="96sp"
-        android:textStyle="bold"
-        android:textColor="@color/textColorPrimary" />
-
-    <TextView
-        android:id="@+id/currentDay"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="8dp"
-        android:text="Friday"
-        android:textAllCaps="true"
-        android:textSize="34sp"
-        android:textStyle="bold"
-        android:textColor="@color/textColorPrimary" />
+        android:textStyle="bold" />
 
     <TextView
         android:id="@+id/currentDate"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="4dp"
-        android:text="Jan 1, 2025"
-        android:textSize="24sp"
-        android:textColor="@color/textColorPrimary" />
+        android:text="Thursday, February 16"
+        android:textColor="@color/white"
+        android:textSize="24sp" />
 
     <Space
         android:layout_width="match_parent"

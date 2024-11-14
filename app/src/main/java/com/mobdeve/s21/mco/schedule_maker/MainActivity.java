@@ -50,7 +50,6 @@ public class MainActivity extends AppCompatActivity {
 
         // Initialize TextViews for clock, date, and schedule
         digitalClock = findViewById(R.id.digitalClock);
-        currentDay = findViewById(R.id.currentDay);
         currentDate = findViewById(R.id.currentDate);
 
         // Set up the BottomNavigationView
@@ -126,7 +125,7 @@ public class MainActivity extends AppCompatActivity {
         if (is24HourFormat) {
             sdf = new SimpleDateFormat("HH:mm", Locale.getDefault());  // 24-hour format, no seconds
         } else {
-            sdf = new SimpleDateFormat("hh:mm a", Locale.getDefault());  // 12-hour format with AM/PM
+            sdf = new SimpleDateFormat("hh:mm ", Locale.getDefault());  // 12-hour format with AM/PM
         }
         String currentTime = sdf.format(new Date());
         digitalClock.setText(currentTime);
@@ -135,13 +134,12 @@ public class MainActivity extends AppCompatActivity {
     // Display the current day and date
     private void displayCurrentDayAndDate() {
         SimpleDateFormat dayFormat = new SimpleDateFormat("EEEE", Locale.getDefault());  // Friday
-        SimpleDateFormat dateFormat = new SimpleDateFormat("MMM d, yyyy", Locale.getDefault());  // Jan 1, 2025
+        SimpleDateFormat dateFormat = new SimpleDateFormat("MMMM d", Locale.getDefault());  // Jan 1
 
         String day = dayFormat.format(new Date());
         String date = dateFormat.format(new Date());
 
-        currentDay.setText(day);
-        currentDate.setText(date);
+        currentDate.setText(day + ", " + date);
     }
 
     private void deletePastEvents() {

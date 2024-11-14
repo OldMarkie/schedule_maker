@@ -2,27 +2,24 @@ package com.mobdeve.s21.mco.schedule_maker;
 
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.icu.text.SimpleDateFormat;
 import android.os.Bundle;
 import android.view.View;
-import android.widget.Button;
-import android.widget.CheckBox;
-import android.widget.EditText;
 import android.widget.TextView;
-import android.widget.Toast;
+
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.app.AppCompatDelegate;
-import androidx.fragment.app.Fragment;  // Import Fragment
+import androidx.fragment.app.FragmentContainer;
+
 import com.google.android.material.bottomnavigation.BottomNavigationView;
-import java.util.Calendar;
-import java.util.Locale;
+import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
 public class EventActivity extends AppCompatActivity {
 
 
-    private Button oneTimeEventButton;
-    private Button weeklyEventButton;
+    private FloatingActionButton oneTimeEventButton;
+    private FloatingActionButton weeklyEventButton;
     private TextView hintTextView;
+    private FragmentContainer holder;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -39,10 +36,12 @@ public class EventActivity extends AppCompatActivity {
         oneTimeEventButton = findViewById(R.id.oneTimeEventButton);
         weeklyEventButton = findViewById(R.id.weeklyEventButton);
         hintTextView = findViewById(R.id.hintTV);
+        holder = findViewById(R.id.holder);
 
         // One-time event button logic
         oneTimeEventButton.setOnClickListener(v -> {
             // Navigate to fragment for one-time event details
+
             hintTextView.setVisibility(View.GONE);
             oneTimeEventButton.setVisibility(View.GONE);
             weeklyEventButton.setVisibility(View.VISIBLE);
