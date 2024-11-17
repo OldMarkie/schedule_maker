@@ -10,7 +10,6 @@ import android.widget.TextView;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.app.AppCompatDelegate;
-import androidx.fragment.app.FragmentContainer;
 
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
@@ -20,11 +19,13 @@ public class EventActivity extends AppCompatActivity {
 
     private FloatingActionButton oneTimeEventButton;
     private FloatingActionButton weeklyEventButton;
+    private TextView activityTitle;
     private TextView hintTextView;
     private View holder;
     private View weeklySec;
     private View oneTimeSec;
     private  View holderBtn;
+    private View holderW;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -41,18 +42,23 @@ public class EventActivity extends AppCompatActivity {
         oneTimeEventButton = findViewById(R.id.oneTimeEventButton);
         weeklyEventButton = findViewById(R.id.weeklyEventButton);
         hintTextView = findViewById(R.id.hintTV);
-        holder = findViewById(R.id.holder);
+        holder = findViewById(R.id.holderOneTime);
         weeklySec = findViewById(R.id.AddWeekly);
         oneTimeSec = findViewById(R.id.AddOneTime);
         holderBtn = findViewById(R.id.ButtonHolder);
+        holderW = findViewById(R.id.holderWeekly);
+        activityTitle = findViewById(R.id.activityTitle);
 
         // One-time event button logic
         oneTimeEventButton.setOnClickListener(v -> {
             // Navigate to fragment for one-time event details
 
             hintTextView.setVisibility(View.GONE);
-            weeklySec.setVisibility(View.GONE);
+            weeklySec.setVisibility(View.VISIBLE);
+            oneTimeSec.setVisibility(View.GONE);
             holder.setVisibility(View.VISIBLE);
+            holderW.setVisibility(View.GONE);
+            activityTitle.setText("Add One-Time Activity");
 
             ViewGroup.LayoutParams layoutParams = holderBtn.getLayoutParams();
             layoutParams.height = ViewGroup.LayoutParams.WRAP_CONTENT;
@@ -60,7 +66,7 @@ public class EventActivity extends AppCompatActivity {
 
 
             getSupportFragmentManager().beginTransaction()
-                    .replace(R.id.holder, new OneTimeEventFragment())
+                    .replace(R.id.holderOneTime, new OneTimeEventFragment())
                     .addToBackStack(null)
                     .commit();
         });
@@ -68,8 +74,11 @@ public class EventActivity extends AppCompatActivity {
         // Weekly event button logic
         weeklyEventButton.setOnClickListener(v -> {
             hintTextView.setVisibility(View.GONE);
-            oneTimeSec.setVisibility(View.GONE);
-            holder.setVisibility(View.VISIBLE);
+            oneTimeSec.setVisibility(View.VISIBLE);
+            weeklySec.setVisibility(View.GONE);
+            holderW.setVisibility(View.VISIBLE);
+            holder.setVisibility(View.GONE);
+            activityTitle.setText("Add Weekly Activity");
 
             ViewGroup.LayoutParams layoutParams = holderBtn.getLayoutParams();
             layoutParams.height = ViewGroup.LayoutParams.WRAP_CONTENT;
@@ -77,7 +86,7 @@ public class EventActivity extends AppCompatActivity {
 
 
             getSupportFragmentManager().beginTransaction()
-                    .replace(R.id.holder, new WeeklyActivityFragment())
+                    .replace(R.id.holderWeekly, new WeeklyActivityFragment())
                     .addToBackStack(null)
                     .commit();
         });
@@ -135,5 +144,28 @@ public class EventActivity extends AppCompatActivity {
 
     public void showAddWeeklyActivityButton(){
         weeklyEventButton.setVisibility(View.VISIBLE);
+    }
+
+    public void resetEventActivity(){
+        // Make all sections visible
+        hintTextView.setVisibility(View.VISIBLE);
+        oneTimeSec.setVisibility(View.VISIBLE);
+        weeklySec.setVisibility(View.VISIBLE);
+        holderW.setVisibility(View.GONE);
+        holder.setVisibility(View.GONE);
+        activityTitle.setText("Add Events");
+
+// Convert 590dp to pixels
+        int heightInPixels = (int) TypedValue.applyDimension(
+                TypedValue.COMPLEX_UNIT_DIP,
+                590,
+                getResources().getDisplayMetrics()
+        );
+
+// Revert the height of holderBtn to 590dp
+        ViewGroup.LayoutParams layoutParams = holderBtn.getLayoutParams();
+        layoutParams.height = heightInPixels;
+        holderBtn.setLayoutParams(layoutParams);
+
     }
 }

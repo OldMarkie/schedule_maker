@@ -8,6 +8,7 @@
     android:orientation="vertical">
 
     <TextView
+        android:id="@+id/activityTitle"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:padding="16dp"
@@ -25,14 +26,24 @@
 
 
         <androidx.fragment.app.FragmentContainerView
-            android:id="@+id/holder"
-            android:name="com.mobdeve.s21.mco.schedule_maker.OneTimeEventEditFragment"
+            android:id="@+id/holderOneTime"
+            android:name="com.mobdeve.s21.mco.schedule_maker.OneTimeEventFragment"
             android:layout_width="0dp"
             android:layout_height="0dp"
             android:layout_weight="1"
-            android:padding="16dp"
             android:visibility="gone"
-            app:layout_constraintBottom_toBottomOf="@id/ButtonHolder"
+            app:layout_constraintBottom_toTopOf="@+id/ButtonHolder"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <androidx.fragment.app.FragmentContainerView
+            android:id="@+id/holderWeekly"
+            android:name="com.mobdeve.s21.mco.schedule_maker.WeeklyActivityFragment"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:visibility="gone"
+            app:layout_constraintBottom_toTopOf="@+id/ButtonHolder"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
@@ -42,7 +53,7 @@
             android:layout_width="0dp"
             android:layout_height="590dp"
             android:layout_marginTop="220dp"
-            android:background="@drawable/circular_background"
+            android:background="@drawable/semi_circle"
             android:backgroundTint="#EB87A8"
             android:gravity="center|left"
             app:layout_constraintBottom_toBottomOf="parent"
@@ -152,6 +163,7 @@
         android:layout_height="wrap_content"
         android:layout_gravity="bottom|center"
         android:background="@color/colorBackground"
+        android:padding="8dp"
         app:itemIconTint="@color/bottomNavIconColor"
         app:itemTextColor="@color/bottomNavTextColor"
         app:menu="@menu/bottom_nav_menu" />

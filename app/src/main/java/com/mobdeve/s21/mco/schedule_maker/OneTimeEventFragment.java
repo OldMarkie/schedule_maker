@@ -323,9 +323,7 @@ public class OneTimeEventFragment extends Fragment {
             Toast.makeText(getActivity(), "One-Time Event Saved!", Toast.LENGTH_SHORT).show();
             FragmentManager fragmentManager = getParentFragmentManager();
             fragmentManager.popBackStack(null, FragmentManager.POP_BACK_STACK_INCLUSIVE);
-            ((EventActivity) getActivity()).showHintTextView();
-            ((EventActivity) getActivity()).showAddOneTimeEventButton();
-            ((EventActivity) getActivity()).hideHolder();
+            ((EventActivity) getActivity()).resetEventActivity();
 
         } catch (ParseException e) {
             e.printStackTrace();
