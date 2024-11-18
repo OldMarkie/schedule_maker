@@ -71,6 +71,7 @@ public class OneTimeEventFragment extends Fragment {
 
     private static final int AUTOCOMPLETE_REQUEST_CODE = 1;
     private static final int MAP_REQUEST_CODE = 2;
+    private PlacesClient placesClient;
 
 
 
@@ -93,7 +94,7 @@ public class OneTimeEventFragment extends Fragment {
         colorPickerInput.setHint("Electric Violet By Default");
         colorPickerInput.setHintTextColor(Color.WHITE);
 
-        PlacesClient placesClient = Places.createClient(requireContext());
+        placesClient = Places.createClient(requireContext());
         eventLocationInput.setOnClickListener(v -> openMapForLocation());
 
 
@@ -338,7 +339,9 @@ public class OneTimeEventFragment extends Fragment {
         // Initialize the Calendar API service
         GoogleSignInAccount account = GoogleSignIn.getLastSignedInAccount(getContext());
         if (account == null) {
-            Toast.makeText(getContext(), "You need to sign in with Google first!", Toast.LENGTH_SHORT).show();
+            if (getContext() != null) {
+                Toast.makeText(getContext(), "You need to sign in with Google first!", Toast.LENGTH_SHORT).show();
+            }
             return;
         }
 
@@ -373,12 +376,31 @@ public class OneTimeEventFragment extends Fragment {
         new Thread(() -> {
             try {
                 service.events().insert("primary", event).execute();
-                getActivity().runOnUiThread(() -> Toast.makeText(getActivity(), "Event added to Google Calendar!", Toast.LENGTH_SHORT).show());
+
+                // Safely access the activity for UI updates
+                if (getActivity() != null && isAdded()) {
+                    getActivity().runOnUiThread(() ->
+                            Toast.makeText(getActivity(), "Event added to Google Calendar!", Toast.LENGTH_SHORT).show()
+                    );
+                }
             } catch (Exception e) {
-                getActivity().runOnUiThread(() -> Toast.makeText(getActivity(), "Failed to save event to Google Calendar", Toast.LENGTH_SHORT).show());
+                if (getActivity() != null && isAdded()) {
+                    getActivity().runOnUiThread(() ->
+                            Toast.makeText(getActivity(), "Failed to save event to Google Calendar", Toast.LENGTH_SHORT).show()
+                    );
+                }
                 e.printStackTrace();
             }
         }).start();
     }
+
+
+    public void onDestroy() {
+        super.onDestroy();
+        if (placesClient != null) {
+            placesClient = null;     // Avoid memory leaks
+        }
+    }
+
 
 }
