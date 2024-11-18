@@ -60,15 +60,16 @@ dependencies {
     implementation(libs.sqlite)
     implementation(libs.places)
     implementation(libs.play.services.maps)
-    implementation(libs.play.services.auth)
-    implementation(libs.google.api.client.android)
-    implementation(libs.google.api.services.calendar)
     testImplementation(libs.junit)
     androidTestImplementation(libs.ext.junit)
     androidTestImplementation(libs.espresso.core)
     }
 }
 dependencies {
+    implementation(libs.play.services.auth)
+    implementation(libs.google.api.client.android)
+    implementation(libs.google.api.services.calendar)
     implementation(libs.google.http.client.jackson2)
     implementation(libs.google.http.client.android)
 }
+
