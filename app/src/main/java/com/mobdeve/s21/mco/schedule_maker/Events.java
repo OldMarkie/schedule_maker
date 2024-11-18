@@ -15,6 +15,7 @@ public class Events implements Serializable {
     private boolean isWeekly;
     private int color;
     private int dayWeek;
+    private String googleEventId;
 
 
     public Events(String id, String name, String description, String location, Date startTime, Date endTime, boolean isWeekly, int color, int dayWeek) {
@@ -27,6 +28,20 @@ public class Events implements Serializable {
         this.isWeekly = isWeekly;
         this.color = color;
         this.dayWeek = dayWeek;
+        this.googleEventId = "";
+    }
+
+    public Events(String id, String name, String description, String location, Date startTime, Date endTime, boolean isWeekly, int color, int dayWeek, String googleEventId) {
+        this.id = id;
+        this.name = name;
+        this.description = description;
+        this.location = location;
+        this.startTime = startTime;
+        this.endTime = endTime;
+        this.isWeekly = isWeekly;
+        this.color = color;
+        this.dayWeek = dayWeek;
+        this.googleEventId = googleEventId;
     }
 
 
@@ -67,6 +82,10 @@ public class Events implements Serializable {
         return dayWeek;
     }
 
+    public String getGoogleEventId() {
+        return googleEventId;
+    }
+
     public void setColor(int color) {
         this.color = color;
     }
@@ -102,6 +121,8 @@ public class Events implements Serializable {
     public void setDayWeek(int dayWeek) {
         this.dayWeek = dayWeek;
     }
+
+    public void setGoogleEventId(String googleEventId) {this.googleEventId = googleEventId; }
 
     @NonNull
     @Override

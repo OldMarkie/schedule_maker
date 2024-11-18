@@ -3,6 +3,7 @@ package com.mobdeve.s21.mco.schedule_maker;
 import static android.app.Activity.RESULT_OK;
 import static android.content.Context.MODE_PRIVATE;
 
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.SharedPreferences;
 import android.content.res.ColorStateList;
@@ -72,6 +73,7 @@ public class OneTimeEventFragment extends Fragment {
     private static final int AUTOCOMPLETE_REQUEST_CODE = 1;
     private static final int MAP_REQUEST_CODE = 2;
     private PlacesClient placesClient;
+    private final String googleEventId = "";
 
 
 
@@ -318,11 +320,12 @@ public class OneTimeEventFragment extends Fragment {
             }
 
             String eventId = UUID.randomUUID().toString();
+
             // Create and save the event
             Events newEvents = new Events(eventId,eventName, eventDescription, eventLocation, startDate, endDate, false, eventColor, -1);
             Log.d("OneTimeEventFragment", "Saving event: " + newEvents.toString());
             dbHelper.addEvent(newEvents);
-            saveEventToGoogleCalendar(eventName, eventDescription, eventLocation, eventStartDateTime, eventEndDateTime);
+            saveEventToGoogleCalendar(eventName, eventDescription, eventLocation, eventStartDateTime, eventEndDateTime, newEvents);
             Toast.makeText(getActivity(), "One-Time Events Saved!", Toast.LENGTH_SHORT).show();
             FragmentManager fragmentManager = getParentFragmentManager();
             fragmentManager.popBackStack(null, FragmentManager.POP_BACK_STACK_INCLUSIVE);
@@ -335,7 +338,7 @@ public class OneTimeEventFragment extends Fragment {
 
     }
 
-    private void saveEventToGoogleCalendar(String title, String description, String location, Date startDateTime, Date endDateTime) {
+    private void saveEventToGoogleCalendar(String title, String description, String location, Date startDateTime, Date endDateTime, Events newEvents) {
         // Initialize the Calendar API service
         GoogleSignInAccount account = GoogleSignIn.getLastSignedInAccount(getContext());
         if (account == null) {
@@ -357,11 +360,15 @@ public class OneTimeEventFragment extends Fragment {
                 credential
         ).setApplicationName("Schedule Maker").build();
 
+        String sanitizedId = newEvents.getId().replace("-", "").toLowerCase();
         // Create the Google Calendar Event
         Event event = new Event()
+                .setId(sanitizedId)
                 .setSummary(title)
                 .setDescription(description)
                 .setLocation(location);
+
+        newEvents.setGoogleEventId(event.getId());
 
         // Set start and end times
         DateTime start = new DateTime(startDateTime);
@@ -371,11 +378,18 @@ public class OneTimeEventFragment extends Fragment {
         DateTime end = new DateTime(endDateTime);
         EventDateTime endEventDateTime = new EventDateTime().setDateTime(end).setTimeZone("Asia/Manila");
         event.setEnd(endEventDateTime);
-
+        Context context = getContext();
         // Insert event into the user's primary calendar
         new Thread(() -> {
             try {
-                service.events().insert("primary", event).execute();
+                Event insertedEvent = service.events().insert("primary", event).execute();
+                String googleEventId = insertedEvent.getId();
+                Log.d("GoogleCalendarEvent", "Inserted Event ID: " + googleEventId);
+                newEvents.setGoogleEventId(googleEventId);
+                DatabaseHelper dbHelper = new DatabaseHelper(context);
+                dbHelper.updateEventWithGoogleEventId(newEvents);
+                Log.d("GoogleCalendarEvent", "Event saved to database");
+
 
                 // Safely access the activity for UI updates
                 if (getActivity() != null && isAdded()) {

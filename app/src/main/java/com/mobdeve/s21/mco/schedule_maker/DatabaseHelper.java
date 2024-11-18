@@ -32,6 +32,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     private static final String COLUMN_IS_WEEKLY = "is_weekly";
     private static final String COLUMN_COLOR = "color";
     private static final String COLUMN_DAY_OF_WEEK = "day_of_week";
+    private static final String COLUMN_GOOGLE_ID = "google_id";
 
     public DatabaseHelper(Context context) {
         super(context, DATABASE_NAME, null, DATABASE_VERSION);
@@ -48,7 +49,8 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                 + COLUMN_END_TIME + " INTEGER, "
                 + COLUMN_IS_WEEKLY + " INTEGER, "
                 + COLUMN_COLOR + " INTEGER,"
-                + COLUMN_DAY_OF_WEEK + " INTEGER)";
+                + COLUMN_DAY_OF_WEEK + " INTEGER,"
+                + COLUMN_GOOGLE_ID + " TEXT)";
         db.execSQL(createTable);
     }
 
@@ -70,10 +72,12 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         values.put(COLUMN_IS_WEEKLY, events.isWeekly() ? 1 : 0);
         values.put(COLUMN_DAY_OF_WEEK, events.getDayWeek());
         values.put(COLUMN_COLOR, events.getColor());
+        values.put(COLUMN_GOOGLE_ID, events.getGoogleEventId());
 
         long result = db.insert(TABLE_EVENTS, null, values);
         db.close();
         return result != -1;
+
     }
 
     public List<Events> getEventsForDate(Date date) {
@@ -475,6 +479,27 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         db.delete(TABLE_EVENTS, COLUMN_END_TIME + " < ?", new String[]{String.valueOf(currentTime)});
         db.close();
     }
+
+    public void updateEventWithGoogleEventId(Events event) {
+        SQLiteDatabase db = this.getWritableDatabase();
+
+        ContentValues values = new ContentValues();
+        values.put(COLUMN_GOOGLE_ID, event.getGoogleEventId()); // Ensure the column is correct
+
+        // Log the values being updated for debugging
+        Log.d("DatabaseHelper", "Updating Google Event ID for Event: " + event.getName() + ", ID: " + event.getGoogleEventId());
+
+        int rowsAffected = db.update(TABLE_EVENTS, values, COLUMN_NAME + " = ?", new String[]{event.getName()});
+
+        if (rowsAffected > 0) {
+            Log.d("DatabaseHelper", "Event updated successfully in the database.");
+        } else {
+            Log.e("DatabaseHelper", "Failed to update event in the database. Event not found.");
+        }
+    }
+
+
+
 
 
 }
