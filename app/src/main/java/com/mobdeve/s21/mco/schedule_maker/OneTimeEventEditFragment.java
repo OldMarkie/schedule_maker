@@ -2,6 +2,7 @@ package com.mobdeve.s21.mco.schedule_maker;
 
 import static android.app.Activity.RESULT_OK;
 
+import android.content.Context;
 import android.content.Intent;
 import android.content.res.ColorStateList;
 import android.graphics.Color;
@@ -19,18 +20,28 @@ import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 
+import com.google.android.gms.auth.api.signin.GoogleSignIn;
+import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.material.datepicker.CalendarConstraints;
 import com.google.android.material.datepicker.MaterialDatePicker;
 import com.google.android.material.timepicker.MaterialTimePicker;
 import com.flask.colorpicker.ColorPickerView;
 import com.flask.colorpicker.builder.ColorPickerDialogBuilder;
+import com.google.api.client.extensions.android.http.AndroidHttp;
+import com.google.api.client.googleapis.extensions.android.gms.auth.GoogleAccountCredential;
+import com.google.api.client.json.jackson2.JacksonFactory;
+import com.google.api.client.util.DateTime;
+import com.google.api.services.calendar.CalendarScopes;
+import com.google.api.services.calendar.model.Event;
+import com.google.api.services.calendar.model.EventDateTime;
 
 import java.io.IOException;
 import java.io.InputStream;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
+import java.util.Collections;
 import java.util.Date;
 
 public class OneTimeEventEditFragment extends Fragment {
@@ -240,15 +251,19 @@ public class OneTimeEventEditFragment extends Fragment {
                 return;
             }
 
+            String sanitizedGoogleid = currentEvents.getId().replace("-", "").toLowerCase();
+
+
             currentEvents.setName(eventName);
             currentEvents.setDescription(eventDescription);
             currentEvents.setLocation(eventLocation);
             currentEvents.setStartTime(startDateTime);
             currentEvents.setEndTime(endDateTime);
             currentEvents.setColor(selectedColor);
+            currentEvents.setGoogleEventId(sanitizedGoogleid);
 
             dbHelper.updateEvent(currentEvents);
-
+            updateEventInGoogleCalendar(eventName, eventDescription, eventLocation, startDateTime, endDateTime, currentEvents);
             Toast.makeText(getActivity(), "Events updated successfully!", Toast.LENGTH_SHORT).show();
             FragmentManager fragmentManager = getParentFragmentManager();
             fragmentManager.popBackStack();
@@ -259,6 +274,105 @@ public class OneTimeEventEditFragment extends Fragment {
             Toast.makeText(getActivity(), "Invalid date or time format", Toast.LENGTH_SHORT).show();
         }
     }
+
+    private void updateEventInGoogleCalendar(String title, String description, String location, Date startDateTime, Date endDateTime, Events newEvents) {
+        // Initialize the Calendar API service
+        GoogleSignInAccount account = GoogleSignIn.getLastSignedInAccount(getContext());
+        if (account == null) {
+            if (getContext() != null) {
+                Toast.makeText(getContext(), "You need to sign in with Google first!", Toast.LENGTH_SHORT).show();
+            }
+            return;
+        }
+
+        GoogleAccountCredential credential = GoogleAccountCredential.usingOAuth2(
+                getContext(),
+                Collections.singleton(CalendarScopes.CALENDAR)
+        );
+        credential.setSelectedAccount(account.getAccount());
+
+        com.google.api.services.calendar.Calendar service = new com.google.api.services.calendar.Calendar.Builder(
+                AndroidHttp.newCompatibleTransport(),
+                JacksonFactory.getDefaultInstance(),
+                credential
+        ).setApplicationName("Schedule Maker").build();
+
+        String sanitizedId = newEvents.getId().replace("-", "").toLowerCase();
+
+        // Log the event ID to be used for updating the Google Calendar event
+        Log.d("GoogleCalendarEvent", "Updating event with sanitized ID: " + sanitizedId);
+        Log.d("GoogleCalendarEvent", "Current Google Event ID: " + newEvents.getGoogleEventId());
+
+        // Create the Google Calendar Event object
+        Event event = new Event()
+                .setId(newEvents.getGoogleEventId())  // Use the existing Google Event ID for update
+                .setSummary(title)
+                .setDescription(description)
+                .setLocation(location);
+
+        // Set start and end times
+        DateTime start = new DateTime(startDateTime);
+        EventDateTime startEventDateTime = new EventDateTime().setDateTime(start).setTimeZone("Asia/Manila");
+        event.setStart(startEventDateTime);
+
+        DateTime end = new DateTime(endDateTime);
+        EventDateTime endEventDateTime = new EventDateTime().setDateTime(end).setTimeZone("Asia/Manila");
+        event.setEnd(endEventDateTime);
+
+        // Log the details of the event being updated
+        Log.d("GoogleCalendarEvent", "Event Details: ");
+        Log.d("GoogleCalendarEvent", "Title: " + title);
+        Log.d("GoogleCalendarEvent", "Description: " + description);
+        Log.d("GoogleCalendarEvent", "Location: " + location);
+        Log.d("GoogleCalendarEvent", "Start DateTime: " + startDateTime.toString());
+        Log.d("GoogleCalendarEvent", "End DateTime: " + endDateTime.toString());
+
+        Context context = getContext();
+        if (context == null) {
+            return;
+        }
+
+        // Update event in Google Calendar
+        new Thread(() -> {
+            try {
+                // Log the URL being used for the update request
+                String eventId = event.getId();
+                String updateUrl = "https://www.googleapis.com/calendar/v3/calendars/primary/events/" + eventId;
+                Log.d("GoogleCalendarEvent", "Request URL: " + updateUrl);
+
+                // Execute the update request for Google Calendar
+                Event updatedEvent = service.events().update("primary", eventId, event).execute();
+                String updatedGoogleEventId = updatedEvent.getId();
+                Log.d("GoogleCalendarEvent", "Updated Event ID: " + updatedGoogleEventId);
+
+                // Update the event with the new Google Event ID in your local database
+                newEvents.setGoogleEventId(updatedGoogleEventId);
+                DatabaseHelper dbHelper = new DatabaseHelper(context);
+                dbHelper.updateEventWithGoogleEventId(newEvents);
+                Log.d("GoogleCalendarEvent", "Event updated in database");
+
+                // Safely access the activity for UI updates
+                if (getActivity() != null && isAdded()) {
+                    getActivity().runOnUiThread(() -> {
+                        Toast.makeText(getActivity(), "Event updated in Google Calendar!", Toast.LENGTH_SHORT).show();
+                    });
+                }
+            } catch (Exception e) {
+                // Log the exception if the update fails
+                Log.e("GoogleCalendarEvent", "Error updating event in Google Calendar", e);
+
+                if (getActivity() != null && isAdded()) {
+                    getActivity().runOnUiThread(() -> {
+                        Toast.makeText(getActivity(), "Failed to update event in Google Calendar", Toast.LENGTH_SHORT).show();
+                    });
+                }
+            }
+        }).start();
+    }
+
+
+
+
 
     private void setTextColorBasedOnContrast(int selectedColor) {
         double luminance = (0.299 * Color.red(selectedColor) + 0.587 * Color.green(selectedColor) + 0.114 * Color.blue(selectedColor)) / 255;
