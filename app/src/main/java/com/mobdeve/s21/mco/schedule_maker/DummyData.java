@@ -9,53 +9,53 @@ import java.util.List;
 
 public class DummyData {
 
-    private static List<Event> eventList = new ArrayList<>();
+    private static List<Events> eventsList = new ArrayList<>();
 
     // Return events for a specific weekday (including recurring weekly events)
-    public static List<Event> getEventsForWeekDay(Date weekDay) {
-        List<Event> filteredEvents = new ArrayList<>();
+    public static List<Events> getEventsForWeekDay(Date weekDay) {
+        List<Events> filteredEvents = new ArrayList<>();
         Calendar selectedDate = Calendar.getInstance();
         selectedDate.setTime(weekDay);
 
-        for (Event event : eventList) {
+        for (Events events : eventsList) {
             Calendar eventDate = Calendar.getInstance();
-            eventDate.setTime(event.getStartTime());
+            eventDate.setTime(events.getStartTime());
 
-            if (event.isWeekly()) {
+            if (events.isWeekly()) {
                 if (eventDate.get(Calendar.DAY_OF_WEEK) == selectedDate.get(Calendar.DAY_OF_WEEK)) {
-                    filteredEvents.add(event);
+                    filteredEvents.add(events);
                 }
             }
         }
 
         // Sort by start time
-        Collections.sort(filteredEvents, Comparator.comparing(Event::getStartTime));
+        Collections.sort(filteredEvents, Comparator.comparing(Events::getStartTime));
         return filteredEvents;
     }
 
     // Return events for a specific date (including recurring weekly events)
-    public static List<Event> getEventsForDate(Date date) {
-        List<Event> filteredEvents = new ArrayList<>();
+    public static List<Events> getEventsForDate(Date date) {
+        List<Events> filteredEvents = new ArrayList<>();
         Calendar selectedDate = Calendar.getInstance();
         selectedDate.setTime(date);
 
-        for (Event event : eventList) {
+        for (Events events : eventsList) {
             Calendar eventDate = Calendar.getInstance();
-            eventDate.setTime(event.getStartTime());
+            eventDate.setTime(events.getStartTime());
 
-            if (event.isWeekly()) {
+            if (events.isWeekly()) {
                 if (eventDate.get(Calendar.DAY_OF_WEEK) == selectedDate.get(Calendar.DAY_OF_WEEK)) {
-                    filteredEvents.add(event);
+                    filteredEvents.add(events);
                 }
             } else {
                 if (isSameDay(eventDate, selectedDate)) {
-                    filteredEvents.add(event);
+                    filteredEvents.add(events);
                 }
             }
         }
 
         // Sort by start time
-        Collections.sort(filteredEvents, Comparator.comparing(Event::getStartTime));
+        Collections.sort(filteredEvents, Comparator.comparing(Events::getStartTime));
         return filteredEvents;
     }
 
@@ -67,39 +67,39 @@ public class DummyData {
 
     // Method to check if an event overlaps with existing events
     public static boolean isEventTimeConflict(Date startTime, Date endTime) {
-        for (Event event : eventList) {
-            if (startTime.before(event.getEndTime()) && endTime.after(event.getStartTime())) {
+        for (Events events : eventsList) {
+            if (startTime.before(events.getEndTime()) && endTime.after(events.getStartTime())) {
                 return true;
             }
         }
         return false;
     }
 
-    // Method to add an event (one-time or weekly)
-    public static boolean addEvent(Event event) {
-        if (isEventTimeConflict(event.getStartTime(), event.getEndTime())) {
+    // Method to add an events (one-time or weekly)
+    public static boolean addEvent(Events events) {
+        if (isEventTimeConflict(events.getStartTime(), events.getEndTime())) {
             return false;
         }
-        eventList.add(event);
+        eventsList.add(events);
         return true;
     }
 
-    // Method to delete an event
-    public static void deleteEvent(Event event) {
-        eventList.remove(event);
+    // Method to delete an events
+    public static void deleteEvent(Events events) {
+        eventsList.remove(events);
     }
 
     // Return all events sorted by start time
-    public static List<Event> getEvents() {
-        Collections.sort(eventList, Comparator.comparing(Event::getStartTime));
-        return eventList;
+    public static List<Events> getEvents() {
+        Collections.sort(eventsList, Comparator.comparing(Events::getStartTime));
+        return eventsList;
     }
 
-    // Method to update an existing event
-    public static void updateEvent(Event event) {
-        for (int i = 0; i < eventList.size(); i++) {
-            if (eventList.get(i).getId().equals(event.getId())) {
-                eventList.set(i, event);
+    // Method to update an existing events
+    public static void updateEvent(Events events) {
+        for (int i = 0; i < eventsList.size(); i++) {
+            if (eventsList.get(i).getId().equals(events.getId())) {
+                eventsList.set(i, events);
                 break;
             }
         }

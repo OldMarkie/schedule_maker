@@ -58,26 +58,26 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         onCreate(db);
     }
 
-    public boolean addEvent(Event event) {
+    public boolean addEvent(Events events) {
         SQLiteDatabase db = this.getWritableDatabase();
         ContentValues values = new ContentValues();
-        values.put(COLUMN_ID, event.getId());
-        values.put(COLUMN_NAME, event.getName());
-        values.put(COLUMN_DESCRIPTION, event.getDescription());
-        values.put(COLUMN_LOCATION, event.getLocation());
-        values.put(COLUMN_START_TIME, event.getStartTime().getTime());
-        values.put(COLUMN_END_TIME, event.getEndTime().getTime());
-        values.put(COLUMN_IS_WEEKLY, event.isWeekly() ? 1 : 0);
-        values.put(COLUMN_DAY_OF_WEEK, event.getDayWeek());
-        values.put(COLUMN_COLOR, event.getColor());
+        values.put(COLUMN_ID, events.getId());
+        values.put(COLUMN_NAME, events.getName());
+        values.put(COLUMN_DESCRIPTION, events.getDescription());
+        values.put(COLUMN_LOCATION, events.getLocation());
+        values.put(COLUMN_START_TIME, events.getStartTime().getTime());
+        values.put(COLUMN_END_TIME, events.getEndTime().getTime());
+        values.put(COLUMN_IS_WEEKLY, events.isWeekly() ? 1 : 0);
+        values.put(COLUMN_DAY_OF_WEEK, events.getDayWeek());
+        values.put(COLUMN_COLOR, events.getColor());
 
         long result = db.insert(TABLE_EVENTS, null, values);
         db.close();
         return result != -1;
     }
 
-    public List<Event> getEventsForDate(Date date) {
-        List<Event> events = new ArrayList<>();
+    public List<Events> getEventsForDate(Date date) {
+        List<Events> events = new ArrayList<>();
         Set<String> uniqueWeeklyEventIds = new HashSet<>(); // To track unique weekly events
         SQLiteDatabase db = this.getReadableDatabase();
 
@@ -89,7 +89,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         Cursor cursor = db.query(TABLE_EVENTS, null, null, null, null, null, COLUMN_START_TIME);
 
         while (cursor.moveToNext()) {
-            Event event = createEventFromCursor(cursor);
+            Events event = createEventFromCursor(cursor);
 
             // Check if the event is for the specified date
             if (isEventOnDate(event, dateString)) {
@@ -111,17 +111,17 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         return events;
     }
 
-    // Helper method to determine if an event is on the specified date
-    private boolean isEventOnDate(Event event, String dateString) {
-        // Format the event's start time to compare with the given date
+    // Helper method to determine if an events is on the specified date
+    private boolean isEventOnDate(Events events, String dateString) {
+        // Format the events's start time to compare with the given date
         SimpleDateFormat eventDateFormat = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault());
-        String eventDateString = eventDateFormat.format(event.getStartTime()); // Assuming getStartTime returns a Date object
+        String eventDateString = eventDateFormat.format(events.getStartTime()); // Assuming getStartTime returns a Date object
         return eventDateString.equals(dateString);
     }
 
 
-    // Helper method to create an Event object from the cursor
-    private Event createEventFromCursor(Cursor cursor) {
+    // Helper method to create an Events object from the cursor
+    private Events createEventFromCursor(Cursor cursor) {
         String id = cursor.getString(cursor.getColumnIndexOrThrow(COLUMN_ID));
         String name = cursor.getString(cursor.getColumnIndexOrThrow(COLUMN_NAME));
         String description = cursor.getString(cursor.getColumnIndexOrThrow(COLUMN_DESCRIPTION));
@@ -132,7 +132,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         int color = cursor.getInt(cursor.getColumnIndexOrThrow(COLUMN_COLOR));
         int dayOfWeek = cursor.getInt(cursor.getColumnIndexOrThrow(COLUMN_DAY_OF_WEEK));
 
-        return new Event(id, name, description, location, startTime, endTime, isWeekly, color, dayOfWeek);
+        return new Events(id, name, description, location, startTime, endTime, isWeekly, color, dayOfWeek);
     }
 
     public void deleteEvent(String eventName) {
@@ -144,16 +144,16 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         if (cursor != null && cursor.moveToFirst()) {
             // Loop through all instances with the same name
             do {
-                Event event = createEventFromCursor(cursor);
+                Events events = createEventFromCursor(cursor);
 
-                // Check if the event is weekly
-                if (event.isWeekly()) {
-                    // If it's a weekly event, delete all instances by its name
-                    db.delete(TABLE_EVENTS, COLUMN_NAME + "=?", new String[]{event.getName()});
+                // Check if the events is weekly
+                if (events.isWeekly()) {
+                    // If it's a weekly events, delete all instances by its name
+                    db.delete(TABLE_EVENTS, COLUMN_NAME + "=?", new String[]{events.getName()});
                     break; // Exit the loop after deletion
                 } else {
-                    // If it's not a weekly event, delete it by its name
-                    db.delete(TABLE_EVENTS, COLUMN_NAME + "=?", new String[]{event.getName()});
+                    // If it's not a weekly events, delete it by its name
+                    db.delete(TABLE_EVENTS, COLUMN_NAME + "=?", new String[]{events.getName()});
                 }
             } while (cursor.moveToNext());
         }
@@ -167,18 +167,18 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
 
 
-    public void updateEvent(Event event) {
+    public void updateEvent(Events events) {
         SQLiteDatabase db = this.getWritableDatabase();
         ContentValues values = new ContentValues();
-        values.put(COLUMN_NAME, event.getName());
-        values.put(COLUMN_DESCRIPTION, event.getDescription());
-        values.put(COLUMN_LOCATION, event.getLocation());
-        values.put(COLUMN_START_TIME, event.getStartTime().getTime());
-        values.put(COLUMN_END_TIME, event.getEndTime().getTime());
-        values.put(COLUMN_IS_WEEKLY, event.isWeekly() ? 1 : 0);
-        values.put(COLUMN_COLOR, event.getColor());
+        values.put(COLUMN_NAME, events.getName());
+        values.put(COLUMN_DESCRIPTION, events.getDescription());
+        values.put(COLUMN_LOCATION, events.getLocation());
+        values.put(COLUMN_START_TIME, events.getStartTime().getTime());
+        values.put(COLUMN_END_TIME, events.getEndTime().getTime());
+        values.put(COLUMN_IS_WEEKLY, events.isWeekly() ? 1 : 0);
+        values.put(COLUMN_COLOR, events.getColor());
 
-        db.update(TABLE_EVENTS, values, COLUMN_ID + "=?", new String[]{event.getId()});
+        db.update(TABLE_EVENTS, values, COLUMN_ID + "=?", new String[]{events.getId()});
         db.close();
     }
 
@@ -214,9 +214,9 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     }
 
     @SuppressLint("Range")
-    public Event getEventById(String eventId) {
+    public Events getEventById(String eventId) {
         SQLiteDatabase db = this.getReadableDatabase();
-        Event event = null;
+        Events events = null;
 
         String query = "SELECT * FROM events WHERE id = ?";
         Cursor cursor = db.rawQuery(query, new String[]{eventId});
@@ -240,12 +240,12 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                 Date startDate = new Date(startTimeMillis);
                 Date endDate = new Date(endTimeMillis);
 
-                // Create the Event object with the ID
-                event = new Event(id, name, description, location, startDate, endDate, false, color, dayOfWeek); // Include ID
+                // Create the Events object with the ID
+                events = new Events(id, name, description, location, startDate, endDate, false, color, dayOfWeek); // Include ID
 
-                Log.d("DatabaseHelper", "Event found: " + event.toString());
+                Log.d("DatabaseHelper", "Events found: " + events.toString());
             } else {
-                Log.e("DatabaseHelper", "No event found for ID: " + eventId);
+                Log.e("DatabaseHelper", "No events found for ID: " + eventId);
             }
 
             cursor.close();
@@ -254,7 +254,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         }
 
         db.close();
-        return event;
+        return events;
     }
 
     // Update a specific instance of a weekly activity for a specific day of the week

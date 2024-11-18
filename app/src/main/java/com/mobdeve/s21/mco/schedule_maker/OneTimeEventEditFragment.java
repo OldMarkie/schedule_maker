@@ -2,10 +2,7 @@ package com.mobdeve.s21.mco.schedule_maker;
 
 import static android.app.Activity.RESULT_OK;
 
-import android.content.Context;
-import android.content.DialogInterface;
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.content.res.ColorStateList;
 import android.graphics.Color;
 import android.os.Bundle;
@@ -28,8 +25,6 @@ import com.google.android.material.datepicker.MaterialDatePicker;
 import com.google.android.material.timepicker.MaterialTimePicker;
 import com.flask.colorpicker.ColorPickerView;
 import com.flask.colorpicker.builder.ColorPickerDialogBuilder;
-import com.flask.colorpicker.OnColorSelectedListener;
-import com.flask.colorpicker.builder.ColorPickerClickListener;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -37,7 +32,6 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
-import java.util.Locale;
 
 public class OneTimeEventEditFragment extends Fragment {
 
@@ -47,7 +41,7 @@ public class OneTimeEventEditFragment extends Fragment {
     private int selectedColor = Color.WHITE;
     private ColorUtils colorUtils;
     private DatabaseHelper dbHelper;
-    private Event currentEvent;  // Holds the event to be edited
+    private Events currentEvents;  // Holds the event to be edited
     private static final int MAP_REQUEST_CODE = 2;
 
     @Nullable
@@ -76,7 +70,7 @@ public class OneTimeEventEditFragment extends Fragment {
         Bundle args = getArguments();
         if (args != null) {
             String eventId = args.getString("eventId");
-            Log.d("OneTimeEventEditFragment", "Received Event ID: " + eventId);
+            Log.d("OneTimeEventEditFragment", "Received Events ID: " + eventId);
             // Load event data if editing
             if (getArguments() != null) {
                 loadEventData(eventId);
@@ -135,30 +129,30 @@ public class OneTimeEventEditFragment extends Fragment {
     }
 
     private void loadEventData(String eventId) {
-        Log.d("OneTimeEventEditFragment", "Loading event data for Event Name: " + eventId);
+        Log.d("OneTimeEventEditFragment", "Loading event data for Events Name: " + eventId);
 
         dbHelper = new DatabaseHelper(getContext());
-        currentEvent = dbHelper.getEventById(eventId);
+        currentEvents = dbHelper.getEventById(eventId);
 
-        if (currentEvent != null) {
-            Log.d("OneTimeEventEditFragment", "Event found: " + currentEvent.toString()); // Log the event details
-            eventNameInput.setText(currentEvent.getName());
-            eventDescriptionInput.setText(currentEvent.getDescription());
-            eventLocationInput.setText(currentEvent.getLocation());
+        if (currentEvents != null) {
+            Log.d("OneTimeEventEditFragment", "Events found: " + currentEvents.toString()); // Log the event details
+            eventNameInput.setText(currentEvents.getName());
+            eventDescriptionInput.setText(currentEvents.getDescription());
+            eventLocationInput.setText(currentEvents.getLocation());
 
             SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy");
             SimpleDateFormat timeFormat = new SimpleDateFormat("HH:mm");
 
-            eventDateInput.setText(dateFormat.format(currentEvent.getStartTime()));
-            eventTimeInput.setText(timeFormat.format(currentEvent.getStartTime()));
-            eventEndTimeInput.setText(timeFormat.format(currentEvent.getEndTime()));
+            eventDateInput.setText(dateFormat.format(currentEvents.getStartTime()));
+            eventTimeInput.setText(timeFormat.format(currentEvents.getStartTime()));
+            eventEndTimeInput.setText(timeFormat.format(currentEvents.getEndTime()));
 
-            selectedColor = currentEvent.getColor();
+            selectedColor = currentEvents.getColor();
             colorPickerInput.setBackgroundTintList(ColorStateList.valueOf(selectedColor));
             colorPickerInput.setHint(colorUtils.getNearestColorName(selectedColor));
             setTextColorBasedOnContrast(selectedColor);
 
-            Log.d("OneTimeEventEditFragment", "Event details populated in UI.");
+            Log.d("OneTimeEventEditFragment", "Events details populated in UI.");
         } else {
             Log.e("OneTimeEventEditFragment", "No event found for ID: " + eventId);
         }
@@ -190,7 +184,7 @@ public class OneTimeEventEditFragment extends Fragment {
     private void showDatePicker() {
         long todayInMillis = MaterialDatePicker.todayInUtcMilliseconds();
         MaterialDatePicker<Long> datePicker = MaterialDatePicker.Builder.datePicker()
-                .setTitleText("Select Event Date")
+                .setTitleText("Select Events Date")
                 .setSelection(todayInMillis)
                 .setCalendarConstraints(new CalendarConstraints.Builder()
                         .setStart(todayInMillis)
@@ -246,16 +240,16 @@ public class OneTimeEventEditFragment extends Fragment {
                 return;
             }
 
-            currentEvent.setName(eventName);
-            currentEvent.setDescription(eventDescription);
-            currentEvent.setLocation(eventLocation);
-            currentEvent.setStartTime(startDateTime);
-            currentEvent.setEndTime(endDateTime);
-            currentEvent.setColor(selectedColor);
+            currentEvents.setName(eventName);
+            currentEvents.setDescription(eventDescription);
+            currentEvents.setLocation(eventLocation);
+            currentEvents.setStartTime(startDateTime);
+            currentEvents.setEndTime(endDateTime);
+            currentEvents.setColor(selectedColor);
 
-            dbHelper.updateEvent(currentEvent);
+            dbHelper.updateEvent(currentEvents);
 
-            Toast.makeText(getActivity(), "Event updated successfully!", Toast.LENGTH_SHORT).show();
+            Toast.makeText(getActivity(), "Events updated successfully!", Toast.LENGTH_SHORT).show();
             FragmentManager fragmentManager = getParentFragmentManager();
             fragmentManager.popBackStack();
             backToEventList();

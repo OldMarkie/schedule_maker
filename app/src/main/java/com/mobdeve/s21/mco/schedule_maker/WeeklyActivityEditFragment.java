@@ -2,8 +2,6 @@ package com.mobdeve.s21.mco.schedule_maker;
 
 import static android.app.Activity.RESULT_OK;
 
-import android.app.TimePickerDialog;
-import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.res.ColorStateList;
@@ -11,11 +9,8 @@ import android.graphics.Color;
 import android.icu.text.SimpleDateFormat;
 import android.os.Bundle;
 
-import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.fragment.app.DialogFragment;
 import androidx.fragment.app.Fragment;
-import androidx.fragment.app.FragmentManager;
 
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -109,7 +104,7 @@ public class WeeklyActivityEditFragment extends Fragment {
         Bundle args = getArguments();
 
         String eventName = args.getString("eventName");
-        Log.d("OneTimeEventEditFragment", "Received Event Name: " + eventName);
+        Log.d("OneTimeEventEditFragment", "Received Events Name: " + eventName);
 
 
         // Load color names
@@ -367,11 +362,11 @@ public class WeeklyActivityEditFragment extends Fragment {
         int eventColor = colorStateList.getDefaultColor();
 
         // Debugging the dayWeek value
-        Log.d("Event", "dayWeek value: " + dayWeek);
+        Log.d("Events", "dayWeek value: " + dayWeek);
 
         // Ensure dayWeek is not null or invalid (set a default value if necessary)
         if (dayWeek < 1 || dayWeek > 7) {
-            Log.w("Event", "Invalid dayWeek value. Setting to default (0 - Monday).");
+            Log.w("Events", "Invalid dayWeek value. Setting to default (0 - Monday).");
             dayWeek = 1;  // Default to Sunday (or handle this appropriately)
         }
 
@@ -379,35 +374,35 @@ public class WeeklyActivityEditFragment extends Fragment {
 
             // Iterate through each week for the next year (52 weeks)
             for (int i = 0; i < 52; i++) {
-                // Create the start and end Date for the event instance
+                // Create the start and end Date for the events instance
                 Calendar eventDate = (Calendar) baseDate.clone();
                 eventDate.add(Calendar.WEEK_OF_YEAR, i); // Move to the correct week
 
                 Date eventStartDate = combineDateAndTime(eventDate, startTime);
                 Date eventEndDate = combineDateAndTime(eventDate, endTime);
 
-                Log.d("Event", "Event " + (i + 1) + " - Start: " + eventStartDate + ", End: " + eventEndDate);
+                Log.d("Events", "Events " + (i + 1) + " - Start: " + eventStartDate + ", End: " + eventEndDate);
 
                 // Check for conflicts
                 if (dbHelper.isTimeConflict(eventStartDate, eventEndDate)) {
-                    Toast.makeText(getActivity(), "Event time conflict for week " + (i + 1) + "!", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(getActivity(), "Events time conflict for week " + (i + 1) + "!", Toast.LENGTH_SHORT).show();
                     continue; // Optionally continue to check the next week
                 }
 
                 String counter = UUID.randomUUID().toString();
-                // Create the Event object
-                Event event = new Event(counter, name, description, location, eventStartDate, eventEndDate, true, eventColor, dayWeek);
+                // Create the Events object
+                Events events = new Events(counter, name, description, location, eventStartDate, eventEndDate, true, eventColor, dayWeek);
 
-                // Save the Event object to the database
-                boolean success = dbHelper.addEvent(event);
+                // Save the Events object to the database
+                boolean success = dbHelper.addEvent(events);
                 if (!success) {
-                    Toast.makeText(getContext(), "Failed to save event for week " + (i + 1), Toast.LENGTH_SHORT).show();
-                    Log.e("Event", "Failed to save event for week " + (i + 1));
+                    Toast.makeText(getContext(), "Failed to save events for week " + (i + 1), Toast.LENGTH_SHORT).show();
+                    Log.e("Events", "Failed to save events for week " + (i + 1));
                 } else {
-                    Log.d("Event", "Event saved for week " + (i + 1));
+                    Log.d("Events", "Events saved for week " + (i + 1));
                 }
             }
-            Toast.makeText(getContext(), "Weekly Event saved for a year!", Toast.LENGTH_SHORT).show();
+            Toast.makeText(getContext(), "Weekly Events saved for a year!", Toast.LENGTH_SHORT).show();
         } else {
             Toast.makeText(getContext(), "Invalid start or end time!", Toast.LENGTH_SHORT).show();
         }

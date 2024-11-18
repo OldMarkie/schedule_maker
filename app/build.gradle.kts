@@ -31,6 +31,13 @@ android {
         targetCompatibility = JavaVersion.VERSION_1_8
     }
 
+    packagingOptions {
+        exclude("META-INF/INDEX.LIST")
+        exclude("META-INF/DEPENDENCIES")
+        // You can add more exclusions if necessary:
+        // exclude 'META-INF/*.kotlin_module'
+        // exclude 'META-INF/LICENSE'
+
     kotlinOptions {
         jvmTarget = "1.8"
     }
@@ -53,7 +60,15 @@ dependencies {
     implementation(libs.sqlite)
     implementation(libs.places)
     implementation(libs.play.services.maps)
+    implementation(libs.play.services.auth)
+    implementation(libs.google.api.client.android)
+    implementation(libs.google.api.services.calendar)
     testImplementation(libs.junit)
     androidTestImplementation(libs.ext.junit)
     androidTestImplementation(libs.espresso.core)
+    }
+}
+dependencies {
+    implementation(libs.google.http.client.jackson2)
+    implementation(libs.google.http.client.android)
 }

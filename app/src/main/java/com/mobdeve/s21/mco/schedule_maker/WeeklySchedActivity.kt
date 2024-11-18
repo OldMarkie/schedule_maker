@@ -30,7 +30,7 @@ class WeeklySchedActivity : AppCompatActivity() {
         weekView.adapter = adapter
 
         viewModel.events.observe(this) { events ->
-            val myEvents = adapter.convertEventsToMyEvents(events) // Convert Event to MyEvent
+            val myEvents = adapter.convertEventsToMyEvents(events) // Convert Events to MyEvent
             adapter.submitList(myEvents) // Updates the adapter with the new event list
         }
 

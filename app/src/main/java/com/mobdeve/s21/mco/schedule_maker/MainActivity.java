@@ -10,11 +10,21 @@ import android.widget.TextView;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.app.AppCompatDelegate;
 import androidx.fragment.app.FragmentTransaction;
+
+import com.google.android.gms.auth.api.signin.GoogleSignIn;
+import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
+import com.google.android.gms.common.Scopes;
+import com.google.android.gms.common.api.Scope;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.android.libraries.places.api.Places;
 
 import java.util.Date;
 import java.util.Locale;
+
+import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
+import com.google.android.gms.auth.api.signin.GoogleSignInClient;
+import com.google.api.services.calendar.CalendarScopes;
+
 
 public class MainActivity extends AppCompatActivity {
 
@@ -26,6 +36,8 @@ public class MainActivity extends AppCompatActivity {
     private TextView currentDate;
     private Handler deletionHandler;
     private Runnable deletionRunnable;
+    private static final int RC_SIGN_IN = 9001;
+    private GoogleSignInClient googleSignInClient;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -109,6 +121,22 @@ public class MainActivity extends AppCompatActivity {
 
         // Load the LatestScheduleFragment
         loadLatestScheduleFragment();
+
+        // Google Sign-In Configuration
+        GoogleSignInOptions googleSignInOptions = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
+                .requestScopes(new Scope(CalendarScopes.CALENDAR))
+                .requestEmail()
+                .build();
+
+        googleSignInClient = GoogleSignIn.getClient(this, googleSignInOptions);
+
+        // Initiate Google Sign-In
+        findViewById(R.id.signInBtn).setOnClickListener(v -> {
+            Intent signInIntent = googleSignInClient.getSignInIntent();
+            startActivityForResult(signInIntent, RC_SIGN_IN);
+        });
+
+
     }
 
     // Update the loadLatestScheduleFragment method to use the correct ID
@@ -153,4 +181,7 @@ public class MainActivity extends AppCompatActivity {
         handler.removeCallbacks(runnable);  // Stop the clock updates when the activity is destroyed
         deletionHandler.removeCallbacks(deletionRunnable);
     }
+
+
+
 }

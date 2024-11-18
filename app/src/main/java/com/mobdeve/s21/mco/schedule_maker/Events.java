@@ -4,9 +4,8 @@ import androidx.annotation.NonNull;
 
 import java.io.Serializable;
 import java.util.Date;
-import java.util.UUID;
 
-public class Event implements Serializable {
+public class Events implements Serializable {
     private String id;           // Unique identifier for the event
     private String name;
     private String description;
@@ -18,7 +17,7 @@ public class Event implements Serializable {
     private int dayWeek;
 
 
-    public Event(String id, String name, String description, String location, Date startTime, Date endTime, boolean isWeekly,int color, int dayWeek) {
+    public Events(String id, String name, String description, String location, Date startTime, Date endTime, boolean isWeekly, int color, int dayWeek) {
         this.id = id;
         this.name = name;
         this.description = description;
@@ -107,7 +106,7 @@ public class Event implements Serializable {
     @NonNull
     @Override
     public String toString() {
-        return "Event{" +
+        return "Events{" +
                 "id='" + id + '\'' +
                 ", name='" + name + '\'' +
                 ", description='" + description + '\'' +

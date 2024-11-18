@@ -49,10 +49,10 @@ public class LatestScheduleFragment extends Fragment {
     }
 
     private void loadLatestSchedule() {
-        List<Event> events = DummyData.getEvents();  // Fetch the events from a data source
+        List<Events> events = DummyData.getEvents();  // Fetch the events from a data source
 
         if (!events.isEmpty()) {
-            Event nextEvent = events.get(0);  // Assuming this is sorted by date
+            Events nextEvents = events.get(0);  // Assuming this is sorted by date
 
             // Retrieve time format preference from SharedPreferences
             SharedPreferences sharedPreferences = requireContext().getSharedPreferences("ThemePref", requireContext().MODE_PRIVATE);
@@ -63,7 +63,7 @@ public class LatestScheduleFragment extends Fragment {
             SimpleDateFormat timeFormat = new SimpleDateFormat(timePattern, Locale.getDefault());
 
             // Get start time
-            Date startTime = nextEvent.getStartTime();
+            Date startTime = nextEvents.getStartTime();
 
             // Create a Calendar instance and set the time
             Calendar calendar = Calendar.getInstance();
@@ -77,10 +77,10 @@ public class LatestScheduleFragment extends Fragment {
 
             // Set text to the TextViews
             upcomingOrNon.setText("Upcoming");
-            latestSchedule.setText(nextEvent.getName());
-            eventTime.setText(timeFormat.format(nextEvent.getStartTime()) + " - " + timeFormat.format(nextEvent.getEndTime()) + " (" + dayOfWeek +")" );
-            eventDescription.setText(nextEvent.getDescription());
-            eventLocation.setText(nextEvent.getLocation());
+            latestSchedule.setText(nextEvents.getName());
+            eventTime.setText(timeFormat.format(nextEvents.getStartTime()) + " - " + timeFormat.format(nextEvents.getEndTime()) + " (" + dayOfWeek +")" );
+            eventDescription.setText(nextEvents.getDescription());
+            eventLocation.setText(nextEvents.getLocation());
         } else {
             upcomingOrNon.setText("No Schedule Stored");
             latestSchedule.setText("");

@@ -1,16 +1,10 @@
 package com.mobdeve.s21.mco.schedule_maker;
 
-import static android.content.Context.MODE_PRIVATE;
-
-import android.content.SharedPreferences;
-import android.content.res.ColorStateList;
-import android.graphics.Color;
 import android.icu.text.SimpleDateFormat;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.LinearLayout;
 import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.cardview.widget.CardView;
@@ -23,14 +17,14 @@ import java.util.Locale;
 
 public class EventAdapter extends RecyclerView.Adapter<EventAdapter.EventViewHolder> {
 
-    private List<Event> eventList;
+    private List<Events> eventsList;
     private FragmentActivity activity; // To manage fragment transactions for the dialog
     private EventDetailsDialogFragment.OnEventActionListener listener;
     private boolean is24HourFormat;
 
-    public EventAdapter(List<Event> eventList, FragmentActivity activity, EventDetailsDialogFragment.OnEventActionListener listener,
+    public EventAdapter(List<Events> eventsList, FragmentActivity activity, EventDetailsDialogFragment.OnEventActionListener listener,
                         boolean is24HourFormat) {
-        this.eventList = eventList;
+        this.eventsList = eventsList;
         this.activity = activity;
         this.listener = listener;
         this.is24HourFormat = is24HourFormat;
@@ -47,26 +41,26 @@ public class EventAdapter extends RecyclerView.Adapter<EventAdapter.EventViewHol
 
     @Override
     public void onBindViewHolder(EventViewHolder holder, int position) {
-        Event currentEvent = eventList.get(position);
-        Log.d("Event", "Event details: " + currentEvent.toString());
+        Events currentEvents = eventsList.get(position);
+        Log.d("Events", "Events details: " + currentEvents.toString());
 
         // Set event name
-        holder.eventName.setText(currentEvent.getName());
+        holder.eventName.setText(currentEvents.getName());
 
         // Format and set event start time and end time
-        String startTime = formatTime(currentEvent.getStartTime());
-        String endTime = formatTime(currentEvent.getEndTime());
+        String startTime = formatTime(currentEvents.getStartTime());
+        String endTime = formatTime(currentEvents.getEndTime());
         holder.eventTime.setText(startTime + " - " + endTime);
 
         // Set recurrence type or any other field if needed
-        holder.eventRecurrence.setText(currentEvent.isWeekly() ? "Weekly" : "One-time");
+        holder.eventRecurrence.setText(currentEvents.isWeekly() ? "Weekly" : "One-time");
 
-        int eventColor = currentEvent.getColor();
-        Log.d("EventAdapter", "Event color (HEX): " + Integer.toHexString(eventColor));
+        int eventColor = currentEvents.getColor();
+        Log.d("EventAdapter", "Events color (HEX): " + Integer.toHexString(eventColor));
 
         // Check if the event color is valid (non-transparent)
         if (eventColor == 0x000000 || eventColor == 0xFFFFFFFF) {
-            Log.w("EventAdapter", "Event color is invalid (black or white). Color: " + Integer.toHexString(eventColor));
+            Log.w("EventAdapter", "Events color is invalid (black or white). Color: " + Integer.toHexString(eventColor));
         }
 
         // Ensure detailsBackground is properly accessed
@@ -76,7 +70,7 @@ public class EventAdapter extends RecyclerView.Adapter<EventAdapter.EventViewHol
             holder.detailsBackground.setBackgroundColor(eventColor);
             Log.d("EventAdapter", "Set background color to: " + Integer.toHexString(eventColor));
         } else {
-            Log.e("EventAdapter", "detailsBackground is null for " + currentEvent.getName());
+            Log.e("EventAdapter", "detailsBackground is null for " + currentEvents.getName());
         }
 
         // Set text color for visibility against the background color
@@ -87,7 +81,7 @@ public class EventAdapter extends RecyclerView.Adapter<EventAdapter.EventViewHol
 
         // Set click listener to show event details
         holder.itemView.setOnClickListener(v -> {
-            EventDetailsDialogFragment dialog = EventDetailsDialogFragment.newInstance(currentEvent, listener);
+            EventDetailsDialogFragment dialog = EventDetailsDialogFragment.newInstance(currentEvents, listener);
             dialog.show(activity.getSupportFragmentManager(), "eventDetails");
         });
     }
@@ -105,7 +99,7 @@ public class EventAdapter extends RecyclerView.Adapter<EventAdapter.EventViewHol
 
     @Override
     public int getItemCount() {
-        return eventList.size();
+        return eventsList.size();
     }
 
     public static class EventViewHolder extends RecyclerView.ViewHolder {
@@ -133,9 +127,9 @@ public class EventAdapter extends RecyclerView.Adapter<EventAdapter.EventViewHol
     }
 
     // Method to update event list and refresh RecyclerView
-    public void updateEventList(List<Event> updatedEvents) {
-        this.eventList.clear();
-        this.eventList.addAll(updatedEvents); // Adding the updated events to the list
+    public void updateEventList(List<Events> updatedEvents) {
+        this.eventsList.clear();
+        this.eventsList.addAll(updatedEvents); // Adding the updated events to the list
         notifyDataSetChanged(); // Refresh the RecyclerView
     }
 

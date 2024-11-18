@@ -1,7 +1,6 @@
 package com.mobdeve.s21.mco.schedule_maker;
 
 import android.app.AlertDialog;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
@@ -29,7 +28,7 @@ public class EventListActivity extends AppCompatActivity {
 
     private RecyclerView recyclerView;
     private EventAdapter eventAdapter;
-    private List<Event> eventList;
+    private List<Events> eventsList;
     private TextView pageTitle, eventsForDateTitle;
     private CalendarView calendarView;
     private Date currentSelectedDate;
@@ -62,21 +61,21 @@ public class EventListActivity extends AppCompatActivity {
 
         // Set up RecyclerView for events of a selected date
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
-        eventList = new ArrayList<>();
-        eventAdapter = new EventAdapter(eventList, this, new EventDetailsDialogFragment.OnEventActionListener(){
+        eventsList = new ArrayList<>();
+        eventAdapter = new EventAdapter(eventsList, this, new EventDetailsDialogFragment.OnEventActionListener(){
             @Override
-            public void onEventDelete(Event event) {
-                confirmDeleteEvent(event);
+            public void onEventDelete(Events events) {
+                confirmDeleteEvent(events);
             }
 
             @Override
-            public void onEventEdit(Event event) {
-                Log.d("EventListActivity", "Editing Event: " + event.getName());
+            public void onEventEdit(Events events) {
+                Log.d("EventListActivity", "Editing Events: " + events.getName());
 
-                if (event.isWeekly()) {
-                    // Handle weekly event edit
+                if (events.isWeekly()) {
+                    // Handle weekly events edit
                     Bundle args = new Bundle();
-                    args.putString("eventName", event.getName()); // Pass the event ID
+                    args.putString("eventName", events.getName()); // Pass the events ID
                     WeeklyActivityEditFragment editFragment = new WeeklyActivityEditFragment();
                     editFragment.setArguments(args);
 
@@ -90,18 +89,18 @@ public class EventListActivity extends AppCompatActivity {
                     findViewById(R.id.mainAEL).setVisibility(View.GONE);
                     findViewById(R.id.editOneTImeEvent).setVisibility(View.VISIBLE); // Ensure container is correct
                 } else {
-                    // Handle one-time event edit
+                    // Handle one-time events edit
                     OneTimeEventEditFragment oneTimeEditDialog = new OneTimeEventEditFragment();
                     Bundle args = new Bundle();
 
-                    // Add event data to the bundle
-                    args.putString("eventId", event.getId());
-                    args.putString("eventName", event.getName());
-                    args.putString("eventDescription", event.getDescription());
-                    args.putString("eventLocation", event.getLocation());
-                    args.putLong("startTime", event.getStartTime().getTime());
-                    args.putLong("endTime", event.getEndTime().getTime());
-                    args.putInt("eventColor", event.getColor());
+                    // Add events data to the bundle
+                    args.putString("eventId", events.getId());
+                    args.putString("eventName", events.getName());
+                    args.putString("eventDescription", events.getDescription());
+                    args.putString("eventLocation", events.getLocation());
+                    args.putLong("startTime", events.getStartTime().getTime());
+                    args.putLong("endTime", events.getEndTime().getTime());
+                    args.putInt("eventColor", events.getColor());
 
                     // Set the arguments to the fragment
                     oneTimeEditDialog.setArguments(args);
@@ -175,29 +174,29 @@ public class EventListActivity extends AppCompatActivity {
         String selectedDateString = dateFormat.format(date);
         eventsForDateTitle.setText("Events for " + selectedDateString);
 
-        eventList.clear();  // Clear current event list
-        List<Event> eventsForDate = dbHelper.getEventsForDate(date);  // Fetch events from DatabaseHelper
+        eventsList.clear();  // Clear current event list
+        List<Events> eventsForDate = dbHelper.getEventsForDate(date);  // Fetch events from DatabaseHelper
         Log.d("EventAdapter", "Loaded " + eventsForDate.size() + " events for " + selectedDateString);
 
 
         if (eventsForDate.isEmpty()) {
             eventsForDateTitle.setText("No Scheduled Events For " + selectedDateString);
         } else {
-            eventList.addAll(eventsForDate);  // Add events if available
+            eventsList.addAll(eventsForDate);  // Add events if available
         }
 
-        Log.d("EventAdapter", "Item count: " + eventList.size());
+        Log.d("EventAdapter", "Item count: " + eventsList.size());
         eventAdapter.notifyDataSetChanged();
     }
 
-    // Method to confirm event deletion
-    private void confirmDeleteEvent(Event event) {
+    // Method to confirm events deletion
+    private void confirmDeleteEvent(Events events) {
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
-        builder.setTitle("Delete Event")
-                .setMessage("Are you sure you want to delete this event?")
+        builder.setTitle("Delete Events")
+                .setMessage("Are you sure you want to delete this events?")
                 .setPositiveButton("Delete", (dialog, which) -> {
-                    // Use DatabaseHelper to delete the event
-                    dbHelper.deleteEvent(event.getName()); // Call the delete method with event ID
+                    // Use DatabaseHelper to delete the events
+                    dbHelper.deleteEvent(events.getName()); // Call the delete method with events ID
                     loadEventsForDate(currentSelectedDate);  // Refresh events for the current date
                 })
                 .setNegativeButton("Cancel", null)

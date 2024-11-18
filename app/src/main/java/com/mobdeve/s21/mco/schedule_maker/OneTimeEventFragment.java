@@ -21,6 +21,8 @@ import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 
+import com.google.android.gms.auth.api.signin.GoogleSignIn;
+import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.libraries.places.api.Places;
 import com.google.android.material.datepicker.CalendarConstraints;
@@ -32,24 +34,24 @@ import com.flask.colorpicker.OnColorSelectedListener;
 import com.flask.colorpicker.builder.ColorPickerClickListener;
 import com.flask.colorpicker.builder.ColorPickerDialogBuilder;
 
-import com.google.android.gms.common.api.Status;
-import com.google.android.libraries.places.api.model.Place;
 import com.google.android.libraries.places.api.net.PlacesClient;
-import com.google.android.libraries.places.widget.Autocomplete;
-import com.google.android.libraries.places.widget.AutocompleteActivity;
-import com.google.android.libraries.places.widget.model.AutocompleteActivityMode;
+import com.google.api.client.extensions.android.http.AndroidHttp;
+import com.google.api.client.googleapis.extensions.android.gms.auth.GoogleAccountCredential;
+import com.google.api.client.json.jackson2.JacksonFactory;
+import com.google.api.client.util.DateTime;
+import com.google.api.services.calendar.CalendarScopes;
+import com.google.api.services.calendar.model.Event;
+import com.google.api.services.calendar.model.EventDateTime;
 
 import android.content.Intent;
-import androidx.annotation.Nullable;
 
 import java.io.IOException;
 import java.io.InputStream;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.Arrays;
 import java.util.Calendar;
+import java.util.Collections;
 import java.util.Date;
-import java.util.List;
 import java.util.UUID;
 
 public class OneTimeEventFragment extends Fragment {
@@ -200,7 +202,7 @@ public class OneTimeEventFragment extends Fragment {
 
         // Create a MaterialDatePicker with constraints
         MaterialDatePicker<Long> datePicker = MaterialDatePicker.Builder.datePicker()
-                .setTitleText("Select Event Date")
+                .setTitleText("Select Events Date")
                 .setSelection(todayInMillis) // Start with today's date selected
                 .setCalendarConstraints(new CalendarConstraints.Builder()
                         .setStart(todayInMillis) // Set the minimum date to today
@@ -303,24 +305,24 @@ public class OneTimeEventFragment extends Fragment {
             }
         }
 
-        // Create and save new Event
+        // Create and save new Events
         try {
             Date startDate = dateFormat.parse(startDateTimeString);
             Date endDate = dateFormat.parse(endDateTimeString);
 
             // Check for conflicts
             if (dbHelper.isTimeConflict(startDate, endDate)) {
-                Toast.makeText(getActivity(), "Event time conflict!", Toast.LENGTH_SHORT).show();
+                Toast.makeText(getActivity(), "Events time conflict!", Toast.LENGTH_SHORT).show();
                 return;
             }
 
             String eventId = UUID.randomUUID().toString();
             // Create and save the event
-            Event newEvent = new Event(eventId,eventName, eventDescription, eventLocation, startDate, endDate, false, eventColor, -1);
-            Log.d("OneTimeEventFragment", "Saving event: " + newEvent.toString());
-            dbHelper.addEvent(newEvent);
-
-            Toast.makeText(getActivity(), "One-Time Event Saved!", Toast.LENGTH_SHORT).show();
+            Events newEvents = new Events(eventId,eventName, eventDescription, eventLocation, startDate, endDate, false, eventColor, -1);
+            Log.d("OneTimeEventFragment", "Saving event: " + newEvents.toString());
+            dbHelper.addEvent(newEvents);
+            saveEventToGoogleCalendar(eventName, eventDescription, eventLocation, eventStartDateTime, eventEndDateTime);
+            Toast.makeText(getActivity(), "One-Time Events Saved!", Toast.LENGTH_SHORT).show();
             FragmentManager fragmentManager = getParentFragmentManager();
             fragmentManager.popBackStack(null, FragmentManager.POP_BACK_STACK_INCLUSIVE);
             ((EventActivity) getActivity()).resetEventActivity();
@@ -331,4 +333,52 @@ public class OneTimeEventFragment extends Fragment {
         }
 
     }
+
+    private void saveEventToGoogleCalendar(String title, String description, String location, Date startDateTime, Date endDateTime) {
+        // Initialize the Calendar API service
+        GoogleSignInAccount account = GoogleSignIn.getLastSignedInAccount(getContext());
+        if (account == null) {
+            Toast.makeText(getContext(), "You need to sign in with Google first!", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        GoogleAccountCredential credential = GoogleAccountCredential.usingOAuth2(
+                getContext(),
+                Collections.singleton(CalendarScopes.CALENDAR)
+        );
+        credential.setSelectedAccount(account.getAccount());
+
+        com.google.api.services.calendar.Calendar service = new com.google.api.services.calendar.Calendar.Builder(
+                AndroidHttp.newCompatibleTransport(),
+                JacksonFactory.getDefaultInstance(),
+                credential
+        ).setApplicationName("Schedule Maker").build();
+
+        // Create the Google Calendar Event
+        Event event = new Event()
+                .setSummary(title)
+                .setDescription(description)
+                .setLocation(location);
+
+        // Set start and end times
+        DateTime start = new DateTime(startDateTime);
+        EventDateTime startEventDateTime = new EventDateTime().setDateTime(start).setTimeZone("Asia/Manila");
+        event.setStart(startEventDateTime);
+
+        DateTime end = new DateTime(endDateTime);
+        EventDateTime endEventDateTime = new EventDateTime().setDateTime(end).setTimeZone("Asia/Manila");
+        event.setEnd(endEventDateTime);
+
+        // Insert event into the user's primary calendar
+        new Thread(() -> {
+            try {
+                service.events().insert("primary", event).execute();
+                getActivity().runOnUiThread(() -> Toast.makeText(getActivity(), "Event added to Google Calendar!", Toast.LENGTH_SHORT).show());
+            } catch (Exception e) {
+                getActivity().runOnUiThread(() -> Toast.makeText(getActivity(), "Failed to save event to Google Calendar", Toast.LENGTH_SHORT).show());
+                e.printStackTrace();
+            }
+        }).start();
+    }
+
 }

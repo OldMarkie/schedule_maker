@@ -5,8 +5,8 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 
 class WeeklySchedViewModel : ViewModel() {
-    private val _events = MutableLiveData<List<Event>>()
-    val events: LiveData<List<Event>> = _events
+    private val _events = MutableLiveData<List<Events>>()
+    val events: LiveData<List<Events>> = _events
 
     fun loadEvents() {
         // Simulate loading events (replace this with actual loading logic)
