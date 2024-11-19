@@ -521,6 +521,30 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         return googleEventIds;
     }
 
+    public List<Events> getWeeklyEvents() {
+        List<Events> weeklyEvents = new ArrayList<>();
+        SQLiteDatabase db = this.getReadableDatabase();
+
+        // Query to get all weekly events from the database
+        String query = "SELECT * FROM " + TABLE_EVENTS + " WHERE " + COLUMN_IS_WEEKLY + " = 1";
+        Cursor cursor = db.rawQuery(query, null);
+
+        // Iterate through the results
+        while (cursor.moveToNext()) {
+            // Create an event from the cursor
+            Events event = createEventFromCursor(cursor);
+            // Add the event to the list of weekly events
+            weeklyEvents.add(event);
+        }
+
+        // Close cursor and database
+        cursor.close();
+        db.close();
+
+        return weeklyEvents;
+    }
+
+
 
 
 }

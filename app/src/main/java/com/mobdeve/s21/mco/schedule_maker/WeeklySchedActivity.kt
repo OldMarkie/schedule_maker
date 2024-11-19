@@ -1,11 +1,18 @@
 package com.mobdeve.s21.mco.schedule_maker
 
+import android.content.Context
 import android.content.Intent
+import android.graphics.Bitmap
+import android.graphics.Canvas
 import android.os.Bundle
+import android.widget.Toast
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import com.alamkanak.weekview.WeekView // Import the WeekView class
 import com.google.android.material.floatingactionbutton.FloatingActionButton
+import io.opencensus.stats.View
+import java.io.File
+import java.io.FileOutputStream
 import java.util.Calendar
 
 class WeeklySchedActivity : AppCompatActivity() {
@@ -45,7 +52,43 @@ class WeeklySchedActivity : AppCompatActivity() {
             startActivity(intent)
             finish() // Optionally finish BasicActivity to remove it from the back stack
         }
+
+        val cptBtn: FloatingActionButton = findViewById(R.id.screenshotBtn)
+        cptBtn.setOnClickListener {
+            // Get the part of the screen you want to capture
+            val targetView: android.view.View = findViewById(R.id.screenshotArea) // Replace with your target view
+
+            // Create a Bitmap to store the screenshot
+            val bitmap = Bitmap.createBitmap(targetView.width, targetView.height, Bitmap.Config.ARGB_8888)
+
+            // Create a Canvas to draw the view into the Bitmap
+            val canvas = Canvas(bitmap)
+            targetView.draw(canvas)
+
+            // Optionally save the bitmap to a file (e.g., internal storage)
+            saveBitmapToFile(bitmap, this)
+
+            // Optionally show a Toast or message to confirm screenshot capture
+            Toast.makeText(this, "Screenshot captured!", Toast.LENGTH_SHORT).show()
+        }
+
     }
 }
+
+private fun saveBitmapToFile(bitmap: Bitmap, context: Context) {
+    try {
+        // Save the screenshot as a PNG file in internal storage
+        val file = File(context.filesDir, "schedule_screenshot.png")
+        val fos = FileOutputStream(file)
+        bitmap.compress(Bitmap.CompressFormat.PNG, 100, fos)
+        fos.flush()
+        fos.close()
+    } catch (e: Exception) {
+        e.printStackTrace()
+        Toast.makeText(context, "Error saving screenshot", Toast.LENGTH_SHORT).show()
+    }
+}
+
+
 
 
