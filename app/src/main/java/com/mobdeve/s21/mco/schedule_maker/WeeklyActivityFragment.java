@@ -385,9 +385,10 @@ public class WeeklyActivityFragment extends Fragment {
                 String counter = UUID.randomUUID().toString();
                 // Create the Events object
                 Events events = new Events(counter, name, description, location, eventStartDate, eventEndDate, true, eventColor, dayWeek);
-                saveEventToGoogleCalendar(name,description,location,eventStartDate,eventEndDate, events);
+
                 // Save the Events object to the database
                 boolean success = dbHelper.addEvent(events);
+                saveEventToGoogleCalendar(name,description,location,eventStartDate,eventEndDate, events);
                 if (!success) {
                     Toast.makeText(getContext(), "Failed to save events for week " + (i + 1), Toast.LENGTH_SHORT).show();
                     Log.e("Events", "Failed to save events for week " + (i + 1));

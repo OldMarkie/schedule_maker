@@ -2,6 +2,7 @@ package com.mobdeve.s21.mco.schedule_maker;
 
 import static android.app.Activity.RESULT_OK;
 
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.res.ColorStateList;
@@ -113,6 +114,7 @@ public class WeeklyActivityEditFragment extends Fragment {
         colorPickerInput.setHint("Electric Violet By Default");
         colorPickerInput.setHintTextColor(Color.WHITE);
         dbHelper = new DatabaseHelper(getContext());
+        weeklyDLT = new EventListActivity();
 
         Bundle args = getArguments();
 
@@ -321,6 +323,7 @@ public class WeeklyActivityEditFragment extends Fragment {
 
         if (isWeekly) {
             Calendar baseDate = Calendar.getInstance();
+            deleteAllInstancesFromGoogleCalendar(oldNameHolder);
             dbHelper.deleteEvent(oldNameHolder);
 
 
@@ -406,9 +409,9 @@ public class WeeklyActivityEditFragment extends Fragment {
                 String counter = UUID.randomUUID().toString();
                 // Create the Events object
                 Events events = new Events(counter, name, description, location, eventStartDate, eventEndDate, true, eventColor, dayWeek);
-                saveEventToGoogleCalendar(name,description,location,eventStartDate,eventEndDate);
                 // Save the Events object to the database
                 boolean success = dbHelper.addEvent(events);
+                saveEventToGoogleCalendar(name,description,location,eventStartDate,eventEndDate, events);
                 if (!success) {
                     Toast.makeText(getContext(), "Failed to save events for week " + (i + 1), Toast.LENGTH_SHORT).show();
                     Log.e("Events", "Failed to save events for week " + (i + 1));
@@ -423,7 +426,7 @@ public class WeeklyActivityEditFragment extends Fragment {
     }
 
 
-    private void saveEventToGoogleCalendar(String title, String description, String location, Date startDateTime, Date endDateTime) {
+    private void saveEventToGoogleCalendar(String title, String description, String location, Date startDateTime, Date endDateTime, Events newEvents) {
         // Initialize the Calendar API service
         GoogleSignInAccount account = GoogleSignIn.getLastSignedInAccount(getContext());
         if (account == null) {
@@ -445,11 +448,15 @@ public class WeeklyActivityEditFragment extends Fragment {
                 credential
         ).setApplicationName("Schedule Maker").build();
 
+        String sanitizedId = newEvents.getId().replace("-", "").toLowerCase();
         // Create the Google Calendar Event
         Event event = new Event()
+                .setId(sanitizedId)
                 .setSummary(title)
                 .setDescription(description)
                 .setLocation(location);
+
+        newEvents.setGoogleEventId(event.getId());
 
         // Set start and end times
         DateTime start = new DateTime(startDateTime);
@@ -471,10 +478,18 @@ public class WeeklyActivityEditFragment extends Fragment {
                 .setOverrides(Arrays.asList(reminders));
         event.setReminders(eventReminders);
 
+        Context context = getContext();
         // Insert event into the user's primary calendar
         new Thread(() -> {
             try {
-                service.events().insert("primary", event).execute();
+                Event insertedEvent = service.events().insert("primary", event).execute();
+                String googleEventId = insertedEvent.getId();
+                Log.d("GoogleCalendarEvent", "Inserted Event ID: " + googleEventId);
+                newEvents.setGoogleEventId(googleEventId);
+                DatabaseHelper dbHelper = new DatabaseHelper(context);
+                dbHelper.updateEventWithGoogleEventId(newEvents);
+                Log.d("GoogleCalendarEvent", "Event saved to database");
+
 
                 // Safely access the activity for UI updates
                 if (getActivity() != null && isAdded()) {
@@ -493,6 +508,59 @@ public class WeeklyActivityEditFragment extends Fragment {
         }).start();
     }
 
+    private void deleteAllInstancesFromGoogleCalendar(String eventName) {
+        Log.d("GoogleCalendarDelete", "Attempting to delete all instances of recurring event: " + eventName);
+
+        // Ensure the user is signed in with Google
+        GoogleSignInAccount account = GoogleSignIn.getLastSignedInAccount(requireContext()); // Use 'requireContext()' for Fragment
+        if (account == null) {
+            Log.e("GoogleCalendarDelete", "Google account not signed in");
+            Toast.makeText(requireContext(), "You need to sign in with Google first!", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        // Initialize Google Calendar API credentials
+        GoogleAccountCredential credential = GoogleAccountCredential.usingOAuth2(
+                requireContext(), // Use 'requireContext()' for Fragment
+                Collections.singleton(CalendarScopes.CALENDAR)
+        );
+        credential.setSelectedAccount(account.getAccount());
+        Log.d("GoogleCalendarDelete", "Google API credentials initialized");
+
+        // Initialize Google Calendar API service
+        com.google.api.services.calendar.Calendar service = new com.google.api.services.calendar.Calendar.Builder(
+                AndroidHttp.newCompatibleTransport(),
+                JacksonFactory.getDefaultInstance(),
+                credential
+        ).setApplicationName("Schedule Maker").build();
+
+        // Retrieve all Google Calendar event IDs for this recurring event
+        List<String> googleEventIds = dbHelper.getGoogleEventIdsForRecurringEvent(eventName);
+        if (googleEventIds == null || googleEventIds.isEmpty()) {
+            Log.e("GoogleCalendarDelete", "No Google Event IDs found for recurring event: " + eventName);
+            Toast.makeText(requireContext(), "No Google Calendar events found for this recurring event!", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        Log.d("GoogleCalendarDelete", "Google Event IDs found: " + googleEventIds);
+
+        // Start a background thread to delete all events
+        new Thread(() -> {
+            for (String googleEventId : googleEventIds) {
+                try {
+                    // Delete each event from Google Calendar
+                    service.events().delete("primary", googleEventId).execute();
+                    Log.d("GoogleCalendarDelete", "Successfully deleted Google Calendar event: " + googleEventId);
+                } catch (Exception e) {
+                    Log.e("GoogleCalendarDelete", "Failed to delete event with ID: " + googleEventId, e);
+                }
+            }
+            // Notify the user of success
+            requireActivity().runOnUiThread(() ->
+                    Toast.makeText(requireContext(), "All instances of the recurring event deleted from Google Calendar!", Toast.LENGTH_SHORT).show()
+            );
+        }).start();
+    }
 
 
 
@@ -622,6 +690,9 @@ public class WeeklyActivityEditFragment extends Fragment {
             endInput.setOnClickListener(v -> showTimePicker(endInput));
         }
     }
+
+
+
 
     private void setTimeInputVisibility() {
         mondayStartTimeInput.setVisibility(View.GONE);
