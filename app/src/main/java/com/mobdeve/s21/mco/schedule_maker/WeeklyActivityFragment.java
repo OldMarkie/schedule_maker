@@ -40,11 +40,13 @@ import com.google.api.client.util.DateTime;
 import com.google.api.services.calendar.CalendarScopes;
 import com.google.api.services.calendar.model.Event;
 import com.google.api.services.calendar.model.EventDateTime;
+import com.google.api.services.calendar.model.EventReminder;
 
 import java.io.IOException;
 import java.io.InputStream;
 import java.text.ParseException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Collections;
 import java.util.Date;
@@ -364,7 +366,7 @@ public class WeeklyActivityFragment extends Fragment {
         if (startTime != null && endTime != null) {
 
             // Iterate through each week for the next year (52 weeks)
-            for (int i = 0; i < 52; i++) {
+            for (int i = 0; i < 13; i++) {
                 // Create the start and end Date for the events instance
                 Calendar eventDate = (Calendar) baseDate.clone();
                 eventDate.add(Calendar.WEEK_OF_YEAR, i); // Move to the correct week
@@ -383,7 +385,7 @@ public class WeeklyActivityFragment extends Fragment {
                 String counter = UUID.randomUUID().toString();
                 // Create the Events object
                 Events events = new Events(counter, name, description, location, eventStartDate, eventEndDate, true, eventColor, dayWeek);
-
+                saveEventToGoogleCalendar(name,description,location,eventStartDate,eventEndDate, events);
                 // Save the Events object to the database
                 boolean success = dbHelper.addEvent(events);
                 if (!success) {
@@ -391,17 +393,16 @@ public class WeeklyActivityFragment extends Fragment {
                     Log.e("Events", "Failed to save events for week " + (i + 1));
                 } else {
                     Log.d("Events", "Events saved for week " + (i + 1));
-                    saveEventToGoogleCalendar(name,description,location,eventStartDate,eventEndDate);
                 }
             }
-            Toast.makeText(getContext(), "Weekly Events saved for a year!", Toast.LENGTH_SHORT).show();
+            Toast.makeText(getContext(), "Weekly Events Saved for Three Months!", Toast.LENGTH_SHORT).show();
         } else {
             Toast.makeText(getContext(), "Invalid start or end time!", Toast.LENGTH_SHORT).show();
         }
     }
 
 
-    private void saveEventToGoogleCalendar(String title, String description, String location, Date startDateTime, Date endDateTime) {
+    private void saveEventToGoogleCalendar(String title, String description, String location, Date startDateTime, Date endDateTime, Events newEvents) {
         // Initialize the Calendar API service
         GoogleSignInAccount account = GoogleSignIn.getLastSignedInAccount(getContext());
         if (account == null) {
@@ -423,11 +424,15 @@ public class WeeklyActivityFragment extends Fragment {
                 credential
         ).setApplicationName("Schedule Maker").build();
 
+        String sanitizedId = newEvents.getId().replace("-", "").toLowerCase();
         // Create the Google Calendar Event
         Event event = new Event()
+                .setId(sanitizedId)
                 .setSummary(title)
                 .setDescription(description)
                 .setLocation(location);
+
+        newEvents.setGoogleEventId(event.getId());
 
         // Set start and end times
         DateTime start = new DateTime(startDateTime);
@@ -438,10 +443,29 @@ public class WeeklyActivityFragment extends Fragment {
         EventDateTime endEventDateTime = new EventDateTime().setDateTime(end).setTimeZone("Asia/Manila");
         event.setEnd(endEventDateTime);
 
+        // Add notifications (reminders)
+        EventReminder[] reminders = new EventReminder[]{
+                new EventReminder().setMethod("popup").setMinutes(10),  // Pop-up reminder 10 minutes before
+                new EventReminder().setMethod("email").setMinutes(30)   // Email reminder 30 minutes before
+        };
+
+        Event.Reminders eventReminders = new Event.Reminders()
+                .setUseDefault(false)  // Disable default reminders
+                .setOverrides(Arrays.asList(reminders));
+        event.setReminders(eventReminders);
+
+        Context context = getContext();
         // Insert event into the user's primary calendar
         new Thread(() -> {
             try {
-                service.events().insert("primary", event).execute();
+                Event insertedEvent = service.events().insert("primary", event).execute();
+                String googleEventId = insertedEvent.getId();
+                Log.d("GoogleCalendarEvent", "Inserted Event ID: " + googleEventId);
+                newEvents.setGoogleEventId(googleEventId);
+                DatabaseHelper dbHelper = new DatabaseHelper(context);
+                dbHelper.updateEventWithGoogleEventId(newEvents);
+                Log.d("GoogleCalendarEvent", "Event saved to database");
+
 
                 // Safely access the activity for UI updates
                 if (getActivity() != null && isAdded()) {

@@ -25,13 +25,25 @@ import com.flask.colorpicker.ColorPickerView;
 import com.flask.colorpicker.OnColorSelectedListener;
 import com.flask.colorpicker.builder.ColorPickerClickListener;
 import com.flask.colorpicker.builder.ColorPickerDialogBuilder;
+import com.google.android.gms.auth.api.signin.GoogleSignIn;
+import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.material.timepicker.MaterialTimePicker;
+import com.google.api.client.extensions.android.http.AndroidHttp;
+import com.google.api.client.googleapis.extensions.android.gms.auth.GoogleAccountCredential;
+import com.google.api.client.json.jackson2.JacksonFactory;
+import com.google.api.client.util.DateTime;
+import com.google.api.services.calendar.CalendarScopes;
+import com.google.api.services.calendar.model.Event;
+import com.google.api.services.calendar.model.EventDateTime;
+import com.google.api.services.calendar.model.EventReminder;
 
 import java.io.IOException;
 import java.io.InputStream;
 import java.text.ParseException;
+import java.util.Arrays;
 import java.util.Calendar;
+import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 import java.util.UUID;
@@ -373,7 +385,7 @@ public class WeeklyActivityEditFragment extends Fragment {
         if (startTime != null && endTime != null) {
 
             // Iterate through each week for the next year (52 weeks)
-            for (int i = 0; i < 52; i++) {
+            for (int i = 0; i < 13; i++) {
                 // Create the start and end Date for the events instance
                 Calendar eventDate = (Calendar) baseDate.clone();
                 eventDate.add(Calendar.WEEK_OF_YEAR, i); // Move to the correct week
@@ -392,7 +404,7 @@ public class WeeklyActivityEditFragment extends Fragment {
                 String counter = UUID.randomUUID().toString();
                 // Create the Events object
                 Events events = new Events(counter, name, description, location, eventStartDate, eventEndDate, true, eventColor, dayWeek);
-
+                saveEventToGoogleCalendar(name,description,location,eventStartDate,eventEndDate);
                 // Save the Events object to the database
                 boolean success = dbHelper.addEvent(events);
                 if (!success) {
@@ -408,6 +420,76 @@ public class WeeklyActivityEditFragment extends Fragment {
         }
     }
 
+
+    private void saveEventToGoogleCalendar(String title, String description, String location, Date startDateTime, Date endDateTime) {
+        // Initialize the Calendar API service
+        GoogleSignInAccount account = GoogleSignIn.getLastSignedInAccount(getContext());
+        if (account == null) {
+            if (getContext() != null) {
+                Toast.makeText(getContext(), "You need to sign in with Google first!", Toast.LENGTH_SHORT).show();
+            }
+            return;
+        }
+
+        GoogleAccountCredential credential = GoogleAccountCredential.usingOAuth2(
+                getContext(),
+                Collections.singleton(CalendarScopes.CALENDAR)
+        );
+        credential.setSelectedAccount(account.getAccount());
+
+        com.google.api.services.calendar.Calendar service = new com.google.api.services.calendar.Calendar.Builder(
+                AndroidHttp.newCompatibleTransport(),
+                JacksonFactory.getDefaultInstance(),
+                credential
+        ).setApplicationName("Schedule Maker").build();
+
+        // Create the Google Calendar Event
+        Event event = new Event()
+                .setSummary(title)
+                .setDescription(description)
+                .setLocation(location);
+
+        // Set start and end times
+        DateTime start = new DateTime(startDateTime);
+        EventDateTime startEventDateTime = new EventDateTime().setDateTime(start).setTimeZone("Asia/Manila");
+        event.setStart(startEventDateTime);
+
+        DateTime end = new DateTime(endDateTime);
+        EventDateTime endEventDateTime = new EventDateTime().setDateTime(end).setTimeZone("Asia/Manila");
+        event.setEnd(endEventDateTime);
+
+        // Add notifications (reminders)
+        EventReminder[] reminders = new EventReminder[]{
+                new EventReminder().setMethod("popup").setMinutes(10),  // Pop-up reminder 10 minutes before
+                new EventReminder().setMethod("email").setMinutes(30)   // Email reminder 30 minutes before
+        };
+
+        Event.Reminders eventReminders = new Event.Reminders()
+                .setUseDefault(false)  // Disable default reminders
+                .setOverrides(Arrays.asList(reminders));
+        event.setReminders(eventReminders);
+
+        // Insert event into the user's primary calendar
+        new Thread(() -> {
+            try {
+                service.events().insert("primary", event).execute();
+
+                // Safely access the activity for UI updates
+                if (getActivity() != null && isAdded()) {
+                    getActivity().runOnUiThread(() ->
+                            Toast.makeText(getActivity(), "Event added to Google Calendar!", Toast.LENGTH_SHORT).show()
+                    );
+                }
+            } catch (Exception e) {
+                if (getActivity() != null && isAdded()) {
+                    getActivity().runOnUiThread(() ->
+                            Toast.makeText(getActivity(), "Failed to save event to Google Calendar", Toast.LENGTH_SHORT).show()
+                    );
+                }
+                e.printStackTrace();
+            }
+        }).start();
+    }
 
 
 

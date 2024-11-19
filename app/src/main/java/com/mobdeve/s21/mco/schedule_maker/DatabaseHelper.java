@@ -75,7 +75,6 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         values.put(COLUMN_GOOGLE_ID, events.getGoogleEventId());
 
         long result = db.insert(TABLE_EVENTS, null, values);
-        db.close();
         return result != -1;
 
     }
