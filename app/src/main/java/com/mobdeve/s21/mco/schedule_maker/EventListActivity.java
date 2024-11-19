@@ -1,6 +1,10 @@
 package com.mobdeve.s21.mco.schedule_maker;
 
+import static android.app.PendingIntent.getActivity;
+import static java.security.AccessController.getContext;
+
 import android.app.AlertDialog;
+import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
@@ -9,17 +13,26 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.CalendarView;
 import android.widget.TextView;
+import android.widget.Toast;
+
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.FragmentManager;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
-import com.google.android.material.bottomnavigation.BottomNavigationView;
 
+import com.google.android.gms.auth.api.signin.GoogleSignIn;
+import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
+import com.google.android.material.bottomnavigation.BottomNavigationView;
+import com.google.api.client.extensions.android.http.AndroidHttp;
+import com.google.api.client.googleapis.extensions.android.gms.auth.GoogleAccountCredential;
+import com.google.api.client.json.jackson2.JacksonFactory;
+import com.google.api.services.calendar.CalendarScopes;
 
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 import java.util.Locale;
@@ -191,23 +204,104 @@ public class EventListActivity extends AppCompatActivity {
 
     // Method to confirm events deletion
     private void confirmDeleteEvent(Events events) {
+        Log.d("ConfirmDeleteEvent", "User initiated delete for event: " + events.getName());
+        //Events updatedEvent = dbHelper.getEventById(events.getId());
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
         builder.setTitle("Delete Events")
-                .setMessage("Are you sure you want to delete this events?")
+                .setMessage("Are you sure you want to delete this event?")
                 .setPositiveButton("Delete", (dialog, which) -> {
-                    // Use DatabaseHelper to delete the events
+                    Log.d("ConfirmDeleteEvent", "User confirmed deletion for event: " + events.getName());
+
+                    // Use DatabaseHelper to delete the event
+                    deleteEventFromGoogleCalendar(events);
                     dbHelper.deleteEvent(events.getName()); // Call the delete method with events ID
+                    Log.d("ConfirmDeleteEvent", "Event deleted from local database: " + events.getName());
+
                     loadEventsForDate(currentSelectedDate);  // Refresh events for the current date
+                    Log.d("ConfirmDeleteEvent", "Events reloaded for date: " + currentSelectedDate);
+                    refreshEventsForCurrentDate();
                 })
-                .setNegativeButton("Cancel", null)
+                .setNegativeButton("Cancel", (dialog, which) ->
+                        Log.d("ConfirmDeleteEvent", "User canceled event deletion: " + events.getName())
+                )
                 .show();
     }
+
+    // Method to delete event from Google Calendar
+    private void deleteEventFromGoogleCalendar(Events event) {
+        Log.d("GoogleCalendarDelete", "Attempting to delete event from Google Calendar: " + event.getName());
+        Log.d("ConfirmDeleteEvent", "User initiated delete for event: " + formatEventDetails(event));
+        // Ensure the user is signed in with Google
+        GoogleSignInAccount account = GoogleSignIn.getLastSignedInAccount(this); // Use 'this' for Activity context
+        if (account == null) {
+            Log.e("GoogleCalendarDelete", "Google account not signed in");
+            Toast.makeText(this, "You need to sign in with Google first!", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        // Initialize Google Calendar API credentials
+        GoogleAccountCredential credential = GoogleAccountCredential.usingOAuth2(
+                this, // Use 'this' for Activity context
+                Collections.singleton(CalendarScopes.CALENDAR)
+        );
+        credential.setSelectedAccount(account.getAccount());
+        Log.d("GoogleCalendarDelete", "Google API credentials initialized");
+
+        // Initialize Google Calendar API service
+        com.google.api.services.calendar.Calendar service = new com.google.api.services.calendar.Calendar.Builder(
+                AndroidHttp.newCompatibleTransport(),
+                JacksonFactory.getDefaultInstance(),
+                credential
+        ).setApplicationName("Schedule Maker").build();
+
+        // Get the Google Event ID
+        String googleEventId = event.getGoogleEventId();
+        if (googleEventId == null || googleEventId.isEmpty()) {
+            Log.e("GoogleCalendarDelete", "Google Event ID is missing for event: " + event.getName());
+            Toast.makeText(this, "Google Calendar Event ID not found!", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        Log.d("GoogleCalendarDelete", "Google Event ID found: " + googleEventId);
+
+        // Start a background thread to perform the deletion
+        new Thread(() -> {
+            try {
+                // Delete the event from Google Calendar
+                service.events().delete("primary", googleEventId).execute();
+                Log.d("GoogleCalendarDelete", "Successfully deleted Google Calendar event: " + googleEventId);
+                //dbHelper.deleteEvent(event.getName());
+                // Notify the user of success
+                runOnUiThread(() ->
+                        Toast.makeText(this, "Event deleted from Google Calendar!", Toast.LENGTH_SHORT).show()
+                );
+            } catch (Exception e) {
+                Log.e("GoogleCalendarDelete", "Failed to delete event from Google Calendar", e);
+                runOnUiThread(() ->
+                        Toast.makeText(this, "Failed to delete event from Google Calendar", Toast.LENGTH_SHORT).show()
+                );
+            }
+        }).start();
+    }
+
+
+
 
     public void refreshEventsForCurrentDate() {
         loadEventsForDate(currentSelectedDate);
         eventAdapter.notifyDataSetChanged();
     }
 
+    private String formatEventDetails(Events event) {
+        return "Event Details: " +
+                "\nID: " + event.getId() +
+                "\nName: " + event.getName() +
+                "\nDescription: " + event.getDescription() +
+                "\nLocation: " + event.getLocation() +
+                "\nStart: " + event.getStartTime() +
+                "\nEnd: " + event.getEndTime() +
+                "\nGoogle Event ID: " + (event.getGoogleEventId() != null ? event.getGoogleEventId() : "N/A");
+    }
 
 
 

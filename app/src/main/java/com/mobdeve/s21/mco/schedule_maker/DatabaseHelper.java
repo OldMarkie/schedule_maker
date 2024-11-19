@@ -135,8 +135,9 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         boolean isWeekly = cursor.getInt(cursor.getColumnIndexOrThrow(COLUMN_IS_WEEKLY)) == 1;
         int color = cursor.getInt(cursor.getColumnIndexOrThrow(COLUMN_COLOR));
         int dayOfWeek = cursor.getInt(cursor.getColumnIndexOrThrow(COLUMN_DAY_OF_WEEK));
+        String googleEventId = cursor.getString(cursor.getColumnIndexOrThrow(COLUMN_GOOGLE_ID));
 
-        return new Events(id, name, description, location, startTime, endTime, isWeekly, color, dayOfWeek);
+        return new Events(id, name, description, location, startTime, endTime, isWeekly, color, dayOfWeek, googleEventId);
     }
 
     public void deleteEvent(String eventName) {
@@ -239,13 +240,14 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                 long endTimeMillis = cursor.getLong(cursor.getColumnIndexOrThrow("end_time"));
                 int color = cursor.getInt(cursor.getColumnIndexOrThrow("color"));
                 int dayOfWeek = cursor.getInt(cursor.getColumnIndexOrThrow("day_of_week"));
+                String googleEventId = cursor.getString(cursor.getColumnIndexOrThrow("google_id"));
 
                 // Convert start and end times from milliseconds to Date objects
                 Date startDate = new Date(startTimeMillis);
                 Date endDate = new Date(endTimeMillis);
 
                 // Create the Events object with the ID
-                events = new Events(id, name, description, location, startDate, endDate, false, color, dayOfWeek); // Include ID
+                events = new Events(id, name, description, location, startDate, endDate, false, color, dayOfWeek, googleEventId); // Include ID
 
                 Log.d("DatabaseHelper", "Events found: " + events.toString());
             } else {
