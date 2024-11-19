@@ -43,6 +43,7 @@ import com.google.api.client.util.DateTime;
 import com.google.api.services.calendar.CalendarScopes;
 import com.google.api.services.calendar.model.Event;
 import com.google.api.services.calendar.model.EventDateTime;
+import com.google.api.services.calendar.model.EventReminder;
 
 import android.content.Intent;
 
@@ -50,6 +51,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Collections;
 import java.util.Date;
@@ -378,6 +380,18 @@ public class OneTimeEventFragment extends Fragment {
         DateTime end = new DateTime(endDateTime);
         EventDateTime endEventDateTime = new EventDateTime().setDateTime(end).setTimeZone("Asia/Manila");
         event.setEnd(endEventDateTime);
+
+        // Add notifications (reminders)
+        EventReminder[] reminders = new EventReminder[]{
+                new EventReminder().setMethod("popup").setMinutes(10),  // Pop-up reminder 10 minutes before
+                new EventReminder().setMethod("email").setMinutes(30)   // Email reminder 30 minutes before
+        };
+
+        Event.Reminders eventReminders = new Event.Reminders()
+                .setUseDefault(false)  // Disable default reminders
+                .setOverrides(Arrays.asList(reminders));
+        event.setReminders(eventReminders);
+
         Context context = getContext();
         // Insert event into the user's primary calendar
         new Thread(() -> {
