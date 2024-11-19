@@ -10,10 +10,15 @@ import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import com.alamkanak.weekview.WeekView // Import the WeekView class
 import com.google.android.material.floatingactionbutton.FloatingActionButton
-import io.opencensus.stats.View
 import java.io.File
 import java.io.FileOutputStream
 import java.util.Calendar
+
+import android.content.ContentValues
+import android.os.Build
+import android.provider.MediaStore
+import java.io.IOException
+
 
 class WeeklySchedActivity : AppCompatActivity() {
     private val viewModel by viewModels<WeeklySchedViewModel>()
@@ -66,7 +71,7 @@ class WeeklySchedActivity : AppCompatActivity() {
             targetView.draw(canvas)
 
             // Optionally save the bitmap to a file (e.g., internal storage)
-            saveBitmapToFile(bitmap, this)
+            saveBitmapToGallery(bitmap, this)
 
             // Optionally show a Toast or message to confirm screenshot capture
             Toast.makeText(this, "Screenshot captured!", Toast.LENGTH_SHORT).show()
@@ -75,15 +80,33 @@ class WeeklySchedActivity : AppCompatActivity() {
     }
 }
 
-private fun saveBitmapToFile(bitmap: Bitmap, context: Context) {
+private fun saveBitmapToGallery(bitmap: Bitmap, context: Context) {
     try {
-        // Save the screenshot as a PNG file in internal storage
-        val file = File(context.filesDir, "schedule_screenshot.png")
-        val fos = FileOutputStream(file)
-        bitmap.compress(Bitmap.CompressFormat.PNG, 100, fos)
-        fos.flush()
-        fos.close()
-    } catch (e: Exception) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+            // For Android 10 and above, save to Pictures directory using MediaStore
+            val contentValues = ContentValues().apply {
+                put(MediaStore.Images.Media.DISPLAY_NAME, "schedule_screenshot.png")
+                put(MediaStore.Images.Media.MIME_TYPE, "image/png")
+                put(MediaStore.Images.Media.RELATIVE_PATH, "Pictures/")  // Save in the Pictures folder
+            }
+
+            val resolver = context.contentResolver
+            val imageUri = resolver.insert(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, contentValues)
+
+            imageUri?.let { uri ->
+                resolver.openOutputStream(uri)?.use { outputStream ->
+                    bitmap.compress(Bitmap.CompressFormat.PNG, 100, outputStream)
+                }
+            }
+        } else {
+            // For devices below Android 10, save to internal storage or legacy external storage
+            val file = File(context.getExternalFilesDir(null), "schedule_screenshot.png")
+            val fos = FileOutputStream(file)
+            bitmap.compress(Bitmap.CompressFormat.PNG, 100, fos)
+            fos.flush()
+            fos.close()
+        }
+    } catch (e: IOException) {
         e.printStackTrace()
         Toast.makeText(context, "Error saving screenshot", Toast.LENGTH_SHORT).show()
     }
