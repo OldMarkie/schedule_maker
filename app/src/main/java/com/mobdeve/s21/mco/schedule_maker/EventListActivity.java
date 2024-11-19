@@ -210,13 +210,18 @@ public class EventListActivity extends AppCompatActivity {
         builder.setTitle("Delete Events")
                 .setMessage("Are you sure you want to delete this event?")
                 .setPositiveButton("Delete", (dialog, which) -> {
-                    Log.d("ConfirmDeleteEvent", "User confirmed deletion for event: " + events.getName());
-
-                    // Use DatabaseHelper to delete the event
-                    deleteEventFromGoogleCalendar(events);
-                    dbHelper.deleteEvent(events.getName()); // Call the delete method with events ID
-                    Log.d("ConfirmDeleteEvent", "Event deleted from local database: " + events.getName());
-
+                    if(events.isWeekly()){
+                        Log.d("ConfirmDeleteEvent", "User confirmed deletion for event: " + events.getName());
+                        deleteAllInstancesFromGoogleCalendar(events);
+                        dbHelper.deleteEvent(events.getName());
+                        Log.d("ConfirmDeleteEvent", "Event deleted from local database: " + events.getName());
+                    }else{
+                        Log.d("ConfirmDeleteEvent", "User confirmed deletion for event: " + events.getName());
+                        // Use DatabaseHelper to delete the event
+                        deleteEventFromGoogleCalendar(events);
+                        dbHelper.deleteEvent(events.getName()); // Call the delete method with events ID
+                        Log.d("ConfirmDeleteEvent", "Event deleted from local database: " + events.getName());
+                    }
                     loadEventsForDate(currentSelectedDate);  // Refresh events for the current date
                     Log.d("ConfirmDeleteEvent", "Events reloaded for date: " + currentSelectedDate);
                     refreshEventsForCurrentDate();
@@ -283,6 +288,62 @@ public class EventListActivity extends AppCompatActivity {
             }
         }).start();
     }
+
+    // Method to delete all Google Calendar instances of a recurring event
+    private void deleteAllInstancesFromGoogleCalendar(Events recurringEvent) {
+        Log.d("GoogleCalendarDelete", "Attempting to delete all instances of recurring event: " + recurringEvent.getName());
+
+        // Ensure the user is signed in with Google
+        GoogleSignInAccount account = GoogleSignIn.getLastSignedInAccount(this); // Use 'this' for Activity context
+        if (account == null) {
+            Log.e("GoogleCalendarDelete", "Google account not signed in");
+            Toast.makeText(this, "You need to sign in with Google first!", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        // Initialize Google Calendar API credentials
+        GoogleAccountCredential credential = GoogleAccountCredential.usingOAuth2(
+                this, // Use 'this' for Activity context
+                Collections.singleton(CalendarScopes.CALENDAR)
+        );
+        credential.setSelectedAccount(account.getAccount());
+        Log.d("GoogleCalendarDelete", "Google API credentials initialized");
+
+        // Initialize Google Calendar API service
+        com.google.api.services.calendar.Calendar service = new com.google.api.services.calendar.Calendar.Builder(
+                AndroidHttp.newCompatibleTransport(),
+                JacksonFactory.getDefaultInstance(),
+                credential
+        ).setApplicationName("Schedule Maker").build();
+
+        // Retrieve all Google Calendar event IDs for this recurring event
+        List<String> googleEventIds = dbHelper.getGoogleEventIdsForRecurringEvent(recurringEvent.getName());
+        if (googleEventIds == null || googleEventIds.isEmpty()) {
+            Log.e("GoogleCalendarDelete", "No Google Event IDs found for recurring event: " + recurringEvent.getName());
+            Toast.makeText(this, "No Google Calendar events found for this recurring event!", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        Log.d("GoogleCalendarDelete", "Google Event IDs found: " + googleEventIds);
+
+        // Start a background thread to delete all events
+        new Thread(() -> {
+            for (String googleEventId : googleEventIds) {
+                try {
+                    // Delete each event from Google Calendar
+                    service.events().delete("primary", googleEventId).execute();
+                    Log.d("GoogleCalendarDelete", "Successfully deleted Google Calendar event: " + googleEventId);
+                } catch (Exception e) {
+                    Log.e("GoogleCalendarDelete", "Failed to delete event with ID: " + googleEventId, e);
+                }
+            }
+            // Notify the user of success
+            runOnUiThread(() ->
+                    Toast.makeText(this, "All instances of the recurring event deleted from Google Calendar!", Toast.LENGTH_SHORT).show()
+            );
+        }).start();
+    }
+
 
 
 

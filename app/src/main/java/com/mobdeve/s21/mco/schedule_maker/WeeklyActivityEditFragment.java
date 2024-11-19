@@ -52,6 +52,7 @@ public class WeeklyActivityEditFragment extends Fragment {
 
     // DatabaseHelper instance
     private DatabaseHelper dbHelper;
+    private EventListActivity weeklyDLT;
 
     // Other fields...
     private EditText activityNameInput, activityDescriptionInput, activityLocationInput;
@@ -321,6 +322,7 @@ public class WeeklyActivityEditFragment extends Fragment {
         if (isWeekly) {
             Calendar baseDate = Calendar.getInstance();
             dbHelper.deleteEvent(oldNameHolder);
+
 
             if (checkMonday.isChecked()) {
                 baseDate.set(Calendar.DAY_OF_WEEK, Calendar.MONDAY);
