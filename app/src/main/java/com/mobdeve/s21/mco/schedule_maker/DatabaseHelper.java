@@ -490,7 +490,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         // Log the values being updated for debugging
         Log.d("DatabaseHelper", "Updating Google Event ID for Event: " + event.getName() + ", ID: " + event.getGoogleEventId());
 
-        int rowsAffected = db.update(TABLE_EVENTS, values, COLUMN_NAME + " = ?", new String[]{event.getName()});
+        int rowsAffected = db.update(TABLE_EVENTS, values, COLUMN_ID + " = ?", new String[]{event.getId()});
 
         if (rowsAffected > 0) {
             Log.d("DatabaseHelper", "Event updated successfully in the database.");
@@ -499,7 +499,27 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         }
     }
 
+    public List<String> getGoogleEventIdsForRecurringEvent(String eventName) {
+        SQLiteDatabase db = this.getReadableDatabase();
+        List<String> googleEventIds = new ArrayList<>();
+        Cursor cursor = db.query(TABLE_EVENTS,
+                new String[]{COLUMN_GOOGLE_ID},
+                COLUMN_NAME + "=?",
+                new String[]{eventName},
+                null, null, null);
 
+        if (cursor != null) {
+            while (cursor.moveToNext()) {
+                String googleEventId = cursor.getString(cursor.getColumnIndexOrThrow(COLUMN_GOOGLE_ID));
+                if (googleEventId != null && !googleEventId.isEmpty()) {
+                    googleEventIds.add(googleEventId);
+                }
+            }
+            cursor.close();
+        }
+        db.close();
+        return googleEventIds;
+    }
 
 
 
