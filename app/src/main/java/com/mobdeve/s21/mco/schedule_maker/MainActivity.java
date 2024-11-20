@@ -36,8 +36,7 @@ public class MainActivity extends AppCompatActivity {
     private TextView currentDate;
     private Handler deletionHandler;
     private Runnable deletionRunnable;
-    private static final int RC_SIGN_IN = 9001;
-    private GoogleSignInClient googleSignInClient;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -121,20 +120,6 @@ public class MainActivity extends AppCompatActivity {
 
         // Load the LatestScheduleFragment
         loadLatestScheduleFragment();
-
-        // Google Sign-In Configuration
-        GoogleSignInOptions googleSignInOptions = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
-                .requestScopes(new Scope(CalendarScopes.CALENDAR))
-                .requestEmail()
-                .build();
-
-        googleSignInClient = GoogleSignIn.getClient(this, googleSignInOptions);
-
-        // Initiate Google Sign-In
-        findViewById(R.id.signInBtn).setOnClickListener(v -> {
-            Intent signInIntent = googleSignInClient.getSignInIntent();
-            startActivityForResult(signInIntent, RC_SIGN_IN);
-        });
 
 
     }

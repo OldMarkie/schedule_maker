@@ -521,6 +521,33 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         return googleEventIds;
     }
 
+    public List<String> getGoogleEventIdsForEvents() {
+        SQLiteDatabase db = this.getReadableDatabase();
+        List<String> googleEventIds = new ArrayList<>();
+        Cursor cursor = db.query(TABLE_EVENTS, // table name
+                new String[]{COLUMN_GOOGLE_ID},   // columns to retrieve
+                null,                             // no WHERE clause
+                null,                             // no arguments for WHERE clause
+                null,                             // no GROUP BY
+                null,                             // no HAVING
+                null);                            // no ORDER BY
+
+
+        if (cursor != null) {
+            while (cursor.moveToNext()) {
+                String googleEventId = cursor.getString(cursor.getColumnIndexOrThrow(COLUMN_GOOGLE_ID));
+                if (googleEventId != null && !googleEventId.isEmpty()) {
+                    googleEventIds.add(googleEventId);
+                }
+            }
+            cursor.close();
+        }
+        db.close();
+        return googleEventIds;
+    }
+
+
+
     public List<Events> getWeeklyEvents() {
         List<Events> weeklyEvents = new ArrayList<>();
         SQLiteDatabase db = this.getReadableDatabase();
@@ -545,6 +572,9 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     }
 
 
-
+    public void clearAllEvents() {
+        SQLiteDatabase db = this.getWritableDatabase();
+        db.execSQL("DELETE FROM " + TABLE_EVENTS);
+    }
 
 }
