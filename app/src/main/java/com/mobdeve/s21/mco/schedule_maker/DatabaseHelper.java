@@ -598,4 +598,49 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         return allEvents;
     }
 
+    public Events getLatestEvent() {
+        SQLiteDatabase db = this.getReadableDatabase();
+        Events event = null;
+
+        // Query to get the latest event based on start_time
+        String query = "SELECT * FROM " + TABLE_EVENTS + " WHERE start_time >= ? ORDER BY start_time ASC LIMIT 1";
+        String currentTime = String.valueOf(System.currentTimeMillis());
+
+        Cursor cursor = db.rawQuery(query, new String[]{currentTime});
+
+        if (cursor.moveToFirst()) {
+            // Extract all required fields from the cursor
+            String id = cursor.getString(cursor.getColumnIndexOrThrow("id"));
+            String name = cursor.getString(cursor.getColumnIndexOrThrow("name"));
+            String description = cursor.getString(cursor.getColumnIndexOrThrow("description"));
+            String location = cursor.getString(cursor.getColumnIndexOrThrow("location"));
+            long startTimeMillis = cursor.getLong(cursor.getColumnIndexOrThrow("start_time"));
+            long endTimeMillis = cursor.getLong(cursor.getColumnIndexOrThrow("end_time"));
+            boolean isWeekly = cursor.getInt(cursor.getColumnIndexOrThrow("is_weekly")) == 1;
+            int color = cursor.getInt(cursor.getColumnIndexOrThrow("color"));
+            int dayOfWeek = cursor.getInt(cursor.getColumnIndexOrThrow("day_of_week"));
+            String googleEventId = cursor.getString(cursor.getColumnIndexOrThrow("google_id"));
+
+            // Create a new Events object
+            event = new Events(
+                    id,
+                    name,
+                    description,
+                    location,
+                    new Date(startTimeMillis),
+                    new Date(endTimeMillis),
+                    isWeekly,
+                    color,
+                    dayOfWeek,
+                    googleEventId
+            );
+        }
+
+        cursor.close();
+        db.close();
+
+        return event;
+    }
+
+
 }
