@@ -264,7 +264,7 @@ public class OneTimeEventEditFragment extends Fragment {
             currentEvents.setColor(selectedColor);
             currentEvents.setGoogleEventId(sanitizedGoogleid);
 
-            dbHelper.updateEvent(currentEvents);
+            //dbHelper.updateEvent(currentEvents);
             updateEventInGoogleCalendar(eventName, eventDescription, eventLocation, startDateTime, endDateTime, currentEvents);
             Toast.makeText(getActivity(), "Events updated successfully!", Toast.LENGTH_SHORT).show();
             FragmentManager fragmentManager = getParentFragmentManager();
@@ -349,6 +349,8 @@ public class OneTimeEventEditFragment extends Fragment {
         // Update event in Google Calendar
         new Thread(() -> {
             try {
+                DatabaseHelper dbHelper = new DatabaseHelper(context);
+                dbHelper.updateEvent(currentEvents);
                 // Log the URL being used for the update request
                 String eventId = event.getId();
                 String updateUrl = "https://www.googleapis.com/calendar/v3/calendars/primary/events/" + eventId;
@@ -361,7 +363,6 @@ public class OneTimeEventEditFragment extends Fragment {
 
                 // Update the event with the new Google Event ID in your local database
                 newEvents.setGoogleEventId(updatedGoogleEventId);
-                DatabaseHelper dbHelper = new DatabaseHelper(context);
                 dbHelper.updateEventWithGoogleEventId(newEvents);
                 Log.d("GoogleCalendarEvent", "Event updated in database");
 

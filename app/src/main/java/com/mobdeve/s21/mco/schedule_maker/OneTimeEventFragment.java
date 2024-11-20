@@ -326,9 +326,8 @@ public class OneTimeEventFragment extends Fragment {
             // Create and save the event
             Events newEvents = new Events(eventId,eventName, eventDescription, eventLocation, startDate, endDate, false, eventColor, -1);
             Log.d("OneTimeEventFragment", "Saving event: " + newEvents.toString());
-            dbHelper.addEvent(newEvents);
+            //dbHelper.addEvent(newEvents);
             saveEventToGoogleCalendar(eventName, eventDescription, eventLocation, eventStartDateTime, eventEndDateTime, newEvents);
-            Toast.makeText(getActivity(), "One-Time Events Saved!", Toast.LENGTH_SHORT).show();
             FragmentManager fragmentManager = getParentFragmentManager();
             fragmentManager.popBackStack(null, FragmentManager.POP_BACK_STACK_INCLUSIVE);
             ((EventActivity) getActivity()).resetEventActivity();
@@ -396,11 +395,12 @@ public class OneTimeEventFragment extends Fragment {
         // Insert event into the user's primary calendar
         new Thread(() -> {
             try {
+                DatabaseHelper dbHelper = new DatabaseHelper(context);
+                dbHelper.addEvent(newEvents);
                 Event insertedEvent = service.events().insert("primary", event).execute();
                 String googleEventId = insertedEvent.getId();
                 Log.d("GoogleCalendarEvent", "Inserted Event ID: " + googleEventId);
                 newEvents.setGoogleEventId(googleEventId);
-                DatabaseHelper dbHelper = new DatabaseHelper(context);
                 dbHelper.updateEventWithGoogleEventId(newEvents);
                 Log.d("GoogleCalendarEvent", "Event saved to database");
 

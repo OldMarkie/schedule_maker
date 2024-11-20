@@ -409,30 +409,34 @@ public class WeeklyActivityEditFragment extends Fragment {
                 String counter = UUID.randomUUID().toString();
                 // Create the Events object
                 Events events = new Events(counter, name, description, location, eventStartDate, eventEndDate, true, eventColor, dayWeek);
+
                 // Save the Events object to the database
-                boolean success = dbHelper.addEvent(events);
-                saveEventToGoogleCalendar(name,description,location,eventStartDate,eventEndDate, events);
-                if (!success) {
-                    Toast.makeText(getContext(), "Failed to save events for week " + (i + 1), Toast.LENGTH_SHORT).show();
-                    Log.e("Events", "Failed to save events for week " + (i + 1));
-                } else {
-                    Log.d("Events", "Events saved for week " + (i + 1));
-                }
+                //boolean success = dbHelper.addEvent(events);
+                int finalI = i;
+                saveEventToGoogleCalendar(name, description, location, eventStartDate, eventEndDate, events, success -> {
+                    if (!success) {
+                        Toast.makeText(getContext(), "Failed to save event for week " + (finalI + 1), Toast.LENGTH_SHORT).show();
+                        Log.e("Events", "Failed to save event for week " + (finalI + 1));
+                    } else {
+                        Log.d("Events", "Event saved for week " + (finalI + 1));
+                    }
+                });
             }
-            Toast.makeText(getContext(), "Weekly Events saved for a year!", Toast.LENGTH_SHORT).show();
+            Toast.makeText(getContext(), "Weekly Events Saved for Three Months!", Toast.LENGTH_SHORT).show();
         } else {
             Toast.makeText(getContext(), "Invalid start or end time!", Toast.LENGTH_SHORT).show();
         }
     }
 
 
-    private void saveEventToGoogleCalendar(String title, String description, String location, Date startDateTime, Date endDateTime, Events newEvents) {
+    private void saveEventToGoogleCalendar(String title, String description, String location, Date startDateTime, Date endDateTime, Events newEvents, WeeklyActivityFragment.SaveEventCallback callback) {
         // Initialize the Calendar API service
         GoogleSignInAccount account = GoogleSignIn.getLastSignedInAccount(getContext());
         if (account == null) {
             if (getContext() != null) {
                 Toast.makeText(getContext(), "You need to sign in with Google first!", Toast.LENGTH_SHORT).show();
             }
+            callback.onComplete(false); // Callback with failure
             return;
         }
 
@@ -482,26 +486,28 @@ public class WeeklyActivityEditFragment extends Fragment {
         // Insert event into the user's primary calendar
         new Thread(() -> {
             try {
+                DatabaseHelper dbHelper = new DatabaseHelper(context);
+                dbHelper.addEvent(newEvents);
                 Event insertedEvent = service.events().insert("primary", event).execute();
                 String googleEventId = insertedEvent.getId();
                 Log.d("GoogleCalendarEvent", "Inserted Event ID: " + googleEventId);
                 newEvents.setGoogleEventId(googleEventId);
-                DatabaseHelper dbHelper = new DatabaseHelper(context);
                 dbHelper.updateEventWithGoogleEventId(newEvents);
                 Log.d("GoogleCalendarEvent", "Event saved to database");
 
-
                 // Safely access the activity for UI updates
                 if (getActivity() != null && isAdded()) {
-                    getActivity().runOnUiThread(() ->
-                            Toast.makeText(getActivity(), "Event added to Google Calendar!", Toast.LENGTH_SHORT).show()
-                    );
+                    getActivity().runOnUiThread(() -> {
+                        Toast.makeText(getActivity(), "Event added to Google Calendar!", Toast.LENGTH_SHORT).show();
+                        callback.onComplete(true); // Notify callback with success
+                    });
                 }
             } catch (Exception e) {
                 if (getActivity() != null && isAdded()) {
-                    getActivity().runOnUiThread(() ->
-                            Toast.makeText(getActivity(), "Failed to save event to Google Calendar", Toast.LENGTH_SHORT).show()
-                    );
+                    getActivity().runOnUiThread(() -> {
+                        Toast.makeText(getActivity(), "Failed to save event to Google Calendar", Toast.LENGTH_SHORT).show();
+                        callback.onComplete(false); // Notify callback with failure
+                    });
                 }
                 e.printStackTrace();
             }
