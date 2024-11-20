@@ -35,6 +35,7 @@ public class MainActivity extends AppCompatActivity {
     private TextView currentDate;
     private Handler deletionHandler;
     private Runnable deletionRunnable;
+    private DatabaseHelper dbHelper;
 
 
     @Override
@@ -65,6 +66,8 @@ public class MainActivity extends AppCompatActivity {
         // Set up the BottomNavigationView
         BottomNavigationView bottomNavigationView = findViewById(R.id.bottomNavigationView);
         bottomNavigationView.setSelectedItemId(R.id.nav_home);  // Highlight Home as the selected tab
+
+        dbHelper = new DatabaseHelper(this);
 
         // Schedule the deletion of past events
         deletionHandler = new Handler();
@@ -127,8 +130,8 @@ public class MainActivity extends AppCompatActivity {
     private void loadLatestScheduleFragment() {
         LatestScheduleFragment latestScheduleFragment = new LatestScheduleFragment();
         FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
-        transaction.replace(R.id.fragmentContainerView, latestScheduleFragment);  // Use the correct container ID
-        transaction.commit();
+        transaction.replace(R.id.fragmentContainerView, latestScheduleFragment);
+        transaction.commitNowAllowingStateLoss();
     }
 
     // Update the digital clock based on user preference (24-hour or 12-hour format)
@@ -159,12 +162,12 @@ public class MainActivity extends AppCompatActivity {
         dbHelper.deletePastEvents();
     }
 
-    @Override
+    /*@Override
     protected void onDestroy() {
         super.onDestroy();
         handler.removeCallbacks(runnable);  // Stop the clock updates when the activity is destroyed
         deletionHandler.removeCallbacks(deletionRunnable);
-    }
+    }*/
 
 
 

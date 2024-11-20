@@ -97,11 +97,5 @@ public class LatestScheduleFragment extends Fragment {
         eventTime.setText("");
     }
 
-    @Override
-    public void onDestroyView() {
-        super.onDestroyView();
-        if (dbHelper != null) {
-            dbHelper.close();
-        }
-    }
+
 }

@@ -110,7 +110,6 @@ public class DatabaseHelper extends SQLiteOpenHelper {
             }
         }
         cursor.close();
-        db.close();
         return events;
     }
 
@@ -166,7 +165,6 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         if (cursor != null) {
             cursor.close();
         }
-        db.close();
     }
 
 
@@ -183,7 +181,6 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         values.put(COLUMN_COLOR, events.getColor());
 
         db.update(TABLE_EVENTS, values, COLUMN_ID + "=?", new String[]{events.getId()});
-        db.close();
     }
 
     public boolean isTimeConflict(Date startTime, Date endTime) {
@@ -201,7 +198,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         boolean conflictExists = cursor.getCount() > 0;
 
         cursor.close();
-        db.close();
+        
 
         return conflictExists;
     }
@@ -213,7 +210,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         boolean exists = cursor.getCount() > 0;
 
         cursor.close();
-        db.close();
+        
         return exists;
     }
 
@@ -258,7 +255,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
             Log.e("DatabaseHelper", "Cursor is null.");
         }
 
-        db.close();
+        
         return events;
     }
 
@@ -275,7 +272,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         // Update the specific instance of the weekly activity
         int rowsAffected = db.update(TABLE_EVENTS, values, COLUMN_ID + "=? AND " + COLUMN_DAY_OF_WEEK + "=?",
                 new String[]{eventId, String.valueOf(dayOfWeek)});
-        db.close();
+        
 
         return rowsAffected > 0;
     }
@@ -293,7 +290,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         }
 
         cursor.close();
-        db.close();
+        
 
         return daysOfWeek;
     }
@@ -341,7 +338,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                 cursor.close();
             }
             if (db != null) {
-                db.close();
+                
             }
         }
 
@@ -391,7 +388,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                 cursor.close();
             }
             if (db != null) {
-                db.close();
+                
             }
         }
 
@@ -421,7 +418,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         // Log the result
         Log.d("UpdateDebug", "Rows affected: " + rowsAffected);
 
-        db.close();
+        
         return rowsAffected > 0;
     }
 
@@ -469,7 +466,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         // Log the number of rows deleted
         Log.d("DeleteDebug", "Rows deleted: " + rowsDeleted);
 
-        db.close();
+        
 
         return rowsDeleted > 0;
     }
@@ -478,7 +475,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         SQLiteDatabase db = this.getWritableDatabase();
         long currentTime = System.currentTimeMillis();
         db.delete(TABLE_EVENTS, COLUMN_END_TIME + " < ?", new String[]{String.valueOf(currentTime)});
-        db.close();
+
     }
 
     public void updateEventWithGoogleEventId(Events event) {
@@ -517,7 +514,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
             }
             cursor.close();
         }
-        db.close();
+        
         return googleEventIds;
     }
 
@@ -542,7 +539,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
             }
             cursor.close();
         }
-        db.close();
+        
         return googleEventIds;
     }
 
@@ -566,7 +563,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
         // Close cursor and database
         cursor.close();
-        db.close();
+        
 
         return weeklyEvents;
     }
@@ -594,7 +591,6 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         }
 
         cursor.close();
-        db.close();
         return allEvents;
     }
 
@@ -637,8 +633,6 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         }
 
         cursor.close();
-        db.close();
-
         return event;
     }
 

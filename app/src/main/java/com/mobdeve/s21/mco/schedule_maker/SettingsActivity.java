@@ -59,6 +59,7 @@ public class SettingsActivity extends AppCompatActivity {
         // Retrieve preferences for dark mode and time format
         boolean isDarkMode = sharedPreferences.getBoolean("isDarkMode", false);
         boolean is24HourFormat = sharedPreferences.getBoolean("is24HourFormat", false);
+        boolean isNotificationsEnabled = sharedPreferences.getBoolean("isNotificationsEnabled", false);
 
         // Set dark mode based on the saved preference
         AppCompatDelegate.setDefaultNightMode(isDarkMode ? AppCompatDelegate.MODE_NIGHT_YES : AppCompatDelegate.MODE_NIGHT_NO);
@@ -80,9 +81,14 @@ public class SettingsActivity extends AppCompatActivity {
         // Set switch states based on saved preferences
         themeSwitch.setChecked(isDarkMode);
         timeFormatSwitch.setChecked(is24HourFormat);
+        notificationSwitch.setChecked(isNotificationsEnabled);
+
 
 
         notificationSwitch.setOnCheckedChangeListener((buttonView, isChecked) -> {
+            editor.putBoolean("isNotificationsEnabled", isChecked);
+            editor.apply();
+
             if (!isChecked) {
                 new EnableNotificationsTask().execute(true);
             } else {
