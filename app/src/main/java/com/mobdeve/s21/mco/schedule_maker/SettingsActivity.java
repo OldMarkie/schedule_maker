@@ -5,6 +5,7 @@ import static androidx.core.content.ContentProviderCompat.requireContext;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.res.ColorStateList;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
@@ -25,6 +26,7 @@ import com.google.api.client.extensions.android.http.AndroidHttp;
 import com.google.api.client.googleapis.extensions.android.gms.auth.GoogleAccountCredential;
 import com.google.api.client.http.javanet.NetHttpTransport;
 import com.google.api.client.json.jackson2.JacksonFactory;
+import com.google.api.services.calendar.Calendar;
 import com.google.api.services.calendar.CalendarScopes;
 import com.google.api.services.calendar.model.Event;
 
@@ -39,7 +41,7 @@ public class SettingsActivity extends AppCompatActivity {
 
     private View LinkAccount, AccountName;
     private TextView pageTitle, userNameTextView;
-    private Switch themeSwitch, timeFormatSwitch;
+    private Switch themeSwitch, timeFormatSwitch, notificationSwitch;
     private SharedPreferences sharedPreferences;
     private SharedPreferences.Editor editor;
     private GoogleSignInClient googleSignInClient;
@@ -73,10 +75,21 @@ public class SettingsActivity extends AppCompatActivity {
         // Initialize switches
         themeSwitch = findViewById(R.id.themeSwitch);
         timeFormatSwitch = findViewById(R.id.timeFormatSwitch);
+        notificationSwitch = findViewById(R.id.notifSwitch);
 
         // Set switch states based on saved preferences
         themeSwitch.setChecked(isDarkMode);
         timeFormatSwitch.setChecked(is24HourFormat);
+
+
+        notificationSwitch.setOnCheckedChangeListener((buttonView, isChecked) -> {
+            if (!isChecked) {
+                new EnableNotificationsTask().execute(true);
+            } else {
+                new EnableNotificationsTask().execute(false);
+            }
+        });
+
 
         // Set listener for theme switch
         themeSwitch.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
@@ -191,6 +204,44 @@ public class SettingsActivity extends AppCompatActivity {
         });
     }
 
+    private void enableGoogleCalendarEventNotifications(Events event, com.google.api.services.calendar.Calendar service) {
+        try {
+            // Fetch the event from Google Calendar
+            Event googleEvent = service.events().get("primary", event.getGoogleEventId()).execute();
+
+            // Enable reminders for this event
+            Event.Reminders eventReminders = new Event.Reminders()
+                    .setUseDefault(true);  // Enable default reminders
+            googleEvent.setReminders(eventReminders);
+
+            // Update the event with the reminders
+            service.events().update("primary", googleEvent.getId(), googleEvent).execute();
+            Log.d("GoogleCalendar", "Notifications enabled for event: " + event.getGoogleEventId());
+        } catch (Exception e) {
+            Log.e("GoogleCalendar", "Failed to enable notifications for event: " + event.getGoogleEventId(), e);
+        }
+    }
+
+
+    private void disableGoogleCalendarEventNotifications(Events event, com.google.api.services.calendar.Calendar service) {
+        try {
+            // Fetch the event from Google Calendar
+            Event googleEvent = service.events().get("primary", event.getGoogleEventId()).execute();
+
+            // Disable all reminders for this event
+            Event.Reminders eventReminders = new Event.Reminders()
+                    .setUseDefault(false);  // Disabling all reminders
+            googleEvent.setReminders(eventReminders);
+
+            // Update the event with no notifications
+            service.events().update("primary", googleEvent.getId(), googleEvent).execute();
+            Log.d("GoogleCalendar", "Notifications disabled for event: " + event.getGoogleEventId());
+        } catch (Exception e) {
+            Log.e("GoogleCalendar", "Failed to disable notifications for event: " + event.getGoogleEventId(), e);
+        }
+    }
+
+
     private void deleteLocalDatabaseContents() {
         DatabaseHelper dbHelper = new DatabaseHelper(this);
         dbHelper.clearAllEvents();
@@ -253,6 +304,50 @@ public class SettingsActivity extends AppCompatActivity {
         }).start();
     }
 
+
+    // AsyncTask to handle enabling/disabling notifications
+    private class EnableNotificationsTask extends AsyncTask<Boolean, Void, Void> {
+        @Override
+        protected Void doInBackground(Boolean... params) {
+            boolean enableNotifications = params[0];
+
+            GoogleSignInAccount account = GoogleSignIn.getLastSignedInAccount(SettingsActivity.this);
+            if (account != null) {
+                GoogleAccountCredential credential = GoogleAccountCredential.usingOAuth2(
+                        SettingsActivity.this,
+                        Collections.singleton(CalendarScopes.CALENDAR)
+                );
+                credential.setSelectedAccount(account.getAccount());
+
+                com.google.api.services.calendar.Calendar service = new com.google.api.services.calendar.Calendar.Builder(
+                        AndroidHttp.newCompatibleTransport(),
+                        JacksonFactory.getDefaultInstance(),
+                        credential
+                ).setApplicationName("Schedule Maker").build();
+
+                // Get all events from your local database
+                DatabaseHelper dbHelper = new DatabaseHelper(SettingsActivity.this);
+                List<Events> allEvents = dbHelper.getAllEvents();
+
+                // Process events for enabling/disabling notifications
+                for (Events event : allEvents) {
+                    if (enableNotifications) {
+                        enableGoogleCalendarEventNotifications(event, service);
+                    } else {
+                        disableGoogleCalendarEventNotifications(event, service);
+                    }
+                }
+            }
+
+            return null;
+        }
+
+        @Override
+        protected void onPostExecute(Void result) {
+            super.onPostExecute(result);
+            // You can add additional UI updates after the task finishes, e.g., a success message or a loading spinner.
+        }
+    }
 
 
     @Override

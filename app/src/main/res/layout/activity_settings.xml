@@ -93,7 +93,7 @@
                 android:layout_height="wrap_content"
                 android:layout_weight="0.5"
                 android:padding="10dp"
-                android:text="Enable Notification"
+                android:text="Disable Notification"
                 android:textColor="@color/textColorPrimary"
                 android:textSize="18sp"
                 android:textStyle="bold" />

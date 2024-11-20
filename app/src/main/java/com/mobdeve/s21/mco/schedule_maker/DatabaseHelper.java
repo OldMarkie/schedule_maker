@@ -577,4 +577,25 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         db.execSQL("DELETE FROM " + TABLE_EVENTS);
     }
 
+    public List<Events> getAllEvents() {
+        List<Events> allEvents = new ArrayList<>();
+        SQLiteDatabase db = this.getReadableDatabase();
+
+        // Query to get all events from the database
+        String query = "SELECT * FROM " + TABLE_EVENTS;
+        Cursor cursor = db.rawQuery(query, null);
+
+        // Iterate through the results
+        while (cursor.moveToNext()) {
+            // Create an event from the cursor
+            Events event = createEventFromCursor(cursor);
+            // Add the event to the list of all events
+            allEvents.add(event);
+        }
+
+        cursor.close();
+        db.close();
+        return allEvents;
+    }
+
 }
