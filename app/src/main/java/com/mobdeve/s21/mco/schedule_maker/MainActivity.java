@@ -32,7 +32,6 @@ public class MainActivity extends AppCompatActivity {
     private Runnable runnable;
     private boolean is24HourFormat;
     private TextView digitalClock;
-    private TextView currentDay;
     private TextView currentDate;
     private Handler deletionHandler;
     private Runnable deletionRunnable;

@@ -25,6 +25,7 @@ public class LatestScheduleFragment extends Fragment {
     private TextView eventTime;
     private TextView descTitle;
     private TextView locTitle;
+    private DatabaseHelper dbHelper;
 
     @Nullable
     @Override
@@ -34,12 +35,9 @@ public class LatestScheduleFragment extends Fragment {
 
         // Initialize TextViews
         latestSchedule = view.findViewById(R.id.latestSchedule);
-        eventDescription = view.findViewById(R.id.eventDescription);
-        eventLocation = view.findViewById(R.id.eventLocation);
         upcomingOrNon = view.findViewById(R.id.UpcomingOrNon);
         eventTime = view.findViewById(R.id.eventTimeTV);
-        descTitle = view.findViewById(R.id.descTitleTV);
-        locTitle = view.findViewById(R.id.locTitleTV);
+
 
 
         // Load the latest schedule
@@ -49,7 +47,8 @@ public class LatestScheduleFragment extends Fragment {
     }
 
     private void loadLatestSchedule() {
-        List<Events> events = DummyData.getEvents();  // Fetch the events from a data source
+        dbHelper = new DatabaseHelper(requireContext());
+        List<Events> events = dbHelper.getAllEvents();  // Fetch the events from a data source
 
         if (!events.isEmpty()) {
             Events nextEvents = events.get(0);  // Assuming this is sorted by date
@@ -78,17 +77,12 @@ public class LatestScheduleFragment extends Fragment {
             // Set text to the TextViews
             upcomingOrNon.setText("Upcoming");
             latestSchedule.setText(nextEvents.getName());
-            eventTime.setText(timeFormat.format(nextEvents.getStartTime()) + " - " + timeFormat.format(nextEvents.getEndTime()) + " (" + dayOfWeek +")" );
-            eventDescription.setText(nextEvents.getDescription());
-            eventLocation.setText(nextEvents.getLocation());
+            eventTime.setText(timeFormat.format(nextEvents.getStartTime()) + " - " + timeFormat.format(nextEvents.getEndTime()) + "\n (" + dayOfWeek +")" );
+
         } else {
             upcomingOrNon.setText("No Schedule Stored");
             latestSchedule.setText("");
             eventTime.setText("");
-            eventDescription.setText("");
-            eventLocation.setText("");
-            locTitle.setText("");
-            descTitle.setText("");
         }
     }
 

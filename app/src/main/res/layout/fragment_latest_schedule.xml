@@ -1,98 +1,55 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
     android:layout_gravity="center"
+    android:background="@drawable/circular_background"
     android:orientation="vertical"
-    android:padding="16dp">
-
-    <TextView
-        android:id="@+id/UpcomingOrNon"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_gravity="center"
-        android:gravity="center"
-        android:text="Upcoming"
-        android:textSize="24sp"
-        android:textStyle="bold"
-        android:textColor="@color/textColorPrimary" />
+    android:padding="32dp">
 
     <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_gravity="center"
-        android:orientation="vertical"
-        android:paddingLeft="0dp"
-        android:paddingTop="8dp"
-        android:paddingBottom="8dp">
+        android:layout_height="match_parent"
+        android:orientation="vertical">
 
         <TextView
-            android:id="@+id/latestSchedule"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center"
-            android:text="No upcoming schedule"
-            android:textSize="20sp"
-            android:textStyle="bold"
-            android:textColor="@color/textColorPrimary" />
-
-        <TextView
-            android:id="@+id/eventTimeTV"
+            android:id="@+id/UpcomingOrNon"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_gravity="center"
             android:gravity="center"
-            android:text="8:00 - 5:00"
-            android:textColor="@color/textColorPrimary" />
-    </LinearLayout>
+            android:text="Upcoming"
+            android:textColor="@color/textColorPrimary"
+            android:textSize="24sp"
+            android:textStyle="bold" />
 
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="vertical"
-        android:padding="8dp">
-
-        <TextView
-            android:id="@+id/descTitleTV"
+        <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:gravity="center"
-            android:text="Description"
-            android:textStyle="bold"
-            android:textColor="@color/textColorPrimary" />
-
-        <TextView
-            android:id="@+id/eventDescription"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
             android:layout_gravity="center"
-            android:text="Description: "
-            android:textSize="14sp"
-            android:textColor="@color/textColorPrimary" />
-    </LinearLayout>
+            android:orientation="vertical"
+            android:paddingLeft="0dp"
+            android:paddingTop="8dp">
 
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="vertical"
-        android:padding="8dp">
+            <TextView
+                android:id="@+id/latestSchedule"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:text="No upcoming schedule"
+                android:textColor="@color/textColorPrimary"
+                android:textSize="20sp"
+                android:textStyle="bold" />
 
-        <TextView
-            android:id="@+id/locTitleTV"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:gravity="center"
-            android:text="Location"
-            android:textStyle="bold"
-            android:textColor="@color/textColorPrimary" />
+            <TextView
+                android:id="@+id/eventTimeTV"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:gravity="center"
+                android:text="8:00 - 5:00 \n Thursday"
+                android:textColor="@color/textColorPrimary" />
+        </LinearLayout>
 
-        <TextView
-            android:id="@+id/eventLocation"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center"
-            android:text="Location: "
-            android:textSize="14sp"
-            android:textColor="@color/textColorPrimary" />
     </LinearLayout>
 
 </LinearLayout>
