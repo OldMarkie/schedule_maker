@@ -14,6 +14,11 @@ colorpicker = "0.0.15"
 sqlite = "2.5.0-alpha10"
 places = "4.0.0"
 playServicesMaps = "19.0.0"
+playServicesAuth = "21.2.0"
+googleApiClientAndroid = "2.7.0"
+googleApiServicesCalendar = "v3-rev20241101-2.0.0"
+googleHttpClientJackson2 = "1.45.1"
+googleHttpClientAndroid = "1.45.1"
 
 [libraries]
 junit = { group = "junit", name = "junit", version.ref = "junit" }
@@ -29,6 +34,11 @@ colorpicker = { group = "com.github.QuadFlask", name = "colorpicker", version.re
 sqlite = { group = "androidx.sqlite", name = "sqlite", version.ref = "sqlite" }
 places = { group = "com.google.android.libraries.places", name = "places", version.ref = "places" }
 play-services-maps = { group = "com.google.android.gms", name = "play-services-maps", version.ref = "playServicesMaps" }
+play-services-auth = { group = "com.google.android.gms", name = "play-services-auth", version.ref = "playServicesAuth" }
+google-api-client-android = { group = "com.google.api-client", name = "google-api-client-android", version.ref = "googleApiClientAndroid" }
+google-api-services-calendar = { group = "com.google.apis", name = "google-api-services-calendar", version.ref = "googleApiServicesCalendar" }
+google-http-client-jackson2 = { group = "com.google.http-client", name = "google-http-client-jackson2", version.ref = "googleHttpClientJackson2" }
+google-http-client-android = { group = "com.google.http-client", name = "google-http-client-android", version.ref = "googleHttpClientAndroid" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }
