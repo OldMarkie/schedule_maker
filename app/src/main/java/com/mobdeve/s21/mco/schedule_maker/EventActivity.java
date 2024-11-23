@@ -147,7 +147,6 @@ public class EventActivity extends AppCompatActivity {
     }
 
     public void resetEventActivity(){
-        // Make all sections visible
         hintTextView.setVisibility(View.VISIBLE);
         oneTimeSec.setVisibility(View.VISIBLE);
         weeklySec.setVisibility(View.VISIBLE);
