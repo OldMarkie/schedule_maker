@@ -2,6 +2,7 @@ package com.mobdeve.s21.mco.schedule_maker;
 
 import static android.app.Activity.RESULT_OK;
 
+import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
 import android.content.res.ColorStateList;
@@ -13,10 +14,12 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.appcompat.app.AlertDialog;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 
@@ -236,12 +239,14 @@ public class OneTimeEventEditFragment extends Fragment {
         ColorStateList textColor = colorPickerInput.getBackgroundTintList();
         int selectedColor = textColor.getDefaultColor();
 
-
         if (eventName.isEmpty() || eventDescription.isEmpty() || eventLocation.isEmpty() ||
                 eventDate.isEmpty() || eventTime.isEmpty() || eventEndTime.isEmpty()) {
             Toast.makeText(getActivity(), "Please fill in all fields", Toast.LENGTH_SHORT).show();
             return;
         }
+
+        // Show progress dialog
+        AlertDialog progressDialog = showCustomProgressDialog(getContext());
 
         SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy HH:mm");
         try {
@@ -249,12 +254,12 @@ public class OneTimeEventEditFragment extends Fragment {
             Date endDateTime = dateFormat.parse(eventDate + " " + eventEndTime);
 
             if (endDateTime.equals(startDateTime) || endDateTime.before(startDateTime)) {
+                progressDialog.dismiss();
                 Toast.makeText(getActivity(), "End time must be later than start time.", Toast.LENGTH_SHORT).show();
                 return;
             }
 
             String sanitizedGoogleid = currentEvents.getId().replace("-", "").toLowerCase();
-
 
             currentEvents.setName(eventName);
             currentEvents.setDescription(eventDescription);
@@ -264,26 +269,20 @@ public class OneTimeEventEditFragment extends Fragment {
             currentEvents.setColor(selectedColor);
             currentEvents.setGoogleEventId(sanitizedGoogleid);
 
-            //dbHelper.updateEvent(currentEvents);
-            updateEventInGoogleCalendar(eventName, eventDescription, eventLocation, startDateTime, endDateTime, currentEvents);
-            Toast.makeText(getActivity(), "Events updated successfully!", Toast.LENGTH_SHORT).show();
-            FragmentManager fragmentManager = getParentFragmentManager();
-            fragmentManager.popBackStack();
-            backToEventList();
-
+            updateEventInGoogleCalendar(eventName, eventDescription, eventLocation, startDateTime, endDateTime, currentEvents, progressDialog);
         } catch (ParseException e) {
+            progressDialog.dismiss();
             e.printStackTrace();
             Toast.makeText(getActivity(), "Invalid date or time format", Toast.LENGTH_SHORT).show();
         }
     }
 
-    private void updateEventInGoogleCalendar(String title, String description, String location, Date startDateTime, Date endDateTime, Events newEvents) {
-        // Initialize the Calendar API service
+
+    private void updateEventInGoogleCalendar(String title, String description, String location, Date startDateTime, Date endDateTime, Events newEvents, AlertDialog progressDialog) {
         GoogleSignInAccount account = GoogleSignIn.getLastSignedInAccount(getContext());
         if (account == null) {
-            if (getContext() != null) {
-                Toast.makeText(getContext(), "You need to sign in with Google first!", Toast.LENGTH_SHORT).show();
-            }
+            progressDialog.dismiss();
+            Toast.makeText(getContext(), "You need to sign in with Google first!", Toast.LENGTH_SHORT).show();
             return;
         }
 
@@ -300,19 +299,12 @@ public class OneTimeEventEditFragment extends Fragment {
         ).setApplicationName("Schedule Maker").build();
 
         String sanitizedId = newEvents.getId().replace("-", "").toLowerCase();
-
-        // Log the event ID to be used for updating the Google Calendar event
-        Log.d("GoogleCalendarEvent", "Updating event with sanitized ID: " + sanitizedId);
-        Log.d("GoogleCalendarEvent", "Current Google Event ID: " + newEvents.getGoogleEventId());
-
-        // Create the Google Calendar Event object
         Event event = new Event()
-                .setId(newEvents.getGoogleEventId())  // Use the existing Google Event ID for update
+                .setId(newEvents.getGoogleEventId())
                 .setSummary(title)
                 .setDescription(description)
                 .setLocation(location);
 
-        // Set start and end times
         DateTime start = new DateTime(startDateTime);
         EventDateTime startEventDateTime = new EventDateTime().setDateTime(start).setTimeZone("Asia/Manila");
         event.setStart(startEventDateTime);
@@ -321,69 +313,39 @@ public class OneTimeEventEditFragment extends Fragment {
         EventDateTime endEventDateTime = new EventDateTime().setDateTime(end).setTimeZone("Asia/Manila");
         event.setEnd(endEventDateTime);
 
-        // Add notifications (reminders)
         EventReminder[] reminders = new EventReminder[]{
-                new EventReminder().setMethod("popup").setMinutes(10),  // Pop-up reminder 10 minutes before
-                new EventReminder().setMethod("email").setMinutes(30)   // Email reminder 30 minutes before
+                new EventReminder().setMethod("popup").setMinutes(10),
+                new EventReminder().setMethod("email").setMinutes(30)
         };
+        event.setReminders(new Event.Reminders().setUseDefault(false).setOverrides(Arrays.asList(reminders)));
 
-        Event.Reminders eventReminders = new Event.Reminders()
-                .setUseDefault(false)  // Disable default reminders
-                .setOverrides(Arrays.asList(reminders));
-        event.setReminders(eventReminders);
-
-
-        // Log the details of the event being updated
-        Log.d("GoogleCalendarEvent", "Event Details: ");
-        Log.d("GoogleCalendarEvent", "Title: " + title);
-        Log.d("GoogleCalendarEvent", "Description: " + description);
-        Log.d("GoogleCalendarEvent", "Location: " + location);
-        Log.d("GoogleCalendarEvent", "Start DateTime: " + startDateTime.toString());
-        Log.d("GoogleCalendarEvent", "End DateTime: " + endDateTime.toString());
-
-        Context context = getContext();
-        if (context == null) {
-            return;
-        }
-
-        // Update event in Google Calendar
         new Thread(() -> {
             try {
-                DatabaseHelper dbHelper = new DatabaseHelper(context);
-                dbHelper.updateEvent(currentEvents);
-                // Log the URL being used for the update request
-                String eventId = event.getId();
-                String updateUrl = "https://www.googleapis.com/calendar/v3/calendars/primary/events/" + eventId;
-                Log.d("GoogleCalendarEvent", "Request URL: " + updateUrl);
+                DatabaseHelper dbHelper = new DatabaseHelper(getContext());
+                dbHelper.updateEvent(newEvents);
 
-                // Execute the update request for Google Calendar
-                Event updatedEvent = service.events().update("primary", eventId, event).execute();
-                String updatedGoogleEventId = updatedEvent.getId();
-                Log.d("GoogleCalendarEvent", "Updated Event ID: " + updatedGoogleEventId);
-
-                // Update the event with the new Google Event ID in your local database
-                newEvents.setGoogleEventId(updatedGoogleEventId);
+                Event updatedEvent = service.events().update("primary", event.getId(), event).execute();
+                newEvents.setGoogleEventId(updatedEvent.getId());
                 dbHelper.updateEventWithGoogleEventId(newEvents);
-                Log.d("GoogleCalendarEvent", "Event updated in database");
 
-                // Safely access the activity for UI updates
                 if (getActivity() != null && isAdded()) {
                     getActivity().runOnUiThread(() -> {
+                        progressDialog.dismiss();
+                        backToEventList();
                         Toast.makeText(getActivity(), "Event updated in Google Calendar!", Toast.LENGTH_SHORT).show();
                     });
                 }
             } catch (Exception e) {
-                // Log the exception if the update fails
-                Log.e("GoogleCalendarEvent", "Error updating event in Google Calendar", e);
-
                 if (getActivity() != null && isAdded()) {
                     getActivity().runOnUiThread(() -> {
+                        progressDialog.dismiss();
                         Toast.makeText(getActivity(), "Failed to update event in Google Calendar", Toast.LENGTH_SHORT).show();
                     });
                 }
             }
         }).start();
     }
+
 
 
 
@@ -410,6 +372,22 @@ public class OneTimeEventEditFragment extends Fragment {
         }
     }
 
+    private AlertDialog showCustomProgressDialog(Context context) {
+        AlertDialog.Builder builder = new AlertDialog.Builder(context);
+        LayoutInflater inflater = LayoutInflater.from(context);
+        View view = inflater.inflate(R.layout.progress_dialog, null);
+
+        // Change the text of descriptionTV
+        TextView descriptionTextView = view.findViewById(R.id.descriptionTV);
+        descriptionTextView.setText("Updating Event...");
+
+        builder.setView(view);
+        builder.setCancelable(false); // Prevent dismissing by tapping outside
+
+        AlertDialog dialog = builder.create();
+        dialog.show();
+        return dialog;
+    }
 
 
 
