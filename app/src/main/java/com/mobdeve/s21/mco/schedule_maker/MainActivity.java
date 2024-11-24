@@ -45,9 +45,35 @@ public class MainActivity extends AppCompatActivity {
         boolean isDarkMode = sharedPreferences.getBoolean("isDarkMode", false);
         is24HourFormat = sharedPreferences.getBoolean("is24HourFormat", false);  // Load time format preference
 
+        boolean isCustomThemeEnabled = sharedPreferences.getBoolean("isCustomThemeEnabled", false);
+        String selectedTheme = sharedPreferences.getString("selectedTheme", "Default");
 
         if (!Places.isInitialized()) {
             Places.initialize(getApplicationContext(), "AIzaSyA8Y8mCFXS14nP5e3JXlQM8G4X96kEDnkI");
+        }
+
+        // Apply the appropriate theme based on the selected option
+        if (isCustomThemeEnabled) {
+            switch (selectedTheme) {
+                case "Mario":
+                    setTheme(isDarkMode ? R.style.AppTheme_Mario_Dark : R.style.AppTheme_Mario_Light);
+                    break;
+                case "Minecraft":
+                    setTheme(isDarkMode ? R.style.AppTheme_Minecraft_Dark : R.style.AppTheme_Minecraft_Light);
+                    break;
+                case "Legend of Zelda":
+                    setTheme(isDarkMode ? R.style.AppTheme_Zelda_Dark : R.style.AppTheme_Zelda_Light);
+                    break;
+                case "Pokemon":
+                    setTheme(isDarkMode ? R.style.AppTheme_Pokemon_Dark : R.style.AppTheme_Pokemon_Light);
+                    break;
+                default:
+                    setTheme(isDarkMode ? R.style.AppTheme : R.style.LightTheme); // Default theme
+                    break;
+            }
+        } else {
+            // Apply default light/dark theme if custom themes are disabled
+            setTheme(isDarkMode ? R.style.AppTheme : R.style.LightTheme);
         }
 
         if (isDarkMode) {
@@ -58,6 +84,27 @@ public class MainActivity extends AppCompatActivity {
 
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        // Dynamically update background
+        if (isCustomThemeEnabled) {
+            switch (selectedTheme) {
+                case "Mario":
+                    findViewById(R.id.mainLayout).setBackgroundResource(isDarkMode ? R.drawable.mario_dark : R.drawable.mario_light);
+                    break;
+                case "Minecraft":
+                    findViewById(R.id.mainLayout).setBackgroundResource(isDarkMode ? R.drawable.minecraft_dark : R.drawable.minecraft_light);
+                    break;
+                case "Legend of Zelda":
+                    findViewById(R.id.mainLayout).setBackgroundResource(isDarkMode ? R.drawable.zelda_dark : R.drawable.zelda_light);
+                    break;
+                case "Pokemon":
+                    findViewById(R.id.mainLayout).setBackgroundResource(isDarkMode ? R.drawable.pokemon_dark : R.drawable.pokemon_light);
+                    break;
+                default:
+                    // No custom background for default theme
+                    break;
+            }
+        }
 
         // Initialize TextViews for clock, date, and schedule
         digitalClock = findViewById(R.id.digitalClock);
@@ -168,6 +215,8 @@ public class MainActivity extends AppCompatActivity {
         handler.removeCallbacks(runnable);  // Stop the clock updates when the activity is destroyed
         deletionHandler.removeCallbacks(deletionRunnable);
     }*/
+
+
 
 
 

@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<selector xmlns:android="http://schemas.android.com/apk/res/android">
+    <item>
+        <layer-list>
+            <item>
+                <shape android:shape="rectangle">
+                    <!-- Use the same color as the switch's background -->
+                    <solid android:color="@color/colorPrimary" />
+
+                    <!-- Consistent rounded corners -->
+                    <corners android:radius="8dp" />
+
+                    <!-- Add padding to match the switch appearance -->
+                    <padding
+                        android:top="12dp"
+                        android:bottom="12dp"
+                        android:left="16dp"
+                        android:right="16dp" />
+                </shape>
+            </item>
+        </layer-list>
+    </item>
+</selector>

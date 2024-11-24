@@ -16,4 +16,58 @@
         <item name="android:windowBackground">@color/white</item>
         <item name="android:textColor">@color/black</item>
     </style>
+
+    <!-- Pokemon themes -->
+    <style name="AppTheme_Pokemon_Light" parent="Theme.AppCompat.DayNight.DarkActionBar">
+        <item name="colorPrimary">#03A9F4</item>
+        <item name="colorAccent">#03A9F4</item>
+        <item name="android:windowBackground">@drawable/pokemon_light</item>
+    </style>
+
+    <style name="AppTheme_Pokemon_Dark" parent="Theme.AppCompat.Light.DarkActionBar">
+        <item name="colorPrimary">#0A0057</item>
+        <item name="colorAccent">#0A0057</item>
+        <item name="android:windowBackground">@drawable/pokemon_dark</item>
+    </style>
+
+    <!-- Mario Theme -->
+    <style name="AppTheme_Mario_Light" parent="Theme.AppCompat.DayNight.DarkActionBar">
+        <item name="colorPrimary">#03A9F4</item>
+        <item name="colorAccent">#03A9F4</item>
+        <item name="android:windowBackground">@drawable/mario_light</item>
+    </style>
+
+    <style name="AppTheme_Mario_Dark" parent="Theme.AppCompat.Light.DarkActionBar">
+        <item name="colorPrimary">#0A0057</item>
+        <item name="colorAccent">#0A0057</item>
+        <item name="android:windowBackground">@drawable/mario_dark</item>
+    </style>
+
+    <!-- Minecraft Theme -->
+    <style name="AppTheme_Minecraft_Light" parent="Theme.AppCompat.DayNight.DarkActionBar">
+        <item name="colorPrimary">#4CAF50</item>
+        <item name="colorAccent">#4CAF50</item>
+        <item name="android:windowBackground">@drawable/minecraft_light</item>
+    </style>
+
+    <style name="AppTheme_Minecraft_Dark" parent="Theme.AppCompat.Light.DarkActionBar">
+        <item name="colorPrimary">#0A0057</item>
+        <item name="colorAccent">#0A0057</item>
+        <item name="android:windowBackground">@drawable/minecraft_dark</item>
+    </style>
+
+    <!-- Zelda Theme -->
+    <style name="AppTheme_Zelda_Light" parent="Theme.AppCompat.DayNight.DarkActionBar">
+        <item name="colorPrimary">#4CAF50</item>
+        <item name="colorAccent">#4CAF50</item>
+        <item name="android:windowBackground">@drawable/zelda_light</item>
+    </style>
+
+    <style name="AppTheme_Zelda_Dark" parent="Theme.AppCompat.Light.DarkActionBar">
+        <item name="colorPrimary">#0A0057</item>
+        <item name="colorAccent">#0A0057</item>
+        <item name="android:windowBackground">@drawable/zelda_dark</item>
+    </style>
+
+
 </resources>

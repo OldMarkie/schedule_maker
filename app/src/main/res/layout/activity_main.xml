@@ -4,6 +4,7 @@
     android:layout_height="match_parent"
     android:background="@drawable/wallpaper"
     android:gravity="center"
+    android:id="@+id/mainLayout"
     android:orientation="vertical">
 
     <Space

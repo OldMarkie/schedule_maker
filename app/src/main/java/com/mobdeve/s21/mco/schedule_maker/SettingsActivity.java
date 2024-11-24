@@ -9,7 +9,10 @@ import android.os.AsyncTask;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
+import android.widget.AdapterView;
 import android.widget.CompoundButton;
+import android.widget.LinearLayout;
+import android.widget.Spinner;
 import android.widget.Switch;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.app.AppCompatDelegate;
@@ -37,6 +40,9 @@ import android.widget.Toast;
 import java.util.Collections;
 import java.util.List;
 
+import com.mobdeve.s21.mco.schedule_maker.Themes;
+import com.mobdeve.s21.mco.schedule_maker.themesData;
+
 public class SettingsActivity extends AppCompatActivity {
 
     private View LinkAccount, AccountName;
@@ -46,6 +52,11 @@ public class SettingsActivity extends AppCompatActivity {
     private SharedPreferences.Editor editor;
     private GoogleSignInClient googleSignInClient;
     private static final int RC_SIGN_IN = 9001;
+
+    private String selectedTheme;
+    private Switch customThemeSwitch;
+    private CustomSpinner spinner_themes;
+    private themeAdapter adapter1;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -61,8 +72,50 @@ public class SettingsActivity extends AppCompatActivity {
         boolean is24HourFormat = sharedPreferences.getBoolean("is24HourFormat", false);
         boolean isNotificationsEnabled = sharedPreferences.getBoolean("isNotificationsEnabled", false);
 
+        // Retrieve preferences for custom themes
+        boolean isCustomThemeEnabled = sharedPreferences.getBoolean("isCustomThemeEnabled", false);
+        selectedTheme = sharedPreferences.getString("selectedTheme", "Default");
+
         // Set dark mode based on the saved preference
         AppCompatDelegate.setDefaultNightMode(isDarkMode ? AppCompatDelegate.MODE_NIGHT_YES : AppCompatDelegate.MODE_NIGHT_NO);
+
+        // initialize spinner
+        spinner_themes = findViewById(R.id.spinner_themes);
+        adapter1 = new themeAdapter(SettingsActivity.this, themesData.getThemesList());
+        spinner_themes.setAdapter(adapter1);
+
+        // Set spinner visibility based on custom theme switch
+        LinearLayout spinnerLayout = findViewById(R.id.spinnerLayout);
+        spinnerLayout.setVisibility(isCustomThemeEnabled ? View.VISIBLE : View.GONE);
+
+        // Set selected spinner item based on saved theme
+        List<Themes> themesList = themesData.getThemesList();
+        for (int i = 0; i < themesList.size(); i++) {
+            if (themesList.get(i).getName().equalsIgnoreCase(selectedTheme)) {
+                spinner_themes.setSelection(i);
+                break;
+            }
+        }
+
+        // Handle spinner selection changes
+        spinner_themes.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                // Update selectedTheme variable directly without redeclaring
+                selectedTheme = themesList.get(position).getName();
+                editor.putString("selectedTheme", selectedTheme);
+                editor.apply();
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> parent) {
+                // No action needed
+            }
+        });
+
+        // Initialize Custom Theme Switch
+        customThemeSwitch = findViewById(R.id.customThemeSwitch);
+        customThemeSwitch.setChecked(isCustomThemeEnabled);
 
         // Initialize pageTitle
         pageTitle = findViewById(R.id.pageTitle);
@@ -77,12 +130,13 @@ public class SettingsActivity extends AppCompatActivity {
         themeSwitch = findViewById(R.id.themeSwitch);
         timeFormatSwitch = findViewById(R.id.timeFormatSwitch);
         notificationSwitch = findViewById(R.id.notifSwitch);
+        customThemeSwitch = findViewById(R.id.customThemeSwitch);
 
         // Set switch states based on saved preferences
         themeSwitch.setChecked(isDarkMode);
         timeFormatSwitch.setChecked(is24HourFormat);
         notificationSwitch.setChecked(isNotificationsEnabled);
-
+        customThemeSwitch.setChecked(isCustomThemeEnabled);
 
 
         notificationSwitch.setOnCheckedChangeListener((buttonView, isChecked) -> {
@@ -97,7 +151,7 @@ public class SettingsActivity extends AppCompatActivity {
         });
 
 
-        // Set listener for theme switch
+        // Set listener for theme switch (dark / light)
         themeSwitch.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
@@ -114,9 +168,46 @@ public class SettingsActivity extends AppCompatActivity {
                 bottomNavigationView.setItemTextColor(ColorStateList.valueOf(textColor));
             }
 
-
-
         });
+
+        // Custom Theme Switch logic
+        customThemeSwitch.setOnCheckedChangeListener((buttonView, isChecked) -> {
+            // Save the custom theme state
+            editor.putBoolean("isCustomThemeEnabled", isChecked);
+            editor.apply();
+
+            // Toggle spinner visibility
+            spinner_themes.setVisibility(isChecked ? View.VISIBLE : View.GONE);
+
+            // Apply the selected theme if custom themes are enabled
+            if (isChecked) {
+                switch (selectedTheme) {
+                    case "Mario":
+                        setTheme(isDarkMode ? R.style.AppTheme_Mario_Dark : R.style.AppTheme_Mario_Light);
+                        break;
+                    case "Minecraft":
+                        setTheme(isDarkMode ? R.style.AppTheme_Minecraft_Dark : R.style.AppTheme_Minecraft_Light);
+                        break;
+                    case "Legend of Zelda":
+                        setTheme(isDarkMode ? R.style.AppTheme_Zelda_Dark : R.style.AppTheme_Zelda_Light);
+                        break;
+                    case "Pokemon":
+                        setTheme(isDarkMode ? R.style.AppTheme_Pokemon_Dark : R.style.AppTheme_Pokemon_Light);
+                        break;
+                    default:
+                        setTheme(isDarkMode ? R.style.AppTheme : R.style.LightTheme);
+                        break;
+                }
+            } else {
+                // Apply default theme if custom themes are disabled
+                setTheme(isDarkMode ? R.style.AppTheme : R.style.LightTheme);
+            }
+
+            // Recreate the activity to apply changes
+            recreate();
+        });
+
+
 
         // Google Sign-In Configuration
         GoogleSignInOptions googleSignInOptions = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
@@ -383,5 +474,40 @@ public class SettingsActivity extends AppCompatActivity {
     private void showToast(String message) {
         Toast.makeText(this, message, Toast.LENGTH_SHORT).show();
     }
+
+    private void applySelectedTheme(boolean isCustomThemeEnabled, boolean isDarkMode) {
+        if (isCustomThemeEnabled) {
+            switch (selectedTheme) {
+                case "Mario":
+                    setTheme(isDarkMode ? R.style.AppTheme_Mario_Dark : R.style.AppTheme_Mario_Light);
+                    break;
+                case "Minecraft":
+                    setTheme(isDarkMode ? R.style.AppTheme_Minecraft_Dark : R.style.AppTheme_Minecraft_Light);
+                    break;
+                case "Legend of Zelda":
+                    setTheme(isDarkMode ? R.style.AppTheme_Zelda_Dark : R.style.AppTheme_Zelda_Light);
+                    break;
+                case "Pokemon":
+                    setTheme(isDarkMode ? R.style.AppTheme_Pokemon_Dark : R.style.AppTheme_Pokemon_Light);
+                    break;
+                default:
+                    setTheme(isDarkMode ? R.style.AppTheme : R.style.LightTheme);
+                    break;
+            }
+        } else {
+            setTheme(isDarkMode ? R.style.AppTheme : R.style.LightTheme);
+        }
+
+        // Restart MainActivity to apply the new theme
+        Intent restartIntent = new Intent(this, MainActivity.class);
+        restartIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK);
+        startActivity(restartIntent);
+
+        // Finish SettingsActivity to prevent multiple layers of activities
+        finish();
+    }
+
+
+
 
 }
