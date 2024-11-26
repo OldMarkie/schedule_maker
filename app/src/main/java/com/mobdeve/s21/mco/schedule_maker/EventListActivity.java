@@ -9,6 +9,7 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.Button;
 import android.widget.CalendarView;
@@ -236,8 +237,9 @@ public class EventListActivity extends AppCompatActivity {
     private void deleteEventFromGoogleCalendar(Events event) {
         Log.d("GoogleCalendarDelete", "Attempting to delete event from Google Calendar: " + event.getName());
         Log.d("ConfirmDeleteEvent", "User initiated delete for event: " + formatEventDetails(event));
+
         // Ensure the user is signed in with Google
-        GoogleSignInAccount account = GoogleSignIn.getLastSignedInAccount(this); // Use 'this' for Activity context
+        GoogleSignInAccount account = GoogleSignIn.getLastSignedInAccount(this);
         if (account == null) {
             Log.e("GoogleCalendarDelete", "Google account not signed in");
             Toast.makeText(this, "You need to sign in with Google first!", Toast.LENGTH_SHORT).show();
@@ -246,13 +248,12 @@ public class EventListActivity extends AppCompatActivity {
 
         // Initialize Google Calendar API credentials
         GoogleAccountCredential credential = GoogleAccountCredential.usingOAuth2(
-                this, // Use 'this' for Activity context
+                this,
                 Collections.singleton(CalendarScopes.CALENDAR)
         );
         credential.setSelectedAccount(account.getAccount());
         Log.d("GoogleCalendarDelete", "Google API credentials initialized");
 
-        // Initialize Google Calendar API service
         com.google.api.services.calendar.Calendar service = new com.google.api.services.calendar.Calendar.Builder(
                 AndroidHttp.newCompatibleTransport(),
                 JacksonFactory.getDefaultInstance(),
@@ -269,25 +270,48 @@ public class EventListActivity extends AppCompatActivity {
 
         Log.d("GoogleCalendarDelete", "Google Event ID found: " + googleEventId);
 
+        // Inflate custom layout for progress dialog
+        LayoutInflater inflater = LayoutInflater.from(this);
+        View progressDialogView = inflater.inflate(R.layout.progress_dialog, null);
+
+        // Set the text in the description TextView
+        TextView descriptionTV = progressDialogView.findViewById(R.id.descriptionTV);
+        if (descriptionTV != null) {
+            descriptionTV.setText("Deleting...");
+        }
+
+        // Build the AlertDialog
+        androidx.appcompat.app.AlertDialog progressDialog = new androidx.appcompat.app.AlertDialog.Builder(this)
+                .setView(progressDialogView) // Use the inflated view
+                .setCancelable(false)
+                .create();
+
+        // Show the progress dialog
+        progressDialog.show();
+
         // Start a background thread to perform the deletion
         new Thread(() -> {
             try {
                 // Delete the event from Google Calendar
                 service.events().delete("primary", googleEventId).execute();
                 Log.d("GoogleCalendarDelete", "Successfully deleted Google Calendar event: " + googleEventId);
-                //dbHelper.deleteEvent(event.getName());
-                // Notify the user of success
-                runOnUiThread(() ->
-                        Toast.makeText(this, "Event deleted from Google Calendar!", Toast.LENGTH_SHORT).show()
-                );
+
+                runOnUiThread(() -> {
+                    // Dismiss progress dialog
+                    progressDialog.dismiss();
+                    Toast.makeText(this, "Event deleted from Google Calendar!", Toast.LENGTH_SHORT).show();
+                });
             } catch (Exception e) {
                 Log.e("GoogleCalendarDelete", "Failed to delete event from Google Calendar", e);
-                runOnUiThread(() ->
-                        Toast.makeText(this, "Failed to delete event from Google Calendar", Toast.LENGTH_SHORT).show()
-                );
+                runOnUiThread(() -> {
+                    // Dismiss progress dialog
+                    progressDialog.dismiss();
+                    Toast.makeText(this, "Failed to delete event from Google Calendar", Toast.LENGTH_SHORT).show();
+                });
             }
         }).start();
     }
+
 
     // Method to delete all Google Calendar instances of a recurring event
     private void deleteAllInstancesFromGoogleCalendar(Events recurringEvent) {
@@ -326,6 +350,27 @@ public class EventListActivity extends AppCompatActivity {
 
         Log.d("GoogleCalendarDelete", "Google Event IDs found: " + googleEventIds);
 
+
+        // Inflate custom layout for progress dialog
+        LayoutInflater inflater = LayoutInflater.from(this);
+        View progressDialogView = inflater.inflate(R.layout.progress_dialog, null);
+
+        // Set the text in the description TextView
+        TextView descriptionTV = progressDialogView.findViewById(R.id.descriptionTV);
+        if (descriptionTV != null) {
+            descriptionTV.setText("Deleting...");
+        }
+
+        // Build the AlertDialog
+        androidx.appcompat.app.AlertDialog progressDialog = new androidx.appcompat.app.AlertDialog.Builder(this)
+                .setView(progressDialogView) // Use the inflated view
+                .setCancelable(false)
+                .create();
+
+
+        // Show the progress dialog
+        progressDialog.show();
+
         // Start a background thread to delete all events
         new Thread(() -> {
             for (String googleEventId : googleEventIds) {
@@ -337,12 +382,15 @@ public class EventListActivity extends AppCompatActivity {
                     Log.e("GoogleCalendarDelete", "Failed to delete event with ID: " + googleEventId, e);
                 }
             }
-            // Notify the user of success
-            runOnUiThread(() ->
-                    Toast.makeText(this, "All instances of the recurring event deleted from Google Calendar!", Toast.LENGTH_SHORT).show()
-            );
+
+            // Dismiss progress dialog and notify user
+            runOnUiThread(() -> {
+                progressDialog.dismiss();
+                Toast.makeText(this, "All instances of the recurring event deleted from Google Calendar!", Toast.LENGTH_SHORT).show();
+            });
         }).start();
     }
+
 
 
 
