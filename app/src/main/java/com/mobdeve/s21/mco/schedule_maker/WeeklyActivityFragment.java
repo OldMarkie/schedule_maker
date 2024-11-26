@@ -16,10 +16,12 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.EditText;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.appcompat.app.AlertDialog;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 
@@ -296,52 +298,73 @@ public class WeeklyActivityFragment extends Fragment {
                 checkThursday.isChecked() || checkFriday.isChecked() || checkSaturday.isChecked() || checkSunday.isChecked();
 
         if (isWeekly) {
-            Calendar baseDate = Calendar.getInstance();
+            // Show progress dialog
+            AlertDialog progressDialog = new AlertDialog.Builder(getContext())
+                    .setView(R.layout.progress_dialog) // Use your progress dialog layout
+                    .setCancelable(false)
+                    .create();
+            progressDialog.show();
 
-            if (checkMonday.isChecked()) {
-                baseDate.set(Calendar.DAY_OF_WEEK, Calendar.MONDAY);
-                saveWeeklyEventToDatabase(activityName, activityDescription, activityLocation, baseDate,
-                        mondayStartTimeInput, mondayEndTimeInput, 1);
-            }
-            if (checkTuesday.isChecked()) {
-                baseDate.set(Calendar.DAY_OF_WEEK, Calendar.TUESDAY);
-                saveWeeklyEventToDatabase(activityName, activityDescription, activityLocation, baseDate,
-                        tuesdayStartTimeInput, tuesdayEndTimeInput, 2);
-            }
-            if (checkWednesday.isChecked()) {
-                baseDate.set(Calendar.DAY_OF_WEEK, Calendar.WEDNESDAY);
-                saveWeeklyEventToDatabase(activityName, activityDescription, activityLocation, baseDate,
-                        wednesdayStartTimeInput, wednesdayEndTimeInput, 3);
-            }
-            if (checkThursday.isChecked()) {
-                baseDate.set(Calendar.DAY_OF_WEEK, Calendar.THURSDAY);
-                saveWeeklyEventToDatabase(activityName, activityDescription, activityLocation, baseDate,
-                        thursdayStartTimeInput, thursdayEndTimeInput, 4);
-            }
-            if (checkFriday.isChecked()) {
-                baseDate.set(Calendar.DAY_OF_WEEK, Calendar.FRIDAY);
-                saveWeeklyEventToDatabase(activityName, activityDescription, activityLocation, baseDate,
-                        fridayStartTimeInput, fridayEndTimeInput, 5);
-            }
-            if (checkSaturday.isChecked()) {
-                baseDate.set(Calendar.DAY_OF_WEEK, Calendar.SATURDAY);
-                saveWeeklyEventToDatabase(activityName, activityDescription, activityLocation, baseDate,
-                        saturdayStartTimeInput, saturdayEndTimeInput, 6);
-            }
-            if (checkSunday.isChecked()) {
-                baseDate.set(Calendar.DAY_OF_WEEK, Calendar.SUNDAY);
-                saveWeeklyEventToDatabase(activityName, activityDescription, activityLocation, baseDate,
-                        sundayStartTimeInput, sundayEndTimeInput, 7);
-            }
+            new Thread(() -> {
+                Calendar baseDate = Calendar.getInstance();
 
-            Toast.makeText(getActivity(), "Events saved successfully!", Toast.LENGTH_SHORT).show();
+                try {
+                    if (checkMonday.isChecked()) {
+                        baseDate.set(Calendar.DAY_OF_WEEK, Calendar.MONDAY);
+                        saveWeeklyEventToDatabase(activityName, activityDescription, activityLocation, baseDate,
+                                mondayStartTimeInput, mondayEndTimeInput, 1);
+                    }
+                    if (checkTuesday.isChecked()) {
+                        baseDate.set(Calendar.DAY_OF_WEEK, Calendar.TUESDAY);
+                        saveWeeklyEventToDatabase(activityName, activityDescription, activityLocation, baseDate,
+                                tuesdayStartTimeInput, tuesdayEndTimeInput, 2);
+                    }
+                    if (checkWednesday.isChecked()) {
+                        baseDate.set(Calendar.DAY_OF_WEEK, Calendar.WEDNESDAY);
+                        saveWeeklyEventToDatabase(activityName, activityDescription, activityLocation, baseDate,
+                                wednesdayStartTimeInput, wednesdayEndTimeInput, 3);
+                    }
+                    if (checkThursday.isChecked()) {
+                        baseDate.set(Calendar.DAY_OF_WEEK, Calendar.THURSDAY);
+                        saveWeeklyEventToDatabase(activityName, activityDescription, activityLocation, baseDate,
+                                thursdayStartTimeInput, thursdayEndTimeInput, 4);
+                    }
+                    if (checkFriday.isChecked()) {
+                        baseDate.set(Calendar.DAY_OF_WEEK, Calendar.FRIDAY);
+                        saveWeeklyEventToDatabase(activityName, activityDescription, activityLocation, baseDate,
+                                fridayStartTimeInput, fridayEndTimeInput, 5);
+                    }
+                    if (checkSaturday.isChecked()) {
+                        baseDate.set(Calendar.DAY_OF_WEEK, Calendar.SATURDAY);
+                        saveWeeklyEventToDatabase(activityName, activityDescription, activityLocation, baseDate,
+                                saturdayStartTimeInput, saturdayEndTimeInput, 6);
+                    }
+                    if (checkSunday.isChecked()) {
+                        baseDate.set(Calendar.DAY_OF_WEEK, Calendar.SUNDAY);
+                        saveWeeklyEventToDatabase(activityName, activityDescription, activityLocation, baseDate,
+                                sundayStartTimeInput, sundayEndTimeInput, 7);
+                    }
 
-            FragmentManager fragmentManager = getParentFragmentManager();
-            fragmentManager.popBackStack(null, FragmentManager.POP_BACK_STACK_INCLUSIVE);
+                    getActivity().runOnUiThread(() -> {
+                        Toast.makeText(getActivity(), "Events saved successfully!", Toast.LENGTH_SHORT).show();
 
-            // After saving, show the hint text view again
-            ((EventActivity) getActivity()).resetEventActivity();
+                        FragmentManager fragmentManager = getParentFragmentManager();
+                        fragmentManager.popBackStack(null, FragmentManager.POP_BACK_STACK_INCLUSIVE);
 
+                        // After saving, show the hint text view again
+                        ((EventActivity) getActivity()).resetEventActivity();
+                    });
+
+                } catch (Exception e) {
+                    getActivity().runOnUiThread(() -> {
+                        Toast.makeText(getActivity(), "Failed to save events. Please try again.", Toast.LENGTH_SHORT).show();
+                    });
+                    e.printStackTrace();
+                } finally {
+                    // Dismiss the progress dialog
+                    getActivity().runOnUiThread(progressDialog::dismiss);
+                }
+            }).start();
         } else {
             Toast.makeText(getActivity(), "Please select at least one day for the weekly event.", Toast.LENGTH_SHORT).show();
         }
@@ -354,55 +377,45 @@ public class WeeklyActivityFragment extends Fragment {
         ColorStateList colorStateList = colorPickerInput.getBackgroundTintList();
         int eventColor = colorStateList.getDefaultColor();
 
-        // Debugging the dayWeek value
-        Log.d("Events", "dayWeek value: " + dayWeek);
-
-        // Ensure dayWeek is not null or invalid (set a default value if necessary)
         if (dayWeek < 1 || dayWeek > 7) {
-            Log.w("Events", "Invalid dayWeek value. Setting to default (0 - Monday).");
-            dayWeek = 1;  // Default to Sunday (or handle this appropriately)
+            dayWeek = 1;  // Default to Monday
         }
 
         if (startTime != null && endTime != null) {
-
-            // Iterate through each week for the next year (52 weeks)
             for (int i = 0; i < 13; i++) {
-                // Create the start and end Date for the events instance
                 Calendar eventDate = (Calendar) baseDate.clone();
-                eventDate.add(Calendar.WEEK_OF_YEAR, i); // Move to the correct week
+                eventDate.add(Calendar.WEEK_OF_YEAR, i);
 
                 Date eventStartDate = combineDateAndTime(eventDate, startTime);
                 Date eventEndDate = combineDateAndTime(eventDate, endTime);
 
-                Log.d("Events", "Events " + (i + 1) + " - Start: " + eventStartDate + ", End: " + eventEndDate);
-
-                // Check for conflicts
                 if (dbHelper.isTimeConflict(eventStartDate, eventEndDate)) {
-                    Toast.makeText(getActivity(), "Events time conflict for week " + (i + 1) + "!", Toast.LENGTH_SHORT).show();
-                    continue; // Optionally continue to check the next week
+                    int finalI = i;
+                    getActivity().runOnUiThread(() ->
+                            Toast.makeText(getActivity(), "Event time conflict for week " + (finalI + 1), Toast.LENGTH_SHORT).show()
+                    );
+                    continue;
                 }
 
                 String counter = UUID.randomUUID().toString();
-                // Create the Events object
                 Events events = new Events(counter, name, description, location, eventStartDate, eventEndDate, true, eventColor, dayWeek);
 
-                // Save the Events object to the database
-                //boolean success = dbHelper.addEvent(events);
-                int finalI = i;
+                int finalI1 = i;
                 saveEventToGoogleCalendar(name, description, location, eventStartDate, eventEndDate, events, success -> {
                     if (!success) {
-                        Toast.makeText(getContext(), "Failed to save event for week " + (finalI + 1), Toast.LENGTH_SHORT).show();
-                        Log.e("Events", "Failed to save event for week " + (finalI + 1));
-                    } else {
-                        Log.d("Events", "Event saved for week " + (finalI + 1));
+                        getActivity().runOnUiThread(() ->
+                                Toast.makeText(getActivity(), "Failed to save event for week " + (finalI1 + 1), Toast.LENGTH_SHORT).show()
+                        );
                     }
                 });
             }
-            Toast.makeText(getContext(), "Weekly Events Saved for Three Months!", Toast.LENGTH_SHORT).show();
         } else {
-            Toast.makeText(getContext(), "Invalid start or end time!", Toast.LENGTH_SHORT).show();
+            getActivity().runOnUiThread(() ->
+                    Toast.makeText(getActivity(), "Invalid start or end time!", Toast.LENGTH_SHORT).show()
+            );
         }
     }
+
 
 
     private void saveEventToGoogleCalendar(String title, String description, String location, Date startDateTime, Date endDateTime, Events newEvents, SaveEventCallback callback) {
@@ -489,6 +502,31 @@ public class WeeklyActivityFragment extends Fragment {
             }
         }).start();
     }
+
+    private AlertDialog progressDialog;
+
+    private void showProgressDialog(String message) {
+        if (getActivity() != null) {
+            AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
+            LayoutInflater inflater = getLayoutInflater();
+            View dialogView = inflater.inflate(R.layout.progress_dialog, null);
+            TextView progressText = dialogView.findViewById(R.id.descriptionTV);
+            progressText.setText(message);
+
+            builder.setView(dialogView);
+            builder.setCancelable(false); // Prevent dismissal by tapping outside
+            progressDialog = builder.create();
+            progressDialog.show();
+        }
+    }
+
+    private void dismissProgressDialog() {
+        if (progressDialog != null && progressDialog.isShowing()) {
+            progressDialog.dismiss();
+        }
+    }
+
+
 
     // Callback interface
     public interface SaveEventCallback {
