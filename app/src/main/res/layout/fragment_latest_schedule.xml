@@ -3,6 +3,7 @@
     android:layout_height="wrap_content"
     android:layout_gravity="center"
     android:background="@drawable/circular_background"
+    android:backgroundTint="@color/buttonColor"
     android:orientation="vertical"
     android:padding="32dp">
 

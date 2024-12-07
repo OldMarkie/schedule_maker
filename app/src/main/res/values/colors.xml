@@ -4,7 +4,7 @@
     <color name="colorPrimary">#6200EE</color> <!-- Purple for primary elements -->
     <color name="colorPrimaryDark">#3700B3</color> <!-- Darker shade of purple -->
     <color name="colorSecondary">#03DAC5</color> <!-- Teal for secondary elements -->
-    <color name="colorAccent">#F0D46A</color>
+    <color name="colorAccent">#355D9D</color>
     <color name="colorBackground">#FFFFFF</color> <!-- White background for light mode -->
     <color name="colorOnPrimary">#FFFFFF</color> <!-- Text/icon color on primary elements -->
     <color name="colorOnSecondary">#FFFFFF</color> <!-- Text/icon color on secondary elements -->
@@ -19,4 +19,5 @@
     <color name="colorDelete">#C62828</color>
     <color name="buttonColor">#FFFFFF</color>
     <color name="buttonOutlineColor">#000000</color>
+    <color name="eventPopUp">#5C8CB1</color>
 </resources>

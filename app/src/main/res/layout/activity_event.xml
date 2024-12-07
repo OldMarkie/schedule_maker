@@ -54,7 +54,7 @@
             android:layout_width="0dp"
             android:layout_height="590dp"
             android:background="@drawable/semi_circle"
-            android:backgroundTint="#EB87A8"
+            android:backgroundTint="@color/eventPopUp"
             android:gravity="center|left"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
@@ -67,11 +67,13 @@
                 android:id="@+id/hintTV"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="16dp"
+                android:layout_marginTop="36dp"
                 android:text="Tap To Add Schedules"
-                android:textColor="@color/textColorSecondary"
-                android:textSize="20sp"
+                android:textColor="@color/textColorPrimary"
+                android:textSize="28sp"
+                android:textStyle="bold"
                 app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintHorizontal_bias="0.497"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent" />
 
@@ -99,7 +101,9 @@
                         android:layout_height="wrap_content"
                         android:layout_weight="1"
                         android:text="One Time Event"
-                        android:textSize="20sp" />
+                        android:textColor="@color/black"
+                        android:textSize="20sp"
+                        android:textStyle="bold" />
 
                     <com.google.android.material.floatingactionbutton.FloatingActionButton
                         android:id="@+id/oneTimeEventButton"
@@ -140,7 +144,9 @@
                         android:layout_height="wrap_content"
                         android:layout_weight="1"
                         android:text="Weekly Activity"
-                        android:textSize="20sp" />
+                        android:textColor="@color/black"
+                        android:textSize="20sp"
+                        android:textStyle="bold" />
 
                     <com.google.android.material.floatingactionbutton.FloatingActionButton
                         android:id="@+id/weeklyEventButton"
