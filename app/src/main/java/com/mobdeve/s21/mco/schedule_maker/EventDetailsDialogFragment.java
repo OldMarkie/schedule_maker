@@ -20,17 +20,17 @@ public class EventDetailsDialogFragment extends DialogFragment{
     private TextView eventName, eventTime, eventRecurrence, eventDescription, eventLocation;
     private Button editButton, deleteButton;
 
-    private Event event;
+    private Events events;
     private OnEventActionListener listener;
 
     public interface OnEventActionListener {
-        void onEventDelete(Event event);
-        void onEventEdit(Event event);
+        void onEventDelete(Events events);
+        void onEventEdit(Events events);
     }
 
-    public static EventDetailsDialogFragment newInstance(Event event, OnEventActionListener listener) {
+    public static EventDetailsDialogFragment newInstance(Events events, OnEventActionListener listener) {
         EventDetailsDialogFragment fragment = new EventDetailsDialogFragment();
-        fragment.event = event;
+        fragment.events = events;
         fragment.listener = listener;
         return fragment;
     }
@@ -52,8 +52,8 @@ public class EventDetailsDialogFragment extends DialogFragment{
         editButton = view.findViewById(R.id.editButton);
         deleteButton = view.findViewById(R.id.deleteButton);
 
-        // Set event details
-        eventName.setText(event.getName());
+        // Set events details
+        eventName.setText(events.getName());
 
         // Get user preference for 24-hour or 12-hour format
         SharedPreferences sharedPreferences = getContext().getSharedPreferences("ThemePref", getContext().MODE_PRIVATE);
@@ -67,24 +67,24 @@ public class EventDetailsDialogFragment extends DialogFragment{
             timeFormat = new SimpleDateFormat("h:mm a", Locale.getDefault());  // 12-hour AM/PM format
         }
 
-        eventTime.setText(timeFormat.format(event.getStartTime()) + " - " + timeFormat.format(event.getEndTime()));
+        eventTime.setText(timeFormat.format(events.getStartTime()) + " - " + timeFormat.format(events.getEndTime()));
 
-        // Show if it's a weekly or one-time event
-        if (event.isWeekly()) {
-            eventRecurrence.setText("Weekly Event");
+        // Show if it's a weekly or one-time events
+        if (events.isWeekly()) {
+            eventRecurrence.setText("Weekly Events");
         } else {
-            eventRecurrence.setText("One-time Event");
+            eventRecurrence.setText("One-time Events");
         }
 
-        // Set event description and location
-        eventDescription.setText(event.getDescription()); // Assuming getDescription() method exists in Event class
-        eventLocation.setText(event.getLocation()); // Assuming getLocation() method exists in Event class
+        // Set events description and location
+        eventDescription.setText(events.getDescription()); // Assuming getDescription() method exists in Events class
+        eventLocation.setText(events.getLocation()); // Assuming getLocation() method exists in Events class
 
         // Handle the edit button click
         editButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                listener.onEventEdit(event); // Notify listener for edit action
+                listener.onEventEdit(events); // Notify listener for edit action
                 dismiss();
             }
         });
@@ -93,14 +93,14 @@ public class EventDetailsDialogFragment extends DialogFragment{
         deleteButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                listener.onEventDelete(event); // Notify listener for delete action
+                listener.onEventDelete(events); // Notify listener for delete action
                 dismiss();
             }
         });
 
         // Set the view and build the dialog
         builder.setView(view)
-                .setTitle("Event Details")
+                .setTitle("Events Details")
                 .setNegativeButton("Close", new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int id) {
                         dialog.dismiss();

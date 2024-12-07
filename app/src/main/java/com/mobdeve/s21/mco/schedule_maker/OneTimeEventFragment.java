@@ -1,12 +1,15 @@
 package com.mobdeve.s21.mco.schedule_maker;
 
+import static android.app.Activity.RESULT_OK;
 import static android.content.Context.MODE_PRIVATE;
 
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.SharedPreferences;
 import android.content.res.ColorStateList;
 import android.graphics.Color;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -16,9 +19,14 @@ import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.appcompat.app.AlertDialog;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 
+import com.google.android.gms.auth.api.signin.GoogleSignIn;
+import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
+import com.google.android.gms.maps.model.LatLng;
+import com.google.android.libraries.places.api.Places;
 import com.google.android.material.datepicker.CalendarConstraints;
 import com.google.android.material.datepicker.MaterialDatePicker;
 import com.google.android.material.timepicker.MaterialTimePicker;
@@ -28,13 +36,27 @@ import com.flask.colorpicker.OnColorSelectedListener;
 import com.flask.colorpicker.builder.ColorPickerClickListener;
 import com.flask.colorpicker.builder.ColorPickerDialogBuilder;
 
+import com.google.android.libraries.places.api.net.PlacesClient;
+import com.google.api.client.extensions.android.http.AndroidHttp;
+import com.google.api.client.googleapis.extensions.android.gms.auth.GoogleAccountCredential;
+import com.google.api.client.json.jackson2.JacksonFactory;
+import com.google.api.client.util.DateTime;
+import com.google.api.services.calendar.CalendarScopes;
+import com.google.api.services.calendar.model.Event;
+import com.google.api.services.calendar.model.EventDateTime;
+import com.google.api.services.calendar.model.EventReminder;
+
+import android.content.Intent;
 
 import java.io.IOException;
 import java.io.InputStream;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.Arrays;
 import java.util.Calendar;
+import java.util.Collections;
 import java.util.Date;
+import java.util.UUID;
 
 public class OneTimeEventFragment extends Fragment {
 
@@ -50,6 +72,12 @@ public class OneTimeEventFragment extends Fragment {
     private Button colorPickerInput;
 
     private ColorUtils colorUtils;
+
+    private static final int AUTOCOMPLETE_REQUEST_CODE = 1;
+    private static final int MAP_REQUEST_CODE = 2;
+    private PlacesClient placesClient;
+    private final String googleEventId = "";
+
 
 
     @Nullable
@@ -70,6 +98,10 @@ public class OneTimeEventFragment extends Fragment {
         colorPickerInput.setBackgroundTintList(ColorStateList.valueOf(0xff6200EE));
         colorPickerInput.setHint("Electric Violet By Default");
         colorPickerInput.setHintTextColor(Color.WHITE);
+
+        placesClient = Places.createClient(requireContext());
+        eventLocationInput.setOnClickListener(v -> openMapForLocation());
+
 
         // Load color names
         try {
@@ -97,6 +129,29 @@ public class OneTimeEventFragment extends Fragment {
 
         return view;
     }
+
+
+    private void openMapForLocation() {
+        Intent intent = new Intent(getContext(), MapLocationPickerActivity.class);
+        startActivityForResult(intent, MAP_REQUEST_CODE);
+    }
+
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+
+        if (requestCode == MAP_REQUEST_CODE && resultCode == RESULT_OK && data != null) {
+            LatLng selectedLocation = data.getParcelableExtra("selected_location");
+            String selectedAddress = data.getStringExtra("selected_address");
+            if (selectedAddress != null) {
+                eventLocationInput.setText(selectedAddress);
+            } else if (selectedLocation != null) {
+                String locationString = selectedLocation.latitude + ", " + selectedLocation.longitude;
+                eventLocationInput.setText(locationString);
+            }
+        }
+    }
+
 
 
 
@@ -153,7 +208,7 @@ public class OneTimeEventFragment extends Fragment {
 
         // Create a MaterialDatePicker with constraints
         MaterialDatePicker<Long> datePicker = MaterialDatePicker.Builder.datePicker()
-                .setTitleText("Select Event Date")
+                .setTitleText("Select Events Date")
                 .setSelection(todayInMillis) // Start with today's date selected
                 .setCalendarConstraints(new CalendarConstraints.Builder()
                         .setStart(todayInMillis) // Set the minimum date to today
@@ -188,6 +243,7 @@ public class OneTimeEventFragment extends Fragment {
     }
 
     private void saveEvent() {
+        DatabaseHelper dbHelper = new DatabaseHelper(getContext());
         String eventName = eventNameInput.getText().toString().trim();
         String eventDescription = eventDescriptionInput.getText().toString().trim();
         String eventLocation = eventLocationInput.getText().toString().trim();
@@ -198,11 +254,15 @@ public class OneTimeEventFragment extends Fragment {
 
         if (eventName.isEmpty() || eventDescription.isEmpty() || eventLocation.isEmpty() ||
                 eventDate.isEmpty() || eventTime.isEmpty() || eventEndTime.isEmpty()) {
-            Toast.makeText(getActivity(), "Please fill in all fields", Toast.LENGTH_SHORT).show();
+            showAlertDialog("Error", "Please fill in all fields.");
             return;
         }
 
-        // Combine date and time into Date objects
+        if (dbHelper.eventExists(eventName)) {
+            showAlertDialog("Duplicate Event", "An event with the same name already exists!");
+            return;
+        }
+
         String startDateTimeString = eventDate + " " + eventTime;
         String endDateTimeString = eventDate + " " + eventEndTime;
         SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy HH:mm");
@@ -213,54 +273,156 @@ public class OneTimeEventFragment extends Fragment {
             eventStartDateTime = dateFormat.parse(startDateTimeString);
             eventEndDateTime = dateFormat.parse(endDateTimeString);
 
-            // Check if end time is not equal to start time and end time is after start time
             if (eventEndDateTime.equals(eventStartDateTime) || eventEndDateTime.before(eventStartDateTime)) {
-                Toast.makeText(getActivity(), "End time must be later than start time.", Toast.LENGTH_SHORT).show();
+                showAlertDialog("Error", "End time must be later than start time.");
                 return;
             }
         } catch (ParseException e) {
-            Toast.makeText(getActivity(), "Invalid date or time format", Toast.LENGTH_SHORT).show();
+            showAlertDialog("Error", "Invalid date or time format.");
             return;
         }
 
-        // Get the color from colorPickerInput or use a default if it's empty
-        // Get the ColorStateList from the colorPickerInput
-        ColorStateList colorStateList = colorPickerInput.getBackgroundTintList();
-        int eventColor;
+        getActivity().runOnUiThread(() -> {
+            AlertDialog progressDialog = new AlertDialog.Builder(getContext())
+                    .setView(R.layout.progress_dialog)
+                    .setCancelable(false)
+                    .create();
+            progressDialog.show();
 
-        // Check if the ColorStateList is null
-        if (colorStateList == null) {
-            colorPickerInput.setBackgroundTintList(ColorStateList.valueOf(0xff6200EE));
-            colorStateList = colorPickerInput.getBackgroundTintList();
-            eventColor = colorStateList.getDefaultColor();
-        } else {
-            // Get the default color from the ColorStateList
-            eventColor = colorStateList.getDefaultColor();
+            new Thread(() -> {
+                try {
+                    String eventId = UUID.randomUUID().toString();
+                    int eventColor = colorPickerInput.getBackgroundTintList().getDefaultColor();
+                    Events newEvents = new Events(eventId, eventName, eventDescription, eventLocation,
+                            eventStartDateTime, eventEndDateTime, false, eventColor, -1);
 
-            // Optionally, if you want to show the color as a string format
-            String colorString = String.format("#%06X", (0xFFFFFF & eventColor));
+                    saveEventToGoogleCalendar(eventName, eventDescription, eventLocation, eventStartDateTime, eventEndDateTime, newEvents);
 
-            // If you need to validate the format (not necessary in this context)
-            try {
-                // This block may not be needed if you trust the colorStateList to be valid
-                eventColor = Color.parseColor(colorString);
-            } catch (IllegalArgumentException e) {
-                Toast.makeText(getActivity(), "Invalid color format", Toast.LENGTH_SHORT).show();
-                return;
-            }
-        }
-
-        // Create and save new Event
-        Event newEvent = new Event(eventName, eventDescription, eventLocation, eventStartDateTime, eventEndDateTime, false, eventColor);
-        if (!DummyData.addEvent(newEvent)) {
-            Toast.makeText(getActivity(), "Event time conflict!", Toast.LENGTH_SHORT).show();
-            return;
-        }
-
-        Toast.makeText(getActivity(), "One-Time Event Saved!", Toast.LENGTH_SHORT).show();
-        FragmentManager fragmentManager = getParentFragmentManager();
-        fragmentManager.popBackStack(null, FragmentManager.POP_BACK_STACK_INCLUSIVE);
-        ((EventActivity) getActivity()).showHintTextView();
-        ((EventActivity) getActivity()).showAddOneTimeEventButton();
+                    getActivity().runOnUiThread(() -> {
+                        progressDialog.dismiss();
+                        showAlertDialog("Success", "Event successfully saved!");
+                        ((EventActivity) getActivity()).resetEventActivity();
+                    });
+                } catch (Exception e) {
+                    e.printStackTrace();
+                    getActivity().runOnUiThread(() -> {
+                        progressDialog.dismiss();
+                        showAlertDialog("Error", "Failed to save the event.");
+                    });
+                }
+            }).start();
+        });
     }
+
+
+
+    private void saveEventToGoogleCalendar(String title, String description, String location, Date startDateTime, Date endDateTime, Events newEvents) {
+        GoogleSignInAccount account = GoogleSignIn.getLastSignedInAccount(getContext());
+        if (account == null) {
+            if (getContext() != null) {
+                getActivity().runOnUiThread(() ->
+                        new AlertDialog.Builder(getContext())
+                                .setTitle("Error")
+                                .setMessage("You need to sign in with Google first!")
+                                .setPositiveButton("OK", null)
+                                .show()
+                );
+            }
+            return;
+        }
+
+        GoogleAccountCredential credential = GoogleAccountCredential.usingOAuth2(
+                getContext(),
+                Collections.singleton(CalendarScopes.CALENDAR)
+        );
+        credential.setSelectedAccount(account.getAccount());
+
+        com.google.api.services.calendar.Calendar service = new com.google.api.services.calendar.Calendar.Builder(
+                AndroidHttp.newCompatibleTransport(),
+                JacksonFactory.getDefaultInstance(),
+                credential
+        ).setApplicationName("Schedule Maker").build();
+
+        String sanitizedId = newEvents.getId().replace("-", "").toLowerCase();
+        Event event = new Event()
+                .setId(sanitizedId)
+                .setSummary(title)
+                .setDescription(description)
+                .setLocation(location);
+
+        newEvents.setGoogleEventId(event.getId());
+
+        DateTime start = new DateTime(startDateTime);
+        EventDateTime startEventDateTime = new EventDateTime().setDateTime(start).setTimeZone("Asia/Manila");
+        event.setStart(startEventDateTime);
+
+        DateTime end = new DateTime(endDateTime);
+        EventDateTime endEventDateTime = new EventDateTime().setDateTime(end).setTimeZone("Asia/Manila");
+        event.setEnd(endEventDateTime);
+
+        EventReminder[] reminders = new EventReminder[]{
+                new EventReminder().setMethod("popup").setMinutes(10),
+                new EventReminder().setMethod("email").setMinutes(30)
+        };
+
+        Event.Reminders eventReminders = new Event.Reminders()
+                .setUseDefault(false)
+                .setOverrides(Arrays.asList(reminders));
+        event.setReminders(eventReminders);
+
+        // Run the database and API operations in the background
+        new Thread(() -> {
+            try {
+                DatabaseHelper dbHelper = new DatabaseHelper(getContext());
+                dbHelper.addEvent(newEvents);
+                Event insertedEvent = service.events().insert("primary", event).execute();
+                String googleEventId = insertedEvent.getId();
+                Log.d("GoogleCalendarEvent", "Inserted Event ID: " + googleEventId);
+                newEvents.setGoogleEventId(googleEventId);
+                dbHelper.updateEventWithGoogleEventId(newEvents);
+
+                if (getActivity() != null && isAdded()) {
+                    getActivity().runOnUiThread(() ->
+                            new AlertDialog.Builder(getContext())
+                                    .setTitle("Success")
+                                    .setMessage("Event added to Google Calendar!")
+                                    .setPositiveButton("OK", null)
+                                    .show()
+                    );
+                }
+            } catch (Exception e) {
+                if (getActivity() != null && isAdded()) {
+                    getActivity().runOnUiThread(() ->
+                            new AlertDialog.Builder(getContext())
+                                    .setTitle("Error")
+                                    .setMessage("Failed to save event to Google Calendar")
+                                    .setPositiveButton("OK", null)
+                                    .show()
+                    );
+                }
+                e.printStackTrace();
+            }
+        }).start();
+    }
+
+
+    private void showAlertDialog(String title, String message) {
+        new AlertDialog.Builder(getContext())
+                .setTitle(title)
+                .setMessage(message)
+                .setPositiveButton("OK", (dialog, which) -> dialog.dismiss())
+                .create()
+                .show();
+    }
+
+
+
+    public void onDestroy() {
+        super.onDestroy();
+        if (placesClient != null) {
+            placesClient = null;     // Avoid memory leaks
+        }
+    }
+
+
 }

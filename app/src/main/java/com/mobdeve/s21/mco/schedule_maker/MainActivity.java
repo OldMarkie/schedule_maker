@@ -10,10 +10,21 @@ import android.widget.TextView;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.app.AppCompatDelegate;
 import androidx.fragment.app.FragmentTransaction;
+
+import com.google.android.gms.auth.api.signin.GoogleSignIn;
+import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
+import com.google.android.gms.common.Scopes;
+import com.google.android.gms.common.api.Scope;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
+import com.google.android.libraries.places.api.Places;
 
 import java.util.Date;
 import java.util.Locale;
+
+import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
+import com.google.android.gms.auth.api.signin.GoogleSignInClient;
+import com.google.api.services.calendar.CalendarScopes;
+
 
 public class MainActivity extends AppCompatActivity {
 
@@ -21,8 +32,11 @@ public class MainActivity extends AppCompatActivity {
     private Runnable runnable;
     private boolean is24HourFormat;
     private TextView digitalClock;
-    private TextView currentDay;
     private TextView currentDate;
+    private Handler deletionHandler;
+    private Runnable deletionRunnable;
+    private DatabaseHelper dbHelper;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -30,6 +44,11 @@ public class MainActivity extends AppCompatActivity {
         SharedPreferences sharedPreferences = getSharedPreferences("ThemePref", MODE_PRIVATE);
         boolean isDarkMode = sharedPreferences.getBoolean("isDarkMode", false);
         is24HourFormat = sharedPreferences.getBoolean("is24HourFormat", false);  // Load time format preference
+
+
+        if (!Places.isInitialized()) {
+            Places.initialize(getApplicationContext(), "AIzaSyA8Y8mCFXS14nP5e3JXlQM8G4X96kEDnkI");
+        }
 
         if (isDarkMode) {
             AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES);
@@ -42,12 +61,24 @@ public class MainActivity extends AppCompatActivity {
 
         // Initialize TextViews for clock, date, and schedule
         digitalClock = findViewById(R.id.digitalClock);
-        currentDay = findViewById(R.id.currentDay);
         currentDate = findViewById(R.id.currentDate);
 
         // Set up the BottomNavigationView
         BottomNavigationView bottomNavigationView = findViewById(R.id.bottomNavigationView);
         bottomNavigationView.setSelectedItemId(R.id.nav_home);  // Highlight Home as the selected tab
+
+        dbHelper = new DatabaseHelper(this);
+
+        // Schedule the deletion of past events
+        deletionHandler = new Handler();
+        deletionRunnable = new Runnable() {
+            @Override
+            public void run() {
+                deletePastEvents();
+                deletionHandler.postDelayed(this, 86400000); // Repeat every 24 hours
+            }
+        };
+        deletionHandler.post(deletionRunnable);
 
         bottomNavigationView.setOnNavigationItemSelectedListener(item -> {
             int id = item.getItemId();
@@ -91,14 +122,16 @@ public class MainActivity extends AppCompatActivity {
 
         // Load the LatestScheduleFragment
         loadLatestScheduleFragment();
+
+
     }
 
     // Update the loadLatestScheduleFragment method to use the correct ID
     private void loadLatestScheduleFragment() {
         LatestScheduleFragment latestScheduleFragment = new LatestScheduleFragment();
         FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
-        transaction.replace(R.id.fragmentContainerView, latestScheduleFragment);  // Use the correct container ID
-        transaction.commit();
+        transaction.replace(R.id.fragmentContainerView, latestScheduleFragment);
+        transaction.commitNowAllowingStateLoss();
     }
 
     // Update the digital clock based on user preference (24-hour or 12-hour format)
@@ -107,7 +140,7 @@ public class MainActivity extends AppCompatActivity {
         if (is24HourFormat) {
             sdf = new SimpleDateFormat("HH:mm", Locale.getDefault());  // 24-hour format, no seconds
         } else {
-            sdf = new SimpleDateFormat("hh:mm a", Locale.getDefault());  // 12-hour format with AM/PM
+            sdf = new SimpleDateFormat("hh:mm ", Locale.getDefault());  // 12-hour format with AM/PM
         }
         String currentTime = sdf.format(new Date());
         digitalClock.setText(currentTime);
@@ -116,18 +149,26 @@ public class MainActivity extends AppCompatActivity {
     // Display the current day and date
     private void displayCurrentDayAndDate() {
         SimpleDateFormat dayFormat = new SimpleDateFormat("EEEE", Locale.getDefault());  // Friday
-        SimpleDateFormat dateFormat = new SimpleDateFormat("MMM d, yyyy", Locale.getDefault());  // Jan 1, 2025
+        SimpleDateFormat dateFormat = new SimpleDateFormat("MMMM d", Locale.getDefault());  // Jan 1
 
         String day = dayFormat.format(new Date());
         String date = dateFormat.format(new Date());
 
-        currentDay.setText(day);
-        currentDate.setText(date);
+        currentDate.setText(day + ", " + date);
     }
 
-    @Override
+    private void deletePastEvents() {
+        DatabaseHelper dbHelper = new DatabaseHelper(this);
+        dbHelper.deletePastEvents();
+    }
+
+    /*@Override
     protected void onDestroy() {
         super.onDestroy();
         handler.removeCallbacks(runnable);  // Stop the clock updates when the activity is destroyed
-    }
+        deletionHandler.removeCallbacks(deletionRunnable);
+    }*/
+
+
+
 }

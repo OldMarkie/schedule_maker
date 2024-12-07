@@ -2,10 +2,9 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical"
+    android:background="@drawable/wallpaper"
     android:gravity="center"
-    android:padding="16dp"
-    android:background="@color/colorBackground">
+    android:orientation="vertical">
 
     <Space
         android:layout_width="match_parent"
@@ -19,29 +18,18 @@
         android:layout_gravity="center"
         android:gravity="center"
         android:text="00:00"
+        android:textColor="@color/white"
         android:textSize="96sp"
-        android:textStyle="bold"
-        android:textColor="@color/textColorPrimary" />
-
-    <TextView
-        android:id="@+id/currentDay"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="8dp"
-        android:text="Friday"
-        android:textAllCaps="true"
-        android:textSize="34sp"
-        android:textStyle="bold"
-        android:textColor="@color/textColorPrimary" />
+        android:textStyle="bold" />
 
     <TextView
         android:id="@+id/currentDate"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="4dp"
-        android:text="Jan 1, 2025"
-        android:textSize="24sp"
-        android:textColor="@color/textColorPrimary" />
+        android:text="Thursday, February 16"
+        android:textColor="@color/white"
+        android:textSize="24sp" />
 
     <Space
         android:layout_width="match_parent"
@@ -65,9 +53,10 @@
         android:id="@+id/bottomNavigationView"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        app:menu="@menu/bottom_nav_menu"
+        android:layout_gravity="bottom"
+        android:background="@color/colorBackground"
+        android:padding="8dp"
         app:itemIconTint="@color/bottomNavIconColor"
         app:itemTextColor="@color/bottomNavTextColor"
-        android:layout_gravity="bottom"
-        android:background="@color/colorBackground" />
+        app:menu="@menu/bottom_nav_menu" />
 </LinearLayout>

@@ -1,82 +1,179 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical"
-    android:padding="16dp"
-    android:background="@color/colorBackground">
+    android:background="#00FFFFFF"
+    android:orientation="vertical">
 
     <TextView
+        android:id="@+id/activityTitle"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:padding="16dp"
         android:text="Add Events"
+        android:textColor="@color/textColorPrimary"
         android:textSize="34sp"
-        android:textStyle="bold"
-        android:textColor="@color/textColorPrimary" />
+        android:textStyle="bold" />
 
-    <LinearLayout
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/linearLayout"
         android:layout_width="match_parent"
-        android:layout_height="0dp"
+        android:layout_height="wrap_content"
         android:layout_weight="1"
-        android:gravity="center"
-        android:orientation="vertical">
+        android:background="#00FFFFFF"
+        android:gravity="center">
 
-        <FrameLayout
-            android:id="@+id/fragment_container"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:layout_gravity="center"
-            android:layout_weight="1">
+
+        <androidx.fragment.app.FragmentContainerView
+            android:id="@+id/holderOneTime"
+            android:name="com.mobdeve.s21.mco.schedule_maker.OneTimeEventFragment"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:layout_weight="1"
+            android:visibility="gone"
+            app:layout_constraintBottom_toTopOf="@+id/ButtonHolder"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <androidx.fragment.app.FragmentContainerView
+            android:id="@+id/holderWeekly"
+            android:name="com.mobdeve.s21.mco.schedule_maker.WeeklyActivityFragment"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:visibility="gone"
+            app:layout_constraintBottom_toTopOf="@+id/ButtonHolder"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:id="@+id/ButtonHolder"
+            android:layout_width="0dp"
+            android:layout_height="590dp"
+            android:background="@drawable/semi_circle"
+            android:backgroundTint="@color/eventPopUp"
+            android:gravity="center|left"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="1.0"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintVertical_bias="1.0">
 
             <TextView
                 android:id="@+id/hintTV"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_gravity="center"
-                android:text="Tap on The Buttons To Add Schedules"
-                android:textColor="@color/textColorSecondary" />
+                android:layout_marginTop="36dp"
+                android:text="Tap To Add Schedules"
+                android:textColor="@color/textColorPrimary"
+                android:textSize="28sp"
+                android:textStyle="bold"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintHorizontal_bias="0.497"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
 
-        </FrameLayout>
+            <androidx.constraintlayout.widget.ConstraintLayout
+                android:id="@+id/AddOneTime"
+                android:layout_width="347dp"
+                android:layout_height="77dp"
+                android:layout_marginTop="43dp"
+                android:background="@drawable/circular_background"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/hintTV">
 
-        <LinearLayout
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:gravity="center|left"
-            android:orientation="vertical"
-            android:paddingTop="8dp"
-            android:paddingBottom="25dp">
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:gravity="center"
+                    android:orientation="horizontal"
+                    tools:layout_editor_absoluteX="16dp"
+                    tools:layout_editor_absoluteY="8dp">
 
-            <Button
-                android:id="@+id/oneTimeEventButton"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_margin="8dp"
-                android:text="Add One-Time Event"
-                android:backgroundTint="@color/colorPrimary"
-                android:textColor="@color/colorOnPrimary" />
+                    <TextView
+                        android:id="@+id/textView7"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:text="One Time Event"
+                        android:textColor="@color/black"
+                        android:textSize="20sp"
+                        android:textStyle="bold" />
 
-            <Button
-                android:id="@+id/weeklyEventButton"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_margin="8dp"
-                android:text="Add Weekly Activity"
-                android:backgroundTint="@color/colorPrimary"
-                android:textColor="@color/colorOnPrimary" />
+                    <com.google.android.material.floatingactionbutton.FloatingActionButton
+                        android:id="@+id/oneTimeEventButton"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:backgroundTint="@color/colorAccent"
+                        android:src="@android:drawable/ic_input_add"
+                        android:text="Add One-Time Event"
+                        android:textColor="@color/colorOnPrimary" />
 
-        </LinearLayout>
+                </LinearLayout>
 
-    </LinearLayout>
+            </androidx.constraintlayout.widget.ConstraintLayout>
+
+            <androidx.constraintlayout.widget.ConstraintLayout
+                android:id="@+id/AddWeekly"
+                android:layout_width="347dp"
+                android:layout_height="77dp"
+                android:layout_marginTop="43dp"
+                android:background="@drawable/circular_background"
+                android:foregroundGravity="center"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/AddOneTime">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:gravity="center"
+                    android:orientation="horizontal"
+                    tools:layout_editor_absoluteX="16dp"
+                    tools:layout_editor_absoluteY="8dp">
+
+                    <TextView
+                        android:id="@+id/textView8"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:text="Weekly Activity"
+                        android:textColor="@color/black"
+                        android:textSize="20sp"
+                        android:textStyle="bold" />
+
+                    <com.google.android.material.floatingactionbutton.FloatingActionButton
+                        android:id="@+id/weeklyEventButton"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:backgroundTint="@color/colorAccent"
+                        android:src="@android:drawable/ic_input_add"
+                        android:text="Add Weekly Activity"
+                        android:textColor="@color/colorOnPrimary" />
+                </LinearLayout>
+
+            </androidx.constraintlayout.widget.ConstraintLayout>
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
 
     <com.google.android.material.bottomnavigation.BottomNavigationView
         android:id="@+id/bottomNavigationView"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_gravity="bottom|center"
+        android:background="@color/colorBackground"
+        android:padding="8dp"
         app:itemIconTint="@color/bottomNavIconColor"
         app:itemTextColor="@color/bottomNavTextColor"
-        app:menu="@menu/bottom_nav_menu"
-        android:background="@color/colorBackground" />
+        app:menu="@menu/bottom_nav_menu" />
 
 </LinearLayout>

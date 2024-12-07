@@ -37,18 +37,18 @@ class MyCustomPagingAdapter(
         loadMoreHandler.loadMore(startDate, endDate)
     }
 
-    // Convert Event to MyEvent
-    fun convertEventToMyEvent(event: Event): MyEvent {
+    // Convert Events to MyEvent
+    fun convertEventToMyEvent(events: Events): MyEvent {
         return MyEvent(
-            id = event.hashCode().toLong(), // Example ID, consider using a better unique ID if available
-            title = event.getName(),
-            startTime = Calendar.getInstance().apply { time = event.getStartTime() },
-            endTime = Calendar.getInstance().apply { time = event.getEndTime() }
+            id = events.hashCode().toLong(), // Example ID, consider using a better unique ID if available
+            title = events.getName(),
+            startTime = Calendar.getInstance().apply { time = events.getStartTime() },
+            endTime = Calendar.getInstance().apply { time = events.getEndTime() }
         )
     }
 
-    // Convert a list of Event to MyEvent
-    fun convertEventsToMyEvents(events: List<Event>): List<MyEvent> {
+    // Convert a list of Events to MyEvent
+    fun convertEventsToMyEvents(events: List<Events>): List<MyEvent> {
         return events.map { convertEventToMyEvent(it) }
     }
 }

@@ -1,29 +1,31 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="100dp"
+    android:layout_height="wrap_content"
     android:background="@color/colorBackground"
     android:clickable="true"
     android:focusable="true"
     android:orientation="vertical"
     android:padding="8dp">
 
-    <!-- Event Name -->
     <androidx.cardview.widget.CardView
+        android:id="@+id/detailsBackground"
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="8dp">
 
         <LinearLayout
-            android:id="@+id/detailsBackground"
+            android:id="@+id/detailBackground"
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:orientation="vertical">
+            android:layout_height="wrap_content"
+            android:gravity="center|left"
+            android:orientation="vertical"
+            android:padding="8dp">
 
             <TextView
                 android:id="@+id/eventName"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginLeft="8dp"
-                android:layout_marginTop="8dp"
                 android:text="Event Name"
                 android:textColor="@color/textColorPrimary"
                 android:textSize="18sp"
@@ -46,12 +48,8 @@
                 android:text="Recurrence Type"
                 android:textColor="@color/textColorSecondary"
                 android:textSize="14sp" />
+
         </LinearLayout>
-
     </androidx.cardview.widget.CardView>
-
-    <!-- Event Time (time only) -->
-
-    <!-- Event Recurrence (Weekly or One-time) -->
 
 </LinearLayout>

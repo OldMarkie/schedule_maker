@@ -1,66 +1,87 @@
-<androidx.constraintlayout.widget.ConstraintLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/relativeLayout"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:background="@color/colorBackground">
+    android:layout_height="match_parent">
 
-    <com.alamkanak.weekview.WeekView
-        android:id="@+id/weekView"
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/screenshotArea"
         android:layout_width="0dp"
         android:layout_height="0dp"
-        android:layout_marginStart="8dp"
-        android:layout_marginTop="8dp"
-        android:layout_marginEnd="8dp"
-        android:layout_marginBottom="50dp"
-        android:soundEffectsEnabled="true"
-        app:columnGap="10dp"
-        app:dayBackgroundColor="?android:attr/windowBackground"
-        app:eventTextColor="@color/colorOnPrimary"
-        app:headerPadding="12dp"
-        app:hourHeight="35dp"
-        app:layout_constraintBottom_toBottomOf="parent"
+        android:background="@color/colorOnIcon"
+        android:backgroundTint="@color/colorOnIcon"
+        app:layout_constraintBottom_toTopOf="@+id/constraintLayout2"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:numberOfVisibleDays="7"
-        app:showCurrentTimeFirst="true"
-        app:showHeaderBottomLine="true"
-        app:showHourSeparator="false"
-        app:showNowLine="true"
-        app:showTimeColumnHourSeparator="true"
-        app:showWeekNumber="true"
-        app:timeColumnBackgroundColor="?android:attr/windowBackground"
-        app:timeColumnPadding="6dp"
-        app:timeColumnTextSize="8sp" />
+        tools:visibility="visible">
 
-    <com.google.android.material.floatingactionbutton.FloatingActionButton
-        android:id="@+id/backBtn"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_margin="16dp"
-        android:layout_marginEnd="16dp"
-        android:layout_marginBottom="16dp"
-        android:contentDescription="Add Event"
-        android:src="@drawable/ic_arrow_up"
-        app:backgroundTint="@color/colorAccent"
-        app:tint="@color/colorOnIcon"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent" />
+        <com.alamkanak.weekview.WeekView
+            android:id="@+id/weekView"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:soundEffectsEnabled="true"
+            app:columnGap="12dp"
+            app:dayBackgroundColor="?android:attr/windowBackground"
+            app:eventTextColor="@color/colorOnPrimary"
+            app:headerPadding="12dp"
+            app:hourHeight="35dp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:numberOfVisibleDays="7"
+            app:showCurrentTimeFirst="true"
+            app:showHeaderBottomLine="true"
+            app:showHourSeparator="false"
+            app:showNowLine="true"
+            app:showTimeColumnHourSeparator="true"
+            app:showWeekNumber="true"
+            app:timeColumnBackgroundColor="?android:attr/windowBackground"
+            app:timeColumnPadding="6dp"
+            app:timeColumnTextSize="8sp" />
 
-    <com.google.android.material.floatingactionbutton.FloatingActionButton
-        android:id="@+id/screenshotBtn"
-        android:layout_width="wrap_content"
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/constraintLayout2"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_marginStart="16dp"
-        android:layout_marginBottom="16dp"
-        android:clickable="true"
-        app:backgroundTint="@color/colorAccent"
-        app:tint="@color/colorOnIcon"
+        android:background="@color/colorPrimary"
+        android:backgroundTint="@color/bottomNavIconColor"
+        android:foregroundGravity="center"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:srcCompat="@android:drawable/ic_menu_camera" />
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent">
+
+        <com.google.android.material.floatingactionbutton.FloatingActionButton
+            android:id="@+id/backBtn"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_margin="16dp"
+            android:layout_marginEnd="128dp"
+            android:contentDescription="Add Event"
+            android:src="@drawable/ic_arrow_up"
+            app:backgroundTint="@color/colorAccent"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:tint="@color/colorOnIcon" />
+
+        <com.google.android.material.floatingactionbutton.FloatingActionButton
+            android:id="@+id/screenshotBtn"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_margin="16dp"
+            android:layout_marginStart="128dp"
+            android:clickable="true"
+            app:backgroundTint="@color/colorAccent"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:srcCompat="@android:drawable/ic_menu_camera"
+            app:tint="@color/colorOnIcon" />
+    </androidx.constraintlayout.widget.ConstraintLayout>
 
 </androidx.constraintlayout.widget.ConstraintLayout>
