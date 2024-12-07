@@ -52,6 +52,12 @@ import java.util.Date;
 import java.util.List;
 import java.util.UUID;
 
+/**
+ * WeeklyActivityEditFragment is a subclass of Fragment that provides the user interface
+ * for editing weekly activities in the application. This fragment allows users to view
+ * and modify details about a specific weekly activity, including information such as
+ * the activity name, description, start and end times, and recurring schedule.
+**/
 public class WeeklyActivityEditFragment extends Fragment {
 
     // DatabaseHelper instance

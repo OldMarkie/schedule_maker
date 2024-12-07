@@ -49,6 +49,12 @@ import java.util.Calendar;
 import java.util.Collections;
 import java.util.Date;
 
+/**
+ * Fragment for editing one-time events.
+ * This fragment allows users to edit details of a one-time event, including name, description, location,
+ * date, time, and color. It also supports saving the updated event to both the local database and Google Calendar.
+ */
+
 public class OneTimeEventEditFragment extends Fragment {
 
     private EditText eventNameInput, eventDescriptionInput, eventLocationInput;

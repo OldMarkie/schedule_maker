@@ -33,6 +33,13 @@ import java.util.Date;
 import java.util.List;
 import java.util.Locale;
 
+/**
+ * EventListActivity is a subclass of AppCompatActivity that serves as the main screen
+ * for displaying a list of events in the application. This activity is responsible for
+ * retrieving and presenting a list of events from the database or other data sources
+ * in a user-friendly manner.
+ * */
+
 public class EventListActivity extends AppCompatActivity {
 
     private RecyclerView recyclerView;

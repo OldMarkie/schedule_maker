@@ -2,6 +2,7 @@ package com.mobdeve.s21.mco.schedule_maker;
 
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.net.Uri;
 import android.os.Bundle;
 import android.util.TypedValue;
 import android.view.View;
@@ -13,6 +14,13 @@ import androidx.appcompat.app.AppCompatDelegate;
 
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
+
+/**
+ * The `EventActivity` class represents the activity for adding new events,
+ * either one-time or weekly events. It provides a user interface with buttons
+ * to initiate the event creation process and a bottom navigation bar for
+ * navigation within the app.
+ */
 
 public class EventActivity extends AppCompatActivity {
 
@@ -26,6 +34,28 @@ public class EventActivity extends AppCompatActivity {
     private View oneTimeSec;
     private  View holderBtn;
     private View holderW;
+
+
+    /**
+     * Called when the activity is starting. This is where most initialization
+     * should go: calling {@link #setContentView(int)} to inflate the
+     * activity's UI, using {@link #findViewById(int)} to programmatically interact
+     * with widgets in the UI, calling
+     * {@link #managedQuery(Uri, String[], String, String[], String)} to retrieve
+     * cursors for data being displayed, etc.
+     *
+     * <p>You can call {@link #finish} from within this function, in
+     * which case onDestroy() will be immediately called without any of the rest
+     * of the activity lifecycle ({@link #onStart}, {@link #onResume},
+     * {@link #onPause}, etc) being called.
+     *
+     * <p><em>Derived classes must call through to the super class's
+     * implementation of this method.  If they do not, an exception will be
+     * thrown.</em></p>
+     *
+     * @param savedInstanceState If the activity is being re-created from
+     *                           a previous saved state, this is the state.
+     */
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {

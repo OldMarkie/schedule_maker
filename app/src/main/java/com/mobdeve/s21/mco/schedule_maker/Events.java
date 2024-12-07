@@ -5,6 +5,33 @@ import androidx.annotation.NonNull;
 import java.io.Serializable;
 import java.util.Date;
 
+/**
+ * The Events class represents an event with details such as name, description,
+ * location, start and end times, color, and recurrence information. It implements
+ * the Serializable interface to allow instances of this class to be serialized
+ * for saving to files or transferring between components of the application.
+ *
+ * This class contains the following attributes:
+ * - id: A unique identifier for the event.
+ * - name: The name or title of the event.
+ * - description: A detailed description of the event.
+ * - location: The location where the event takes place.
+ * - startTime: The start date and time of the event.
+ * - endTime: The end date and time of the event.
+ * - isWeekly: A boolean indicating if the event is recurring weekly.
+ * - color: A color code associated with the event.
+ * - dayWeek: The day of the week on which the event occurs (0 for Sunday, 6 for Saturday).
+ * - googleEventId: An optional ID used to reference the event in Google Calendar.
+ *
+ * The class provides getter and setter methods for accessing and modifying the
+ * event's details, as well as a custom toString method for generating a string
+ * representation of the event's data.
+ *
+ * Two constructors are provided:
+ * - One constructor without the googleEventId parameter, which sets it to an empty string.
+ * - Another constructor that includes the googleEventId for Google Calendar integration.
+ */
+
 public class Events implements Serializable {
     private String id;           // Unique identifier for the event
     private String name;

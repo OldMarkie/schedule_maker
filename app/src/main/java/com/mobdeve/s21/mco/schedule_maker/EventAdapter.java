@@ -22,6 +22,13 @@ public class EventAdapter extends RecyclerView.Adapter<EventAdapter.EventViewHol
     private EventDetailsDialogFragment.OnEventActionListener listener;
     private boolean is24HourFormat;
 
+    /**
+     * The `EventAdapter` class is a RecyclerView adapter that displays a list of events.
+     * It handles the creation and binding of event views to the RecyclerView, including
+     * displaying event details, formatting time, and handling click events to show
+     * event details in a dialog.
+     */
+
     public EventAdapter(List<Events> eventsList, FragmentActivity activity, EventDetailsDialogFragment.OnEventActionListener listener,
                         boolean is24HourFormat) {
         this.eventsList = eventsList;

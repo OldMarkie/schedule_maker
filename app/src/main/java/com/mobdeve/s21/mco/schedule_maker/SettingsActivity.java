@@ -36,6 +36,26 @@ import android.widget.Toast;
 import java.util.Collections;
 import java.util.List;
 
+/**
+ * The SettingsActivity class handles the settings screen for the app.
+ * It allows users to toggle dark mode, switch time formats, manage notifications,
+ * and sign in/out of Google Calendar for event synchronization.
+ *
+ * Features:
+ * - Dark mode toggle
+ * - Time format (24-hour or 12-hour) switch
+ * - Notification enable/disable functionality
+ * - Google Calendar integration for syncing events
+ * - Clear local database and unlink Google account
+ * - Bottom navigation for switching between screens
+ *
+ * Dependencies:
+ * - Google Sign-In API
+ * - Google Calendar API
+ * - Android SharedPreferences for storing user settings
+ */
+
+
 public class SettingsActivity extends AppCompatActivity {
 
     private View LinkAccount, AccountName;

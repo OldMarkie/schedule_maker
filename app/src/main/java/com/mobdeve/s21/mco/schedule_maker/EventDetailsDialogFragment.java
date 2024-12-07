@@ -15,6 +15,21 @@ import androidx.fragment.app.DialogFragment;
 import java.text.SimpleDateFormat;
 import java.util.Locale;
 
+/**
+ * EventDetailsDialogFragment is a subclass of DialogFragment that provides a dialog
+ * interface for displaying detailed information about a specific event. This fragment
+ * is typically used to show additional information or allow the user to interact
+ * with event data, such as editing or deleting an event.
+ *
+ * The dialog may include fields for the event's name, description, date, time, location,
+ * and any other relevant details. The fragment interacts with the underlying data model
+ * to provide real-time updates and actions.
+ *
+ * It is important for this fragment to handle user input and ensure the event details
+ * are managed correctly, either by updating the database or performing other necessary
+ * operations based on user actions.
+ */
+
 public class EventDetailsDialogFragment extends DialogFragment{
 
     private TextView eventName, eventTime, eventRecurrence, eventDescription, eventLocation;

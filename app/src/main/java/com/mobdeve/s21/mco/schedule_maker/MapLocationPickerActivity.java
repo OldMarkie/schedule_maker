@@ -27,6 +27,13 @@ import java.io.IOException;
 import java.util.List;
 import java.util.Locale;
 
+/**
+ * The `MapLocationPickerActivity` class provides an interactive map interface
+ * for users to select a location. It utilizes Google Maps to display the map
+ * and allows users to tap on a location to set a marker. The selected location
+ * and its corresponding address are then returned to the calling activity.
+ */
+
 public class MapLocationPickerActivity extends FragmentActivity implements OnMapReadyCallback {
     private GoogleMap googleMap;
     private LatLng selectedLocation;

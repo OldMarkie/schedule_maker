@@ -16,6 +16,17 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Set;
 
+/**
+ * DatabaseHelper is a subclass of SQLiteOpenHelper that manages database creation,
+ * version management, and basic CRUD operations for the application. This class is
+ * responsible for creating, opening, and managing the SQLite database and its schema.
+ * It includes methods for handling SQL queries such as insert, update, delete, and select.
+ *
+ * The database contains various tables that hold information related to the application's
+ * functionality, and this helper class ensures that the database operations are efficient,
+ * consistent, and secure.
+ */
+
 public class DatabaseHelper extends SQLiteOpenHelper {
 
     private static final String DATABASE_NAME = "ScheduleMaker.db";

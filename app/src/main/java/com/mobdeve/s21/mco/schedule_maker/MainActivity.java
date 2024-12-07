@@ -27,6 +27,7 @@ import com.google.android.gms.auth.api.signin.GoogleSignInClient;
 import com.google.api.services.calendar.CalendarScopes;
 
 
+
 public class MainActivity extends AppCompatActivity {
 
     private Handler handler;
@@ -47,9 +48,19 @@ public class MainActivity extends AppCompatActivity {
         is24HourFormat = sharedPreferences.getBoolean("is24HourFormat", false);  // Load time format preference
 
 
+        /*
+         * Initialize the Google Places API if it has not been initialized yet.
+         */
+
         if (!Places.isInitialized()) {
             Places.initialize(getApplicationContext(), "AIzaSyA8Y8mCFXS14nP5e3JXlQM8G4X96kEDnkI");
         }
+
+
+        /*
+         * Apply the selected theme (dark or light mode).
+         */
+
 
         if (isDarkMode) {
             AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES);
@@ -59,6 +70,12 @@ public class MainActivity extends AppCompatActivity {
 
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        /*
+         * Set the background based on the selected theme.
+         * - Dark mode: use dark wallpaper.
+         * - Light mode: use light wallpaper.
+         */
 
         View rootLayout = findViewById(R.id.background);
 

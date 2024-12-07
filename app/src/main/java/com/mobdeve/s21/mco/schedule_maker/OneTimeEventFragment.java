@@ -58,6 +58,12 @@ import java.util.Collections;
 import java.util.Date;
 import java.util.UUID;
 
+/*
+ * This fragment handles creating one-time events.
+ * It includes features for setting event details such as name, description, location,
+ * date, time, and color, along with saving the event locally and to Google Calendar.
+ */
+
 public class OneTimeEventFragment extends Fragment {
 
     private EditText eventNameInput;
