@@ -20,4 +20,5 @@
     <color name="buttonColor">#FFFFFF</color>
     <color name="buttonOutlineColor">#000000</color>
     <color name="eventPopUp">#5C8CB1</color>
+    <color name="settingBackground">#E6E6E6</color>
 </resources>
