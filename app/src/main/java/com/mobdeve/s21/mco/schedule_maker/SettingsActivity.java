@@ -1,7 +1,5 @@
 package com.mobdeve.s21.mco.schedule_maker;
 
-import static androidx.core.content.ContentProviderCompat.requireContext;
-
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.res.ColorStateList;
@@ -10,7 +8,10 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.widget.CompoundButton;
+import android.widget.ProgressBar;
 import android.widget.Switch;
+
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.app.AppCompatDelegate;
 
@@ -24,9 +25,7 @@ import com.google.android.gms.tasks.Task;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.api.client.extensions.android.http.AndroidHttp;
 import com.google.api.client.googleapis.extensions.android.gms.auth.GoogleAccountCredential;
-import com.google.api.client.http.javanet.NetHttpTransport;
 import com.google.api.client.json.jackson2.JacksonFactory;
-import com.google.api.services.calendar.Calendar;
 import com.google.api.services.calendar.CalendarScopes;
 import com.google.api.services.calendar.model.Event;
 
@@ -46,6 +45,7 @@ public class SettingsActivity extends AppCompatActivity {
     private SharedPreferences.Editor editor;
     private GoogleSignInClient googleSignInClient;
     private static final int RC_SIGN_IN = 9001;
+    private AlertDialog progressDialog;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -259,16 +259,16 @@ public class SettingsActivity extends AppCompatActivity {
         Log.d("GoogleCalendarDelete", "Attempting to delete all events from Google Calendar");
 
         // Ensure the user is signed in with Google
-        GoogleSignInAccount account = GoogleSignIn.getLastSignedInAccount(this  ); // Use 'requireContext()' for Fragment
+        GoogleSignInAccount account = GoogleSignIn.getLastSignedInAccount(this);
         if (account == null) {
             Log.e("GoogleCalendarDelete", "Google account not signed in");
-            Toast.makeText(this , "You need to sign in with Google first!", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, "You need to sign in with Google first!", Toast.LENGTH_SHORT).show();
             return;
         }
 
         // Initialize Google Calendar API credentials
         GoogleAccountCredential credential = GoogleAccountCredential.usingOAuth2(
-                this, // Use 'requireContext()' for Fragment
+                this,
                 Collections.singleton(CalendarScopes.CALENDAR)
         );
         credential.setSelectedAccount(account.getAccount());
@@ -281,7 +281,7 @@ public class SettingsActivity extends AppCompatActivity {
                 credential
         ).setApplicationName("Schedule Maker").build();
 
-        // Retrieve all Google Calendar event IDs for all events (not just a specific event name)
+        // Retrieve all Google Calendar event IDs for all events
         DatabaseHelper dbHelper = new DatabaseHelper(this);
         List<String> googleEventIds = dbHelper.getGoogleEventIdsForEvents(); // Get all event IDs
         if (googleEventIds == null || googleEventIds.isEmpty()) {
@@ -292,27 +292,71 @@ public class SettingsActivity extends AppCompatActivity {
 
         Log.d("GoogleCalendarDelete", "Google Event IDs found: " + googleEventIds);
 
+        // Create and show the progress dialog
+        View progressView = getLayoutInflater().inflate(R.layout.progress_dialog, null);
+        ProgressBar progressBar = progressView.findViewById(R.id.progressBar);
+        TextView progressText = progressView.findViewById(R.id.descriptionTV);
+        AlertDialog progressDialog = new AlertDialog.Builder(this)
+                .setTitle("Deleting Events")
+                .setView(progressView)
+                .setCancelable(false) // Disable cancellation
+                .create();
+        progressDialog.show();
+
         // Start a background thread to delete all events
         new Thread(() -> {
+            int totalEvents = googleEventIds.size();
+            int deletedEvents = 0;
+
             for (String googleEventId : googleEventIds) {
                 try {
                     // Delete each event from Google Calendar
                     service.events().delete("primary", googleEventId).execute();
+                    deletedEvents++;
                     Log.d("GoogleCalendarDelete", "Successfully deleted Google Calendar event: " + googleEventId);
+
+                    // Update the progress
+                    int progress = (int) ((double) deletedEvents / totalEvents * 100);
+                    int finalProgress = progress;
+                    runOnUiThread(() -> {
+                        progressBar.setProgress(finalProgress);
+                        progressText.setText("Deleting events: " + finalProgress + "%");
+                    });
+
                 } catch (Exception e) {
                     Log.e("GoogleCalendarDelete", "Failed to delete event with ID: " + googleEventId, e);
                 }
             }
-            // Notify the user of success
-            runOnUiThread(() ->
-                    Toast.makeText(this, "All events deleted from Google Calendar!", Toast.LENGTH_SHORT).show()
-            );
+
+            // Notify the user of success and dismiss the progress dialog
+            runOnUiThread(() -> {
+                progressDialog.dismiss();
+                Toast.makeText(this, "All events deleted from Google Calendar!", Toast.LENGTH_SHORT).show();
+            });
         }).start();
     }
 
 
+
     // AsyncTask to handle enabling/disabling notifications
     private class EnableNotificationsTask extends AsyncTask<Boolean, Void, Void> {
+
+        @Override
+        protected void onPreExecute() {
+            super.onPreExecute();
+
+            // Create a custom AlertDialog using the layout
+            AlertDialog.Builder builder = new AlertDialog.Builder(SettingsActivity.this);
+            builder.setView(R.layout.progress_dialog);  // Use the custom layout
+            builder.setCancelable(false);  // Prevent cancellation by user
+            progressDialog = builder.create();
+
+
+
+            // Show the dialog
+            progressDialog.show();
+        }
+
         @Override
         protected Void doInBackground(Boolean... params) {
             boolean enableNotifications = params[0];
@@ -351,7 +395,10 @@ public class SettingsActivity extends AppCompatActivity {
         @Override
         protected void onPostExecute(Void result) {
             super.onPostExecute(result);
-            // You can add additional UI updates after the task finishes, e.g., a success message or a loading spinner.
+            if (progressDialog != null && progressDialog.isShowing()) {
+                progressDialog.dismiss();
+                Toast.makeText(SettingsActivity.this, "Notifications updated!", Toast.LENGTH_SHORT).show();
+            }
         }
     }
 

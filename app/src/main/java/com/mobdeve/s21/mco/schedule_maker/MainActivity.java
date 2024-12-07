@@ -5,6 +5,7 @@ import android.content.SharedPreferences;
 import android.icu.text.SimpleDateFormat;
 import android.os.Bundle;
 import android.os.Handler;
+import android.view.View;
 import android.widget.TextView;
 
 import androidx.appcompat.app.AppCompatActivity;
@@ -58,6 +59,15 @@ public class MainActivity extends AppCompatActivity {
 
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        View rootLayout = findViewById(R.id.background);
+
+        if (isDarkMode) {
+            rootLayout.setBackgroundResource(R.drawable.wallpaper); // Background image for Dark Mode
+        } else {
+            rootLayout.setBackgroundResource(R.drawable.backgroundwhite); // Background image for Light Mode
+        }
+
 
         // Initialize TextViews for clock, date, and schedule
         digitalClock = findViewById(R.id.digitalClock);
