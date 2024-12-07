@@ -1,10 +1,6 @@
 package com.mobdeve.s21.mco.schedule_maker;
 
-import static android.app.PendingIntent.getActivity;
-import static java.security.AccessController.getContext;
-
 import android.app.AlertDialog;
-import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
@@ -28,7 +24,6 @@ import com.google.api.client.extensions.android.http.AndroidHttp;
 import com.google.api.client.googleapis.extensions.android.gms.auth.GoogleAccountCredential;
 import com.google.api.client.json.jackson2.JacksonFactory;
 import com.google.api.services.calendar.CalendarScopes;
-
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;

@@ -292,7 +292,7 @@ public class OneTimeEventFragment extends Fragment {
             new Thread(() -> {
                 try {
                     String eventId = UUID.randomUUID().toString();
-                    int eventColor = Color.parseColor("#6200EE");
+                    int eventColor = colorPickerInput.getBackgroundTintList().getDefaultColor();
                     Events newEvents = new Events(eventId, eventName, eventDescription, eventLocation,
                             eventStartDateTime, eventEndDateTime, false, eventColor, -1);
 
